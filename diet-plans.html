@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Indian Diet Plans | Mind Sanctuary</title>
+
+  <!-- Aesthetic Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* --- HOPEFUL MINIMAL CSS --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+    
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.45);
+      --glass-card: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --text-main: #334155; 
+      --text-muted: #64748b;
+      --accent-color: #d97706; /* Warm Spice / Marigold Color for India theme */
+      --success-color: #16a34a;
+      --warm-shadow: 0 20px 40px rgba(100, 116, 139, 0.08);
+      --radius: 24px;
+    }
+
+    /* Living Background */
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      background-size: 400% 400%;
+      animation: sunriseFlow 20s ease infinite;
+      color: var(--text-main);
+      padding: 20px;
+      display: flex; justify-content: center; align-items: flex-start;
+    }
+    @keyframes sunriseFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+    /* Main Container */
+    .wrap {
+      width: 100%; max-width: 1000px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 30px;
+      box-shadow: var(--warm-shadow);
+      margin-top: 20px;
+    }
+
+    /* Header */
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .backBtn {
+      text-decoration: none; color: var(--text-muted); font-weight: 600; 
+      display: flex; align-items: center; gap: 8px; transition: color 0.2s;
+    }
+    .backBtn:hover { color: var(--accent-color); }
+
+    .title {
+      font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700;
+      color: var(--text-main); text-align: center; margin-bottom: 20px;
+    }
+
+    /* Tabs */
+    .diet-tabs {
+      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 25px;
+    }
+    .diet-tab-btn {
+      padding: 10px 20px; border-radius: 50px; border: 1px solid var(--glass-border);
+      background: white; color: var(--text-muted); font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: 0.2s;
+    }
+    .diet-tab-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .diet-tab-btn.active {
+      background: var(--accent-color); color: white; border-color: var(--accent-color);
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+    }
+
+    /* Diet Content Card */
+    .diet-content {
+      background: white; border-radius: 20px; padding: 25px;
+      border: 1px solid #fed7aa; box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+      margin-bottom: 25px;
+    }
+    
+    .diet-section-title {
+      font-family: 'Playfair Display'; font-size: 20px; color: var(--accent-color);
+      margin-bottom: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px;
+    }
+    
+    .diet-meals { list-style: none; padding: 0; margin-bottom: 20px; }
+    .diet-meals li {
+      padding: 12px; border-bottom: 1px solid #fff7ed; color: var(--text-main); font-size: 15px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .diet-meals li:last-child { border-bottom: none; }
+    
+    /* Checkboxes */
+    .diet-meals input[type="checkbox"] {
+      accent-color: var(--success-color); width: 18px; height: 18px; margin-top: 2px; cursor: pointer;
+    }
+
+    /* Tips & Benefits */
+    .diet-benefits, .diet-tips {
+      padding: 15px; border-radius: 12px; font-size: 14px; line-height: 1.6;
+      margin-top: 15px;
+    }
+    .diet-benefits { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; }
+    .diet-tips { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+
+    /* Extras Grid */
+    .extras {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
+    }
+    
+    .panel {
+      background: rgba(255,255,255,0.6); border: 1px solid white; border-radius: 20px;
+      padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    }
+    .panel h3 {
+      font-family: 'Playfair Display'; font-size: 18px; color: var(--text-main);
+      margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;
+    }
+
+    /* Form Elements */
+    .smallInput, .smallSel {
+      width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #fed7aa;
+      background: white; outline: none; font-size: 14px; color: var(--text-main);
+      transition: 0.2s;
+    }
+    .smallInput:focus, .smallSel:focus { border-color: var(--accent-color); }
+
+    .btn {
+      padding: 8px 16px; border-radius: 8px; border: none; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: 0.2s; background: var(--accent-color); color: white;
+      text-align: center; display: inline-block;
+    }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-secondary { background: white; color: var(--text-muted); border: 1px solid #e2e8f0; }
+
+    /* Progress & Tracking */
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; color: var(--text-muted); }
+    .progress-bar { height: 8px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin-top: 5px; }
+    .progress-fill { height: 100%; background: var(--success-color); width: 0%; transition: width 0.5s ease; }
+
+    /* Water Tracker */
+    .water-grid { display: flex; gap: 5px; flex-wrap: wrap; margin: 10px 0; }
+    .water-cup {
+      width: 30px; height: 30px; border-radius: 50%; background: #e0f2fe; border: 1px solid #bae6fd;
+      cursor: pointer; transition: 0.2s;
+    }
+    .water-cup.filled { background: #3b82f6; border-color: #2563eb; }
+
+    /* Dialogs */
+    dialog {
+      border: none; border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+      width: 90%; max-width: 500px;
+    }
+    dialog::backdrop { background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); }
+  </style>
+</head>
+
+<body>
+
+<main class="wrap">
+  <div class="topbar">
+    <a class="backBtn" href="dashboard.html">← Back to Dashboard</a>
+    <button class="btn btn-secondary" onclick="generateShoppingList()">🛒 Desi Grocery List</button>
+  </div>
+
+  <div class="title">Indian Wellness Plans</div>
+
+  <!-- TABS -->
+  <div class="diet-tabs" id="dietTabs"></div>
+
+  <!-- MAIN CONTENT -->
+  <div class="diet-content" id="dietContent">
+    <div style="text-align:center; padding:20px; color:#64748b;">Select a plan above (e.g., Weight Loss, Muscle)</div>
+  </div>
+
+  <!-- EXTRAS GRID -->
+  <div class="extras">
+    
+    <!-- PROGRESS -->
+    <div class="panel">
+      <h3>Daily Tracker <span id="streakBadge" style="font-size:12px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:10px;">0 Day Streak</span></h3>
+      <div class="stat-row">
+        <span>Meals Checked:</span>
+        <span id="mealsCount">0 / 0</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="mealProgress"></div></div>
+      
+      <div style="margin-top:20px;">
+        <div class="stat-row"><span>Water Intake (8 cups):</span> <span id="waterCount">0/8</span></div>
+        <div class="water-grid" id="waterGrid"></div>
+      </div>
+    </div>
+
+    <!-- CALORIE (BMR) CALCULATOR (New Feature) -->
+    <div class="panel">
+      <h3>Calorie Needs (BMR)</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+        <input type="number" id="bmrW" class="smallInput" placeholder="Weight (kg)">
+        <input type="number" id="bmrH" class="smallInput" placeholder="Height (cm)">
+        <input type="number" id="bmrA" class="smallInput" placeholder="Age (yrs)">
+        <select id="bmrG" class="smallSel"><option value="m">Male</option><option value="f">Female</option></select>
+      </div>
+      <button class="btn" onclick="calcBMR()" style="width:100%">Calculate Needs</button>
+      <div id="bmrResult" style="margin-top:10px; font-size:13px; font-weight:600; text-align:center; color:var(--text-main);"></div>
+    </div>
+
+    <!-- WEIGHT LOG -->
+    <div class="panel">
+      <h3>Weight Log</h3>
+      <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <input type="number" id="weightInput" class="smallInput" placeholder="Kg" step="0.1">
+        <button class="btn" id="saveWeightBtn">Log</button>
+      </div>
+      <div id="weightHistory" style="max-height:80px; overflow-y:auto; font-size:13px; color:#64748b;"></div>
+    </div>
+
+    <!-- MACROS -->
+    <div class="panel">
+      <h3>Desi Macro Tracker</h3>
+      <select id="macroMealSel" class="smallSel" style="margin-bottom:10px;"></select>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:10px;">
+        <input type="number" id="macroP" class="smallInput" placeholder="Prot(g)">
+        <input type="number" id="macroC" class="smallInput" placeholder="Carb(g)">
+        <input type="number" id="macroF" class="smallInput" placeholder="Fat(g)">
+      </div>
+      <button class="btn" id="saveMacrosBtn" style="width:100%">Add</button>
+      <div id="dailyMacros" style="margin-top:10px; font-size:12px; color:#64748b; text-align:center;">
+        Today: 0g P / 0g C / 0g F
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- SHOPPING LIST DIALOG -->
+<dialog id="shoppingDialog">
+  <h3 style="font-family:'Playfair Display'; margin-bottom:15px;">🛒 Desi Grocery List</h3>
+  <p style="font-size:13px; color:#64748b; margin-bottom:15px;">Items needed for your plan:</p>
+  <textarea id="shoppingListText" style="width:100%; height:150px; padding:10px; border-radius:10px; border:1px solid #e2e8f0; font-family:'Outfit'; font-size:13px; margin-bottom:15px;"></textarea>
+  <div style="display:flex; justify-content:flex-end; gap:10px;">
+    <button class="btn btn-secondary" onclick="document.getElementById('shoppingDialog').close()">Close</button>
+    <button class="btn" onclick="copyShoppingList()">Copy</button>
+  </div>
+</dialog>
+
+<script>
+  // --- INDIANIZED DATA ---
+  const plans = {
+    weightloss: {
+      label: "Weight Loss",
+      meals: [
+        "Breakfast: Poha or Upma with veggies & lemon",
+        "Lunch: 2 Multigrain Roti + Dal Tadka + Cucumber Salad",
+        "Dinner: Grilled Paneer/Chicken + Clear Veg Soup",
+        "Snack: Roasted Makhana or Green Tea"
+      ],
+      benefits: "Low carb, high fiber, sustainable fat loss.",
+      tips: "Replace sugar with jaggery (sparingly). Drink warm jeera water."
+    },
+    muscle: {
+      label: "Muscle Gain",
+      meals: [
+        "Breakfast: 3 Boiled Eggs / Paneer Bhurji + Toast",
+        "Lunch: Rice + Rajma/Chicken Curry + Curd",
+        "Dinner: 3 Roti + Soya Chunks Sabzi + Salad",
+        "Snack: Banana Shake (with Sattu or Whey)"
+      ],
+      benefits: "High protein for recovery and growth.",
+      tips: "Add ghee to rotis. Eat dal/sprouts daily for protein."
+    },
+    balanced: {
+      label: "Balanced",
+      meals: [
+        "Breakfast: 2 Idli/Dosa with Sambar & Chutney",
+        "Lunch: Thali (Rice, Dal, Seasonal Sabzi, Curd)",
+        "Dinner: Khichdi with Ghee + Papad",
+        "Snack: Fruit Chat or Mixed Nuts"
+      ],
+      benefits: "Classic Indian nutrition, easy to digest.",
+      tips: "Practice portion control with rice."
+    },
+    keto: {
+      label: "Indian Keto",
+      meals: [
+        "Breakfast: Masala Omelette or Paneer Tikka (Grilled)",
+        "Lunch: Palak Paneer (No Potato) + Butter Chicken (No Gravy sugar)",
+        "Dinner: Cauli-Rice Pulao or Grilled Fish",
+        "Snack: Cheese cubes, Almonds, Salted Lassi"
+      ],
+      benefits: "Fat adaptation, stable blood sugar.",
+      tips: "Avoid Roti/Rice completely. Use Coconut oil/Ghee generously."
+    }
+  };
+
+  let activePlan = "balanced";
+  const DB_KEY = "mind_diet_data";
+
+  // --- INIT ---
+  document.addEventListener("DOMContentLoaded", () => {
+    renderTabs();
+    loadData();
+    initWater();
+    initMacros();
+    refreshUI();
+  });
+
+  function renderTabs() {
+    const container = document.getElementById("dietTabs");
+    container.innerHTML = Object.keys(plans).map(key => 
+      `<button class="diet-tab-btn ${key === activePlan ? 'active' : ''}" onclick="switchPlan('${key}')">${plans[key].label}</button>`
+    ).join("");
+  }
+
+  function switchPlan(key) {
+    activePlan = key;
+    renderTabs();
+    refreshUI();
+  }
+
+  function refreshUI() {
+    const p = plans[activePlan];
+    const content = document.getElementById("dietContent");
+    
+    // Checkbox State
+    const today = new Date().toISOString().split('T')[0];
+    const savedChecks = JSON.parse(localStorage.getItem(DB_KEY + "_checks") || "{}");
+    const todayChecks = savedChecks[today] || {};
+
+    let mealsHtml = p.meals.map((m, i) => `
+      <li>
+        <input type="checkbox" id="meal_${i}" ${todayChecks[i] ? 'checked' : ''} onchange="toggleMeal(${i})">
+        <label for="meal_${i}">${m}</label>
+      </li>
+    `).join("");
+
+    content.innerHTML = `
+      <div class="diet-section-title">🍛 ${p.label} Plan</div>
+      <ul class="diet-meals">${mealsHtml}</ul>
+      <div class="diet-benefits"><strong>Why?</strong> ${p.benefits}</div>
+      <div class="diet-tips"><strong>Desi Tip:</strong> ${p.tips}</div>
+    `;
+
+    updateProgress();
+  }
+
+  // --- SHOPPING LIST ---
+  function generateShoppingList() {
+    const p = plans[activePlan];
+    const text = `🛒 Desi Grocery List for ${p.label}:\n\n` + 
+                 p.meals.map(m => "- " + m.split(":")[1].trim()).join("\n");
+    
+    document.getElementById("shoppingListText").value = text;
+    document.getElementById("shoppingDialog").showModal();
+  }
+
+  function copyShoppingList() {
+    const txt = document.getElementById("shoppingListText");
+    txt.select();
+    navigator.clipboard.writeText(txt.value);
+    alert("Copied!");
+  }
+
+  // --- PROGRESS ---
+  function toggleMeal(idx) {
+    const today = new Date().toISOString().split('T')[0];
+    const savedChecks = JSON.parse(localStorage.getItem(DB_KEY + "_checks") || "{}");
+    
+    if(!savedChecks[today]) savedChecks[today] = {};
+    savedChecks[today][idx] = document.getElementById(`meal_${idx}`).checked;
+    
+    localStorage.setItem(DB_KEY + "_checks", JSON.stringify(savedChecks));
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const today = new Date().toISOString().split('T')[0];
+    const savedChecks = JSON.parse(localStorage.getItem(DB_KEY + "_checks") || "{}")[today] || {};
+    
+    const total = plans[activePlan].meals.length;
+    const checked = Object.values(savedChecks).filter(Boolean).length;
+    
+    document.getElementById("mealsCount").innerText = `${checked} / ${total}`;
+    document.getElementById("mealProgress").style.width = `${(checked/total)*100}%`;
+
+    if(checked === total) {
+      document.getElementById("streakBadge").innerText = "Target Hit! 🔥";
+      document.getElementById("streakBadge").style.background = "#dcfce7";
+      document.getElementById("streakBadge").style.color = "#166534";
+    }
+  }
+
+  // --- BMR CALCULATOR (New) ---
+  function calcBMR() {
+    const w = parseFloat(document.getElementById("bmrW").value);
+    const h = parseFloat(document.getElementById("bmrH").value);
+    const a = parseFloat(document.getElementById("bmrA").value);
+    const g = document.getElementById("bmrG").value;
+
+    if(w && h && a) {
+      // Mifflin-St Jeor Equation
+      let bmr = (10 * w) + (6.25 * h) - (5 * a);
+      bmr += (g === 'm' ? 5 : -161);
+      
+      document.getElementById("bmrResult").innerHTML = `
+        BMR: ${Math.round(bmr)} kcal/day<br>
+        <span style="font-weight:400; font-size:12px; color:#64748b;">(Body's resting energy needs)</span>
+      `;
+    } else {
+      document.getElementById("bmrResult").innerText = "Enter details properly.";
+    }
+  }
+
+  // --- WATER TRACKER ---
+  function initWater() {
+    const grid = document.getElementById("waterGrid");
+    grid.innerHTML = "";
+    const today = new Date().toISOString().split('T')[0];
+    const water = parseInt(localStorage.getItem(DB_KEY + "_water_" + today) || "0");
+
+    for(let i=0; i<8; i++) {
+      const cup = document.createElement("div");
+      cup.className = `water-cup ${i < water ? 'filled' : ''}`;
+      cup.onclick = () => setWater(i + 1);
+      grid.appendChild(cup);
+    }
+    document.getElementById("waterCount").innerText = `${water}/8`;
+  }
+
+  function setWater(n) {
+    const today = new Date().toISOString().split('T')[0];
+    let current = parseInt(localStorage.getItem(DB_KEY + "_water_" + today) || "0");
+    if(n === 1 && current === 1) n = 0;
+    localStorage.setItem(DB_KEY + "_water_" + today, n);
+    initWater();
+  }
+
+  // --- WEIGHT LOG ---
+  document.getElementById("saveWeightBtn").onclick = () => {
+    const w = document.getElementById("weightInput").value;
+    if(!w) return;
+    const history = JSON.parse(localStorage.getItem(DB_KEY + "_weight") || "[]");
+    history.unshift({ date: new Date().toLocaleDateString(), w: w });
+    localStorage.setItem(DB_KEY + "_weight", JSON.stringify(history));
+    renderWeight();
+  };
+
+  function renderWeight() {
+    const history = JSON.parse(localStorage.getItem(DB_KEY + "_weight") || "[]");
+    document.getElementById("weightHistory").innerHTML = history.map(h => 
+      `<div>${h.date}: <strong>${h.w}kg</strong></div>`
+    ).join("");
+  }
+
+  // --- MACROS ---
+  function initMacros() {
+    const sel = document.getElementById("macroMealSel");
+    sel.innerHTML = `<option value="breakfast">Breakfast</option><option value="lunch">Lunch</option><option value="dinner">Dinner</option>`;
+    
+    document.getElementById("saveMacrosBtn").onclick = () => {
+      const p = parseInt(document.getElementById("macroP").value) || 0;
+      const c = parseInt(document.getElementById("macroC").value) || 0;
+      const f = parseInt(document.getElementById("macroF").value) || 0;
+      
+      const today = new Date().toISOString().split('T')[0];
+      const current = JSON.parse(localStorage.getItem(DB_KEY + "_macros_" + today) || "{ \"p\":0, \"c\":0, \"f\":0 }");
+      
+      current.p += p; current.c += c; current.f += f;
+      localStorage.setItem(DB_KEY + "_macros_" + today, JSON.stringify(current));
+      renderMacros();
+      
+      document.getElementById("macroP").value = "";
+      document.getElementById("macroC").value = "";
+      document.getElementById("macroF").value = "";
+    };
+    renderMacros();
+  }
+
+  function renderMacros() {
+    const today = new Date().toISOString().split('T')[0];
+    const m = JSON.parse(localStorage.getItem(DB_KEY + "_macros_" + today) || "{ \"p\":0, \"c\":0, \"f\":0 }");
+    document.getElementById("dailyMacros").innerText = `Today: ${m.p}g P / ${m.c}g C / ${m.f}g F`;
+  }
+  
+  function loadData() {
+    renderWeight();
+  }
+</script>
+
+</body>
+</html>

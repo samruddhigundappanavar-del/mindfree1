@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reflectly - Simple Organized Journal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root{
+      --accent: #00c6ff;
+      --ok: #2ecc71;
+      --danger: #ff4d4d;
+
+      --fg: #222;
+      --muted: rgba(0,0,0,0.65);
+
+      --cardBg: rgba(255,255,255,0.72);
+      --cardBorder: rgba(0,0,0,0.10);
+      --controlBg: rgba(255,255,255,0.86);
+      --controlBorder: rgba(0,0,0,0.12);
+
+      --textareaBg: rgba(255,255,255,0.92);
+      --textareaBorder: rgba(0,0,0,0.12);
+      --placeholder: rgba(0,0,0,0.45);
+
+      --shadow: 0 18px 45px rgba(0,0,0,0.18);
+    }
+
+    body{
+      font-family: 'Roboto', system-ui, Segoe UI, Arial, sans-serif;
+      min-height: 100vh;
+      padding: 14px;
+      color: var(--fg);
+
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(255,182,193,0.75) 0%, transparent 42%),
+        radial-gradient(circle at 85% 25%, rgba(173,216,230,0.75) 0%, transparent 45%),
+        radial-gradient(circle at 55% 85%, rgba(255,228,181,0.70) 0%, transparent 50%),
+        linear-gradient(135deg, #ffecd2 0%, #fcb69f 35%, #c2e9fb 70%, #a1c4fd 100%);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+
+      transition: background 0.35s ease, color 0.35s ease;
+    }
+
+    body.theme-dark{
+      --fg: #fff;
+      --muted: rgba(255,255,255,0.78);
+
+      --cardBg: rgba(255,255,255,0.10);
+      --cardBorder: rgba(255,255,255,0.18);
+      --controlBg: rgba(0,0,0,0.22);
+      --controlBorder: rgba(255,255,255,0.22);
+
+      --textareaBg: rgba(0,0,0,0.28);
+      --textareaBorder: rgba(255,255,255,0.18);
+      --placeholder: rgba(255,255,255,0.55);
+
+      --shadow: 0 18px 45px rgba(0,0,0,0.45);
+
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(0,198,255,0.18) 0%, transparent 45%),
+        radial-gradient(circle at 85% 30%, rgba(124,77,255,0.18) 0%, transparent 50%),
+        linear-gradient(135deg, #050816, #0b1b3a);
+    }
+
+    /* Background options (BG3 removed) */
+    body.bg-pastel { /* default */ }
+
+    body.bg-1{
+      background-image:
+        linear-gradient(135deg, rgba(7,18,38,0.65), rgba(26,43,82,0.65)),
+        url("https://image2url.com/images/1765535429111-dbb6e02c-4e88-4428-9a33-2ed8342cbea7.jpg");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+
+      --fg: #fff;
+      --muted: rgba(255,255,255,0.78);
+      --cardBg: rgba(255,255,255,0.14);
+      --cardBorder: rgba(255,255,255,0.22);
+      --controlBg: rgba(0,0,0,0.22);
+      --controlBorder: rgba(255,255,255,0.22);
+      --textareaBg: rgba(0,0,0,0.22);
+      --textareaBorder: rgba(255,255,255,0.20);
+      --placeholder: rgba(255,255,255,0.55);
+      --shadow: 0 18px 45px rgba(0,0,0,0.35);
+    }
+    body.bg-2{
+      background-image:
+        linear-gradient(135deg, rgba(7,18,38,0.65), rgba(26,43,82,0.65)),
+        url("https://image2url.com/images/1765535471464-a868561c-9b00-4b8e-981d-21259bdcc019.jpg");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+
+      --fg: #fff;
+      --muted: rgba(255,255,255,0.78);
+      --cardBg: rgba(255,255,255,0.14);
+      --cardBorder: rgba(255,255,255,0.22);
+      --controlBg: rgba(0,0,0,0.22);
+      --controlBorder: rgba(255,255,255,0.22);
+      --textareaBg: rgba(0,0,0,0.22);
+      --textareaBorder: rgba(255,255,255,0.20);
+      --placeholder: rgba(255,255,255,0.55);
+      --shadow: 0 18px 45px rgba(0,0,0,0.35);
+    }
+    body.bg-4{
+      background-image:
+        linear-gradient(135deg, rgba(7,18,38,0.65), rgba(26,43,82,0.65)),
+        url("https://image2url.com/images/1765535519824-fd55527b-0e36-4097-8a6a-9d462f1dbeb3.jpg");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+
+      --fg: #fff;
+      --muted: rgba(255,255,255,0.78);
+      --cardBg: rgba(255,255,255,0.14);
+      --cardBorder: rgba(255,255,255,0.22);
+      --controlBg: rgba(0,0,0,0.22);
+      --controlBorder: rgba(255,255,255,0.22);
+      --textareaBg: rgba(0,0,0,0.22);
+      --textareaBorder: rgba(255,255,255,0.20);
+      --placeholder: rgba(255,255,255,0.55);
+      --shadow: 0 18px 45px rgba(0,0,0,0.35);
+    }
+
+    /* Zen mode */
+    body.zen .sidebar { display:none !important; }
+    body.zen .grid { grid-template-columns: 1fr !important; }
+    body.zen .advancedWrap { display:none !important; }
+    body.zen textarea { min-height: 78vh !important; }
+
+    .page{
+      width: min(1240px, 96vw);
+      min-height: calc(100vh - 28px);
+      margin: 0 auto;
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--cardBg);
+      border: 1px solid var(--cardBorder);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+    }
+
+    .brand h1{ font-size: 18px; font-weight: 900; letter-spacing: .2px; line-height: 1.1; }
+    .brand p{ margin-top: 4px; font-size: 12px; opacity: .85; font-weight: 800; color: var(--muted); }
+
+    .controls{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .select, .input{
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--controlBorder);
+      background: var(--controlBg);
+      color: var(--fg);
+      font-weight: 900;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .pill{
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--controlBorder);
+      background: var(--controlBg);
+      color: var(--fg);
+      font-size: 12px;
+      font-weight: 900;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn{
+      padding: 11px 14px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 900;
+      user-select: none;
+      transition: transform .12s ease, filter .12s ease;
+      color: #fff;
+      background: linear-gradient(135deg, #2f80ed, #00c6ff);
+    }
+    .btn:hover{ transform: translateY(-2px); filter: brightness(1.03); }
+    .btn:active{ transform: scale(0.98); }
+    .btn.secondary{
+      background: rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.12);
+      color: var(--fg);
+    }
+    body.theme-dark .btn.secondary{
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(255,255,255,0.18);
+      color: var(--fg);
+    }
+    body.bg-1 .btn.secondary, body.bg-2 .btn.secondary, body.bg-4 .btn.secondary{
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.22);
+      color: var(--fg);
+    }
+    .btn.ok{ background: linear-gradient(135deg, #1abc9c, #2ecc71); }
+    .btn.danger{ background: linear-gradient(135deg, #ff4d4d, #ff9800); }
+
+    .grid{
+      flex: 1;
+      display:grid;
+      grid-template-columns: 1.6fr 0.4fr;
+      gap: 12px;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border-radius: 18px;
+      padding: 14px;
+      background: var(--cardBg);
+      border: 1px solid var(--cardBorder);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      color: var(--fg);
+    }
+
+    .row{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .label{ font-size: 13px; font-weight: 900; }
+    .muted{ font-size: 12px; font-weight: 900; opacity: 0.85; color: var(--muted); }
+
+    .mini{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items:center;
+    }
+
+    .statBox{
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid var(--controlBorder);
+      background: var(--controlBg);
+      color: var(--fg);
+      font-weight: 900;
+      font-size: 12px;
+      user-select:none;
+    }
+
+    /* Basics block */
+    .basics{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 980px){
+      .basics{ grid-template-columns: 1fr; }
+    }
+    .basics .box{
+      border-radius: 16px;
+      border: 1px solid var(--cardBorder);
+      background: rgba(255,255,255,0.08);
+      padding: 12px;
+    }
+    body:not(.theme-dark):not(.bg-1):not(.bg-2):not(.bg-4) .basics .box{
+      background: rgba(255,255,255,0.55);
+      border-color: rgba(0,0,0,0.08);
+    }
+
+    textarea{
+      width: 100%;
+      min-height: 56vh;
+      resize: vertical;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--textareaBorder);
+      background: var(--textareaBg);
+      color: var(--fg);
+      font-weight: 800;
+      outline:none;
+      line-height: 1.6;
+      margin-top: 12px;
+    }
+    textarea::placeholder{ color: var(--placeholder); }
+
+    /* Markdown preview */
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 980px){
+      .split{ grid-template-columns: 1fr; }
+    }
+    .preview{
+      min-height: 56vh;
+      overflow:auto;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--textareaBorder);
+      background: var(--textareaBg);
+      color: var(--fg);
+      line-height: 1.6;
+      font-weight: 700;
+    }
+    .preview h1,.preview h2,.preview h3{ margin: 10px 0 6px; }
+    .preview p{ margin: 8px 0; }
+    .preview code{
+      background: rgba(0,0,0,0.08);
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-weight: 900;
+    }
+    body.theme-dark .preview code,
+    body.bg-1 .preview code, body.bg-2 .preview code, body.bg-4 .preview code{
+      background: rgba(255,255,255,0.10);
+    }
+    .preview pre{
+      background: rgba(0,0,0,0.08);
+      padding: 10px;
+      border-radius: 12px;
+      overflow:auto;
+    }
+
+    input[type="range"]{ width: 100%; accent-color: var(--accent); }
+    .faces{
+      display:flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 900;
+      opacity: 0.9;
+      color: var(--muted);
+    }
+
+    .moods{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .moodBtn{
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--controlBorder);
+      background: var(--controlBg);
+      color: var(--fg);
+      cursor: pointer;
+      font-size: 18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition: transform .12s ease, box-shadow .12s ease;
+      user-select:none;
+    }
+    .moodBtn:hover{ transform: translateY(-2px); box-shadow: 0 0 0 3px rgba(0,198,255,0.14); }
+    .moodBtn.active{ box-shadow: 0 0 0 3px rgba(0,198,255,0.32); border-color: rgba(0,198,255,0.6); }
+
+    /* Details */
+    details{
+      border-radius: 18px;
+      border: 1px solid var(--cardBorder);
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+    body:not(.theme-dark):not(.bg-1):not(.bg-2):not(.bg-4) details{
+      background: rgba(255,255,255,0.55);
+      border-color: rgba(0,0,0,0.08);
+    }
+    summary{
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 14px;
+      font-weight: 900;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      user-select:none;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    .sumRight{ font-size: 12px; color: var(--muted); font-weight: 900; }
+    .detailBody{ padding: 14px; border-top: 1px solid var(--cardBorder); }
+    body:not(.theme-dark):not(.bg-1):not(.bg-2):not(.bg-4) .detailBody{ border-top-color: rgba(0,0,0,0.08); }
+
+    /* Chips / tags */
+    .chips{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .chip{
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--controlBorder);
+      background: var(--controlBg);
+      color: var(--fg);
+      font-weight: 900;
+      font-size: 11px;
+      cursor: pointer;
+      user-select:none;
+      transition: transform .12s ease;
+      white-space: nowrap;
+    }
+    .chip:hover{ transform: translateY(-2px); }
+    .chip.active{ border-color: rgba(0,198,255,0.75); box-shadow: 0 0 0 3px rgba(0,198,255,0.16); }
+
+    .tagInputRow{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .tagInputRow .input{ min-width: 240px; flex: 1; }
+
+    /* Sidebar cards */
+    .sidebar{
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .list{
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+      max-height: 58vh;
+      overflow:auto;
+      padding-right: 6px;
+    }
+    .entry{
+      border-radius: 16px;
+      border: 1px solid var(--cardBorder);
+      background: rgba(255,255,255,0.08);
+      padding: 12px;
+    }
+    body:not(.theme-dark):not(.bg-1):not(.bg-2):not(.bg-4) .entry{
+      background: rgba(255,255,255,0.55);
+      border-color: rgba(0,0,0,0.08);
+    }
+    .entryTop{
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-weight: 900;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .entryText{
+      margin-top: 8px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 800;
+      color: var(--fg);
+    }
+    .entryTags{
+      margin-top: 8px;
+      display:flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tagPill{
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--controlBorder);
+      background: var(--controlBg);
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--fg);
+      user-select:none;
+    }
+    .entryActions{
+      margin-top: 10px;
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .smallBtn{
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--controlBorder);
+      background: var(--controlBg);
+      color: var(--fg);
+      font-weight: 900;
+      font-size: 11px;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .divider{
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--cardBorder);
+    }
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      max-width: 92vw;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.72);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 2000;
+      text-align: center;
+    }
+    .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  </style>
+</head>
+
+<body class="bg-pastel">
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">
+        <h1>Reflectly</h1>
+        <p id="dateLine">Today</p>
+      </div>
+
+      <div class="controls">
+        <button class="btn secondary" id="zenBtn" type="button" title="Distraction-free (Esc to exit)">Zen</button>
+        <button class="btn secondary" id="togglePreviewBtn" type="button">Preview</button>
+
+        <select id="themeSelect" class="select" aria-label="Theme">
+          <option value="pastel">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+
+        <select id="bgSelect" class="select" aria-label="Background">
+          <option value="bg-pastel">Pastel</option>
+          <option value="bg-1">BG 1</option>
+          <option value="bg-2">BG 2</option>
+          <option value="bg-4">BG 4</option>
+        </select>
+
+        <div class="pill" id="liveMood">Stress: 5/10 😐</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Simple writing flow -->
+      <div class="card">
+        <div class="row">
+          <div>
+            <div class="label">Write</div>
+            <div class="muted">Autosave draft is ON</div>
+          </div>
+          <div class="mini">
+            <div class="statBox" id="draftStatus">Draft: —</div>
+            <div class="statBox" id="wordCount">0 words</div>
+            <div class="statBox" id="readingTime">0 min read</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="mini">
+            <button class="btn ok" id="newEntryBtn" type="button">New</button>
+            <button class="btn" id="saveBtn" type="button">Save</button>
+            <button class="btn secondary" id="clearBtn" type="button">Clear</button>
+          </div>
+          <div class="mini">
+            <div class="statBox" id="streakBox">Streak: 0</div>
+          </div>
+        </div>
+
+        <!-- Basics always visible -->
+        <div class="basics">
+          <div class="box">
+            <div class="row" style="margin-bottom:8px;">
+              <div class="label">Date</div>
+              <div class="muted">For this entry</div>
+            </div>
+            <input id="entryDate" class="input" type="date" style="border-radius:14px; width:100%;" />
+          </div>
+
+          <div class="box">
+            <div class="row" style="margin-bottom:8px;">
+              <div class="label">Stress + Mood</div>
+              <div class="muted"><span id="stressValue">5</span>/10 • <span id="moodValue">😐</span></div>
+            </div>
+            <input id="stressRange" type="range" min="0" max="10" step="1" value="5" />
+            <div class="faces"><span>0 😌</span><span>5 😐</span><span>10 😰</span></div>
+            <div class="moods" id="moodRow"></div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <div class="label">Editor</div>
+          <div class="muted"><span id="charCount">0</span> chars</div>
+        </div>
+
+        <div class="split" id="splitWrap">
+          <div>
+            <textarea id="journalText" placeholder="Type here... let it out."></textarea>
+          </div>
+          <div>
+            <div class="preview" id="mdPreview">Preview will appear here.</div>
+          </div>
+        </div>
+
+        <!-- Everything extra goes here -->
+        <div class="advancedWrap" style="margin-top:12px;">
+          <details>
+            <summary>
+              Advanced (Prompts • Tags • Export)
+              <span class="sumRight">Optional</span>
+            </summary>
+            <div class="detailBody">
+              <div class="row">
+                <div class="label">Prompts & Templates</div>
+                <div class="mini">
+                  <button class="smallBtn" id="promptBtn" type="button">Daily prompt</button>
+                  <select id="templateSelect" class="select" aria-label="Template">
+                    <option value="">Template</option>
+                    <option value="gratitude">Gratitude</option>
+                    <option value="vent">Vent</option>
+                    <option value="meeting">Meeting</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="muted" id="promptMeta">—</div>
+              <div class="muted" id="promptText" style="font-size:13px;line-height:1.5;color:var(--fg);font-weight:900; margin-top:6px;">
+                Click “Daily prompt” to load one.
+              </div>
+              <div class="muted" style="margin-top:10px;">Prompt history</div>
+              <div class="chips" id="promptHistoryChips"></div>
+
+              <div class="divider">
+                <div class="row">
+                  <div class="label">Tags</div>
+                  <div class="muted"><span id="tagCount">0</span> active</div>
+                </div>
+                <div class="tagInputRow">
+                  <input id="tagInput" class="input" placeholder="e.g. school, anxiety, goals" />
+                  <button class="smallBtn" id="addTagBtn" type="button">Add</button>
+                </div>
+
+                <div class="muted" style="margin-top:10px;">Active</div>
+                <div class="chips" id="activeTagsChips"></div>
+
+                <div class="muted" style="margin-top:10px;">Suggestions</div>
+                <div class="chips" id="suggestTagsChips"></div>
+              </div>
+
+              <div class="divider">
+                <div class="row">
+                  <div class="label">Export / Import</div>
+                  <div class="muted">Backup</div>
+                </div>
+                <div class="mini">
+                  <button class="smallBtn" id="exportJsonBtn" type="button">Export JSON</button>
+                  <button class="smallBtn" id="exportTxtBtn" type="button">Export TXT</button>
+                  <label class="smallBtn" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+                    Import JSON
+                    <input id="importFile" type="file" accept="application/json" style="display:none;">
+                  </label>
+                </div>
+
+                <div class="divider">
+                  <div class="row">
+                    <div class="label">Danger zone</div>
+                    <div class="muted">Careful</div>
+                  </div>
+                  <button class="btn danger" id="deleteAllBtn" type="button">Delete all entries</button>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- RIGHT: Entries focused -->
+      <div class="sidebar">
+        <div class="card">
+          <div class="row">
+            <div class="label">Entries</div>
+            <div class="muted" id="entriesMeta">—</div>
+          </div>
+
+          <div class="row">
+            <input id="searchInput" class="input" placeholder="Search..." style="width:100%; border-radius:14px;" />
+          </div>
+
+          <details>
+            <summary>
+              Filters
+              <span class="sumRight" id="resultsCount">0 results</span>
+            </summary>
+            <div class="detailBody">
+              <div class="row">
+                <div class="muted">From</div>
+                <input id="fromDate" class="input" type="date" style="border-radius:14px;" />
+              </div>
+              <div class="row">
+                <div class="muted">To</div>
+                <input id="toDate" class="input" type="date" style="border-radius:14px;" />
+              </div>
+
+              <div class="divider">
+                <div class="row">
+                  <div class="label">Tag filter</div>
+                  <button class="smallBtn" id="clearTagFilterBtn" type="button">Clear</button>
+                </div>
+                <div class="chips" id="tagFilterChips"></div>
+              </div>
+
+              <div class="divider">
+                <button class="smallBtn" id="resetFiltersBtn" type="button">Reset filters</button>
+              </div>
+            </div>
+          </details>
+
+          <div class="list" id="entryList"></div>
+        </div>
+
+        <details class="card" style="padding:0;">
+          <summary style="padding:14px;">
+            Insights
+            <span class="sumRight" id="longestStreakBox">Longest: 0</span>
+          </summary>
+          <div class="detailBody">
+            <div class="mini">
+              <div class="statBox" id="streakNowBox">Current: 0</div>
+              <div class="statBox" id="totalEntriesBox">Total: 0</div>
+            </div>
+
+            <div class="divider">
+              <div class="row">
+                <div class="label">Mood history</div>
+                <div class="muted">Last 10</div>
+              </div>
+              <div class="chips" id="moodHistoryChips"></div>
+            </div>
+
+            <div class="divider">
+              <div class="row">
+                <div class="label">On this day</div>
+                <div class="muted">Past years</div>
+              </div>
+              <div class="muted" id="onThisDayText" style="line-height:1.5;">No matching entries yet.</div>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    /* ========= Keys ========= */
+    const K = {
+      ENTRIES: "reflectly_entries_v3",
+      DRAFT: "reflectly_draft_v3",
+      THEME: "reflectly_theme_v3",
+      BG: "reflectly_bg_v3",
+      PROMPT_HISTORY: "reflectly_prompt_history_v3",
+      ZEN: "reflectly_zen_v3"
+    };
+
+    /* ========= Helpers ========= */
+    let toastTimer = null;
+    function toast(msg){
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove("show"), 1200);
+    }
+
+    function safeJSONParse(str, fallback){
+      try { return JSON.parse(str); } catch { return fallback; }
+    }
+
+    function ymd(dateObj){
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth()+1).padStart(2,"0");
+      const d = String(dateObj.getDate()).padStart(2,"0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function prettyDate(ts){
+      const d = new Date(ts);
+      return d.toLocaleString(undefined, { year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" });
+    }
+
+    function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+
+    function debounce(fn, delay){
+      let t = null;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), delay);
+      };
+    }
+
+    /* ========= State ========= */
+    let entries = [];
+    let activeTags = [];
+    let tagFilter = new Set();
+    let selectedMood = "😐";
+    let showPreview = true;
+
+    const promptBank = [
+      "What is one thing you want to forgive yourself for today?",
+      "What drained your energy today, and what gave you energy?",
+      "If your anxiety had a message, what would it say?",
+      "Write 5 lines of gratitude (small things count).",
+      "What do you need most right now: rest, clarity, support, or action?",
+      "What would a kinder version of you say to you right now?",
+      "What’s one small step you can take in the next 10 minutes?",
+      "Describe your day using only emotions (no events).",
+      "What boundaries do you need this week?",
+      "What are you avoiding, and what’s the real fear behind it?"
+    ];
+
+    const tagSuggestions = ["School","Family","Friends","Health","Anxiety","Stress","Goals","Gratitude","Work","Sleep","Gym","Mood"];
+    const moodOptions = ["😌","🙂","😐","😟","😰","😄","🥺","😡","💙","🧠"];
+
+    /* ========= DOM ========= */
+    const dateLine = document.getElementById("dateLine");
+
+    const themeSelect = document.getElementById("themeSelect");
+    const bgSelect = document.getElementById("bgSelect");
+    const liveMood = document.getElementById("liveMood");
+    const zenBtn = document.getElementById("zenBtn");
+    const togglePreviewBtn = document.getElementById("togglePreviewBtn");
+
+    const newEntryBtn = document.getElementById("newEntryBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    const entryDate = document.getElementById("entryDate");
+    const stressRange = document.getElementById("stressRange");
+    const stressValue = document.getElementById("stressValue");
+    const moodValue = document.getElementById("moodValue");
+    const moodRow = document.getElementById("moodRow");
+
+    const journalText = document.getElementById("journalText");
+    const charCount = document.getElementById("charCount");
+    const wordCountEl = document.getElementById("wordCount");
+    const readingTimeEl = document.getElementById("readingTime");
+    const mdPreview = document.getElementById("mdPreview");
+    const splitWrap = document.getElementById("splitWrap");
+
+    const draftStatus = document.getElementById("draftStatus");
+    const streakBox = document.getElementById("streakBox");
+
+    // Advanced
+    const promptBtn = document.getElementById("promptBtn");
+    const promptText = document.getElementById("promptText");
+    const promptMeta = document.getElementById("promptMeta");
+    const promptHistoryChips = document.getElementById("promptHistoryChips");
+    const templateSelect = document.getElementById("templateSelect");
+
+    const tagInput = document.getElementById("tagInput");
+    const addTagBtn = document.getElementById("addTagBtn");
+    const activeTagsChips = document.getElementById("activeTagsChips");
+    const suggestTagsChips = document.getElementById("suggestTagsChips");
+    const tagCount = document.getElementById("tagCount");
+
+    const exportJsonBtn = document.getElementById("exportJsonBtn");
+    const exportTxtBtn = document.getElementById("exportTxtBtn");
+    const importFile = document.getElementById("importFile");
+    const deleteAllBtn = document.getElementById("deleteAllBtn");
+
+    // Sidebar
+    const searchInput = document.getElementById("searchInput");
+    const fromDate = document.getElementById("fromDate");
+    const toDate = document.getElementById("toDate");
+    const tagFilterChips = document.getElementById("tagFilterChips");
+    const clearTagFilterBtn = document.getElementById("clearTagFilterBtn");
+    const resetFiltersBtn = document.getElementById("resetFiltersBtn");
+    const entryList = document.getElementById("entryList");
+    const entriesMeta = document.getElementById("entriesMeta");
+    const resultsCount = document.getElementById("resultsCount");
+
+    // Insights
+    const longestStreakBox = document.getElementById("longestStreakBox");
+    const streakNowBox = document.getElementById("streakNowBox");
+    const totalEntriesBox = document.getElementById("totalEntriesBox");
+    const moodHistoryChips = document.getElementById("moodHistoryChips");
+    const onThisDayText = document.getElementById("onThisDayText");
+
+    /* ========= Theme + BG ========= */
+    function applyTheme(theme){
+      document.body.classList.toggle("theme-dark", theme === "dark");
+      localStorage.setItem(K.THEME, theme);
+    }
+    function applyBg(bg){
+      document.body.classList.remove("bg-pastel","bg-1","bg-2","bg-4");
+      document.body.classList.add(bg);
+      localStorage.setItem(K.BG, bg);
+    }
+
+    /* ========= Mood + Stress ========= */
+    function moodEmojiFromStress(v){
+      v = Number(v);
+      if (v <= 2) return "😌";
+      if (v <= 4) return "🙂";
+      if (v <= 6) return "😐";
+      if (v <= 8) return "😟";
+      return "😰";
+    }
+
+    function setStressUI(v){
+      stressValue.textContent = v;
+      moodValue.textContent = selectedMood;
+      liveMood.textContent = `Stress: ${v}/10 ${selectedMood}`;
+    }
+
+    function setSelectedMood(m){
+      selectedMood = m;
+      moodValue.textContent = m;
+      setStressUI(stressRange.value);
+      renderMoodButtons();
+      saveDraftSoon();
+    }
+
+    function renderMoodButtons(){
+      moodRow.innerHTML = "";
+      moodOptions.forEach(m => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "moodBtn" + (m === selectedMood ? " active" : "");
+        b.textContent = m;
+        b.addEventListener("click", () => setSelectedMood(m));
+        moodRow.appendChild(b);
+      });
+    }
+
+    /* ========= Tags ========= */
+    function normalizeTag(t){ return t.trim().replace(/\s+/g, " "); }
+
+    function addTag(t){
+      t = normalizeTag(t);
+      if (!t) return;
+      if (activeTags.map(x => x.toLowerCase()).includes(t.toLowerCase())) return;
+      activeTags.push(t);
+      renderActiveTags();
+      saveDraftSoon();
+    }
+
+    function removeTag(t){
+      activeTags = activeTags.filter(x => x !== t);
+      renderActiveTags();
+      saveDraftSoon();
+    }
+
+    function renderActiveTags(){
+      activeTagsChips.innerHTML = "";
+      tagCount.textContent = String(activeTags.length);
+
+      if (activeTags.length === 0){
+        const m = document.createElement("div");
+        m.className = "muted";
+        m.textContent = "No tags yet.";
+        activeTagsChips.appendChild(m);
+        return;
+      }
+
+      activeTags.forEach(t => {
+        const c = document.createElement("button");
+        c.type = "button";
+        c.className = "chip";
+        c.textContent = "✕ " + t;
+        c.addEventListener("click", () => removeTag(t));
+        activeTagsChips.appendChild(c);
+      });
+    }
+
+    function renderTagSuggestions(){
+      suggestTagsChips.innerHTML = "";
+      tagSuggestions.forEach(t => {
+        const c = document.createElement("button");
+        c.type = "button";
+        c.className = "chip";
+        c.textContent = "+ " + t;
+        c.addEventListener("click", () => addTag(t));
+        suggestTagsChips.appendChild(c);
+      });
+    }
+
+    /* ========= Markdown (safe mini) ========= */
+    function escapeHTML(s){
+      return s
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function renderMarkdown(md){
+      const src = escapeHTML(md);
+
+      let out = src.replace(/``````/g, (m, g1) => `<pre><code>${g1.replace(/\n/g,"<br>")}</code></pre>`);
+      out = out.replace(/^### (.*)$/gm, "<h3>$1</h3>");
+      out = out.replace(/^## (.*)$/gm, "<h2>$1</h2>");
+      out = out.replace(/^# (.*)$/gm, "<h1>$1</h1>");
+
+      out = out.replace(/^(?:- .*(?:\n|$))+?/gm, (block) => {
+        const items = block.trim().split("\n").map(line => line.replace(/^- /, "").trim());
+        return `<ul>${items.map(i => `<li>${i}</li>`).join("")}</ul>`;
+      });
+
+      out = out.replace(/`([^`]+)`/g, "<code>$1</code>");
+      out = out.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+      out = out.replace(/\*([^*]+)\*/g, "<i>$1</i>");
+
+      const lines = out.split("\n");
+      out = lines.map(line => {
+        const l = line.trim();
+        if (!l) return "";
+        if (l.startsWith("<h") || l.startsWith("<ul") || l.startsWith("<pre")) return l;
+        return `<p>${l}</p>`;
+      }).join("\n");
+
+      return out || "<p class='muted'>Preview will appear here.</p>";
+    }
+
+    /* ========= Draft autosave ========= */
+    const saveDraftSoon = debounce(() => saveDraft(), 600);
+
+    function draftPayload(){
+      return {
+        ts: Date.now(),
+        date: entryDate.value || ymd(new Date()),
+        text: journalText.value,
+        stress: Number(stressRange.value),
+        mood: selectedMood,
+        tags: activeTags
+      };
+    }
+
+    function saveDraft(){
+      try{
+        localStorage.setItem(K.DRAFT, JSON.stringify(draftPayload()));
+        const t = new Date();
+        draftStatus.textContent = `Draft: saved ${t.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})}`;
+      }catch{
+        draftStatus.textContent = "Draft: failed";
+      }
+    }
+
+    function loadDraft(){
+      const d = safeJSONParse(localStorage.getItem(K.DRAFT) || "null", null);
+      if (!d){
+        draftStatus.textContent = "Draft: —";
+        return;
+      }
+      entryDate.value = d.date || ymd(new Date());
+      journalText.value = d.text || "";
+      stressRange.value = String(clamp(Number(d.stress ?? 5), 0, 10));
+      selectedMood = d.mood || moodEmojiFromStress(stressRange.value);
+      activeTags = Array.isArray(d.tags) ? d.tags : [];
+
+      renderMoodButtons();
+      renderActiveTags();
+      setStressUI(stressRange.value);
+
+      if (d.ts){
+        const t = new Date(d.ts);
+        draftStatus.textContent = `Draft: restored (${t.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})})`;
+      }else{
+        draftStatus.textContent = "Draft: restored";
+      }
+    }
+
+    /* ========= Entries ========= */
+    function loadEntries(){
+      entries = safeJSONParse(localStorage.getItem(K.ENTRIES) || "[]", []);
+      if (!Array.isArray(entries)) entries = [];
+    }
+    function saveEntries(){
+      localStorage.setItem(K.ENTRIES, JSON.stringify(entries));
+    }
+
+    function computeTextStats(text){
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      const minutes = Math.max(0, Math.ceil(words / 200));
+      return { words, minutes };
+    }
+
+    function updateEditorStats(){
+      charCount.textContent = String(journalText.value.length);
+      const { words, minutes } = computeTextStats(journalText.value);
+      wordCountEl.textContent = `${words} words`;
+      readingTimeEl.textContent = `${minutes} min read`;
+      mdPreview.innerHTML = renderMarkdown(journalText.value);
+    }
+
+    function createEntry(){
+      const text = journalText.value.trim();
+      if (!text){
+        toast("Write something first");
+        return null;
+      }
+      const date = entryDate.value || ymd(new Date());
+      const ts = Date.now();
+      const { words } = computeTextStats(text);
+
+      return {
+        id: (crypto.randomUUID ? crypto.randomUUID() : String(ts) + Math.random()),
+        ts,
+        date,
+        text,
+        stress: Number(stressRange.value),
+        mood: selectedMood || moodEmojiFromStress(stressRange.value),
+        tags: [...activeTags],
+        words
+      };
+    }
+
+    function saveEntry(){
+      const e = createEntry();
+      if (!e) return;
+      entries.push(e);
+      saveEntries();
+      saveDraft();
+      toast("Saved entry");
+      renderAll();
+    }
+
+    function clearEditor(confirmIfNotEmpty = true){
+      if (confirmIfNotEmpty && journalText.value.trim()){
+        if (!confirm("Clear the editor?")) return;
+      }
+      journalText.value = "";
+      activeTags = [];
+      selectedMood = moodEmojiFromStress(stressRange.value);
+      renderActiveTags();
+      renderMoodButtons();
+      updateEditorStats();
+      saveDraft();
+      toast("Cleared");
+    }
+
+    function newEntry(){
+      clearEditor(true);
+      journalText.focus();
+    }
+
+    function deleteEntry(id){
+      entries = entries.filter(x => x.id !== id);
+      saveEntries();
+      renderAll();
+      toast("Deleted");
+    }
+
+    async function copyEntryText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        toast("Copied");
+      }catch{
+        toast("Copy failed");
+      }
+    }
+
+    function editEntry(id){
+      const e = entries.find(x => x.id === id);
+      if (!e) return;
+      entryDate.value = e.date;
+      stressRange.value = String(clamp(e.stress, 0, 10));
+      selectedMood = e.mood || moodEmojiFromStress(stressRange.value);
+      activeTags = Array.isArray(e.tags) ? [...e.tags] : [];
+      journalText.value = e.text;
+
+      setStressUI(stressRange.value);
+      renderMoodButtons();
+      renderActiveTags();
+      updateEditorStats();
+      saveDraft();
+      toast("Loaded into editor");
+      journalText.focus();
+    }
+
+    /* ========= Prompts + Templates ========= */
+    function loadPromptHistory(){
+      const h = safeJSONParse(localStorage.getItem(K.PROMPT_HISTORY) || "[]", []);
+      return Array.isArray(h) ? h : [];
+    }
+    function savePromptHistory(h){
+      localStorage.setItem(K.PROMPT_HISTORY, JSON.stringify(h.slice(-20)));
+    }
+
+    function renderPromptHistory(){
+      const history = loadPromptHistory().slice(-5).reverse();
+      promptHistoryChips.innerHTML = "";
+      if (history.length === 0){
+        const m = document.createElement("div");
+        m.className = "muted";
+        m.textContent = "No prompt history yet.";
+        promptHistoryChips.appendChild(m);
+        return;
+      }
+      history.forEach(h => {
+        const c = document.createElement("button");
+        c.type = "button";
+        c.className = "chip";
+        c.textContent = "↩ " + (h.text.length > 34 ? h.text.slice(0,34) + "…" : h.text);
+        c.addEventListener("click", () => {
+          journalText.value = (journalText.value.trim() ? journalText.value + "\n\n" : "") + `Prompt: ${h.text}\n\n`;
+          updateEditorStats();
+          saveDraftSoon();
+          toast("Inserted from history");
+          journalText.focus();
+        });
+        promptHistoryChips.appendChild(c);
+      });
+    }
+
+    function showPrompt(){
+      const idx = Math.floor(Math.random() * promptBank.length);
+      const text = promptBank[idx];
+
+      const history = loadPromptHistory();
+      history.push({ ts: Date.now(), text });
+      savePromptHistory(history);
+
+      promptText.textContent = text;
+      promptMeta.textContent = `Click prompt to insert • ${new Date().toLocaleDateString()}`;
+
+      promptText.style.cursor = "pointer";
+      promptText.onclick = () => {
+        const p = `\n\nPrompt: ${text}\n\n`;
+        journalText.value = (journalText.value.trim() ? journalText.value + p : `Prompt: ${text}\n\n`);
+        updateEditorStats();
+        saveDraftSoon();
+        toast("Inserted prompt");
+        journalText.focus();
+      };
+
+      renderPromptHistory();
+    }
+
+    function applyTemplate(name){
+      if (!name) return;
+
+      const templates = {
+        gratitude:
+`# Gratitude
+- 1:
+- 2:
+- 3:
+
+## Why this matters today
+`,
+        vent:
+`# Vent / Release
+## What happened?
+## What I felt
+## What I need
+## One small next step
+`,
+        meeting:
+`# Meeting Notes
+Date: ${new Date().toLocaleDateString()}
+
+## Agenda
+- 
+
+## Notes
+- 
+
+## Action items
+- [ ] 
+`
+      };
+
+      const t = templates[name];
+      if (!t) return;
+
+      if (journalText.value.trim() && !confirm("Replace current text with template?")) {
+        templateSelect.value = "";
+        return;
+      }
+
+      journalText.value = t;
+      updateEditorStats();
+      saveDraftSoon();
+      toast("Template applied");
+      journalText.focus();
+      templateSelect.value = "";
+    }
+
+    /* ========= Search / Filter / Insights ========= */
+    function allTagsFromEntries(){
+      const s = new Set();
+      entries.forEach(e => (e.tags || []).forEach(t => s.add(t)));
+      return Array.from(s).sort((a,b) => a.localeCompare(b));
+    }
+
+    function matchesFilters(e){
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const from = fromDate.value || "";
+      const to = toDate.value || "";
+
+      if (from && e.date < from) return false;
+      if (to && e.date > to) return false;
+
+      if (q){
+        const hay = (e.text || "").toLowerCase();
+        const tagHay = (e.tags || []).join(" ").toLowerCase();
+        if (!hay.includes(q) && !tagHay.includes(q)) return false;
+      }
+
+      if (tagFilter.size > 0){
+        const set = new Set((e.tags || []).map(x => x.toLowerCase()));
+        for (const t of tagFilter){
+          if (!set.has(t.toLowerCase())) return false;
+        }
+      }
+
+      return true;
+    }
+
+    function filteredEntries(){
+      return entries
+        .slice()
+        .sort((a,b) => b.ts - a.ts)
+        .filter(matchesFilters);
+    }
+
+    function renderTagFilterChips(){
+      const tags = allTagsFromEntries();
+      tagFilterChips.innerHTML = "";
+      if (tags.length === 0){
+        const m = document.createElement("div");
+        m.className = "muted";
+        m.textContent = "No tags in entries yet.";
+        tagFilterChips.appendChild(m);
+        return;
+      }
+
+      tags.forEach(t => {
+        const c = document.createElement("button");
+        c.type = "button";
+        c.className = "chip" + (tagFilter.has(t) ? " active" : "");
+        c.textContent = t;
+        c.addEventListener("click", () => {
+          if (tagFilter.has(t)) tagFilter.delete(t);
+          else tagFilter.add(t);
+          renderTagFilterChips();
+          renderEntriesList();
+        });
+        tagFilterChips.appendChild(c);
+      });
+    }
+
+    function computeStreaks(){
+      const days = new Set(entries.map(e => e.date));
+      const arr = Array.from(days).sort();
+      if (arr.length === 0) return { current: 0, longest: 0 };
+
+      let longest = 1, run = 1;
+      for (let i = 1; i < arr.length; i++){
+        const prev = new Date(arr[i-1]);
+        const cur = new Date(arr[i]);
+        const diffDays = Math.round((cur - prev) / (1000*60*60*24));
+        if (diffDays === 1) run++;
+        else run = 1;
+        longest = Math.max(longest, run);
+      }
+
+      const today = ymd(new Date());
+      let current = 0;
+      let d = new Date(today);
+      while (true){
+        const k = ymd(d);
+        if (days.has(k)){
+          current++;
+          d.setDate(d.getDate() - 1);
+        } else break;
+      }
+
+      return { current, longest };
+    }
+
+    function renderMoodHistory(){
+      const list = entries.slice().sort((a,b) => b.ts - a.ts).slice(0, 10);
+      moodHistoryChips.innerHTML = "";
+      if (list.length === 0){
+        const m = document.createElement("div");
+        m.className = "muted";
+        m.textContent = "No entries yet.";
+        moodHistoryChips.appendChild(m);
+        return;
+      }
+      list.forEach(e => {
+        const c = document.createElement("div");
+        c.className = "statBox";
+        c.textContent = `${e.mood || "😐"} ${e.stress}/10`;
+        moodHistoryChips.appendChild(c);
+      });
+    }
+
+    function renderOnThisDay(){
+      const now = new Date();
+      const md = `${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+      const matches = entries
+        .filter(e => (e.date || "").slice(5) === md && (e.date || "").slice(0,4) !== String(now.getFullYear()))
+        .sort((a,b) => b.ts - a.ts)
+        .slice(0, 3);
+
+      if (matches.length === 0){
+        onThisDayText.textContent = "No matching entries yet.";
+        return;
+      }
+
+      onThisDayText.textContent = matches.map(e => {
+        const year = e.date.slice(0,4);
+        const snippet = e.text.length > 120 ? e.text.slice(0,120) + "…" : e.text;
+        return `${year}: ${snippet}`;
+      }).join("\n\n");
+    }
+
+    function renderEntriesList(){
+      const list = filteredEntries();
+      entryList.innerHTML = "";
+
+      entriesMeta.textContent = `${entries.length} total`;
+      resultsCount.textContent = `${list.length} results`;
+
+      if (list.length === 0){
+        const empty = document.createElement("div");
+        empty.className = "entry";
+        empty.textContent = "No entries match the current filters.";
+        entryList.appendChild(empty);
+        return;
+      }
+
+      list.forEach(e => {
+        const wrap = document.createElement("div");
+        wrap.className = "entry";
+
+        const top = document.createElement("div");
+        top.className = "entryTop";
+        top.textContent = `${e.date} • ${e.mood || "😐"} • Stress ${e.stress}/10 • ${prettyDate(e.ts)}`;
+
+        const txt = document.createElement("div");
+        txt.className = "entryText";
+        txt.textContent = e.text;
+
+        const tags = document.createElement("div");
+        tags.className = "entryTags";
+        (e.tags || []).forEach(t => {
+          const p = document.createElement("div");
+          p.className = "tagPill";
+          p.textContent = t;
+          tags.appendChild(p);
+        });
+
+        const actions = document.createElement("div");
+        actions.className = "entryActions";
+
+        const copy = document.createElement("button");
+        copy.type = "button";
+        copy.className = "smallBtn";
+        copy.textContent = "Copy";
+        copy.addEventListener("click", () => copyEntryText(e.text));
+
+        const load = document.createElement("button");
+        load.type = "button";
+        load.className = "smallBtn";
+        load.textContent = "Load";
+        load.addEventListener("click", () => editEntry(e.id));
+
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "smallBtn";
+        del.textContent = "Delete";
+        del.addEventListener("click", () => {
+          if (!confirm("Delete this entry?")) return;
+          deleteEntry(e.id);
+        });
+
+        actions.appendChild(copy);
+        actions.appendChild(load);
+        actions.appendChild(del);
+
+        wrap.appendChild(top);
+        wrap.appendChild(txt);
+        if ((e.tags || []).length) wrap.appendChild(tags);
+        wrap.appendChild(actions);
+
+        entryList.appendChild(wrap);
+      });
+    }
+
+    function renderAll(){
+      renderTagFilterChips();
+      renderEntriesList();
+
+      const s = computeStreaks();
+      streakBox.textContent = `Streak: ${s.current}`;
+      streakNowBox.textContent = `Current: ${s.current}`;
+      longestStreakBox.textContent = `Longest: ${s.longest}`;
+      totalEntriesBox.textContent = `Total: ${entries.length}`;
+
+      renderMoodHistory();
+      renderOnThisDay();
+    }
+
+    /* ========= Export / Import ========= */
+    function downloadFile(filename, content, mime){
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    }
+
+    function exportJSON(){
+      const payload = {
+        app: "Reflectly (simple organized v3)",
+        exportedAt: new Date().toISOString(),
+        entries
+      };
+      downloadFile(`reflectly-export-${ymd(new Date())}.json`, JSON.stringify(payload, null, 2), "application/json");
+      toast("Exported JSON");
+    }
+
+    function exportTXT(){
+      const sorted = entries.slice().sort((a,b) => a.ts - b.ts);
+      const lines = sorted.map(e => {
+        const head = `[${e.date}] ${e.mood || "😐"} Stress:${e.stress}/10 Tags:${(e.tags||[]).join(", ")}`;
+        return `${head}\n${e.text}\n---\n`;
+      }).join("\n");
+      downloadFile(`reflectly-export-${ymd(new Date())}.txt`, lines, "text/plain");
+      toast("Exported TXT");
+    }
+
+    async function importJSONFile(file){
+      const text = await file.text();
+      const data = safeJSONParse(text, null);
+      if (!data || !Array.isArray(data.entries)){
+        toast("Invalid JSON format");
+        return;
+      }
+
+      const existing = new Map(entries.map(e => [e.id, e]));
+      data.entries.forEach(e => {
+        if (!e || !e.id) return;
+        existing.set(e.id, e);
+      });
+      entries = Array.from(existing.values());
+      saveEntries();
+      renderAll();
+      toast("Imported");
+    }
+
+    /* ========= Preview toggle ========= */
+    function setPreviewVisible(v){
+      showPreview = v;
+      if (!showPreview){
+        splitWrap.style.gridTemplateColumns = "1fr";
+        splitWrap.children[1].style.display = "none";
+        togglePreviewBtn.textContent = "Preview";
+      }else{
+        splitWrap.style.gridTemplateColumns = "";
+        splitWrap.children[1].style.display = "";
+        togglePreviewBtn.textContent = "Preview";
+      }
+    }
+
+    /* ========= Zen mode ========= */
+    function toggleZen(force){
+      const on = (typeof force === "boolean") ? force : !document.body.classList.contains("zen");
+      document.body.classList.toggle("zen", on);
+      zenBtn.textContent = on ? "Exit Zen" : "Zen";
+      localStorage.setItem(K.ZEN, on ? "1" : "0");
+      toast(on ? "Zen mode on" : "Zen mode off");
+    }
+
+    /* ========= Events ========= */
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && document.body.classList.contains("zen")) toggleZen(false);
+    });
+
+    zenBtn.addEventListener("click", () => toggleZen());
+
+    togglePreviewBtn.addEventListener("click", () => {
+      setPreviewVisible(!showPreview);
+      toast(showPreview ? "Preview on" : "Preview off");
+    });
+
+    themeSelect.addEventListener("change", () => {
+      applyTheme(themeSelect.value);
+      toast("Theme changed");
+    });
+
+    bgSelect.addEventListener("change", () => {
+      applyBg(bgSelect.value);
+      toast("Background changed");
+    });
+
+    stressRange.addEventListener("input", () => {
+      setStressUI(stressRange.value);
+      saveDraftSoon();
+    });
+
+    promptBtn.addEventListener("click", showPrompt);
+    templateSelect.addEventListener("change", () => applyTemplate(templateSelect.value));
+
+    journalText.addEventListener("input", () => {
+      updateEditorStats();
+      saveDraftSoon();
+    });
+
+    entryDate.addEventListener("change", saveDraftSoon);
+
+    tagInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter"){
+        e.preventDefault();
+        const raw = tagInput.value;
+        tagInput.value = "";
+        raw.split(",").forEach(t => addTag(t));
+      }
+      if (e.key === ","){
+        e.preventDefault();
+        const raw = tagInput.value.replace(",", "");
+        tagInput.value = "";
+        addTag(raw);
+      }
+    });
+
+    addTagBtn.addEventListener("click", () => {
+      const raw = tagInput.value;
+      tagInput.value = "";
+      raw.split(",").forEach(t => addTag(t));
+    });
+
+    newEntryBtn.addEventListener("click", newEntry);
+    saveBtn.addEventListener("click", saveEntry);
+    clearBtn.addEventListener("click", () => clearEditor(true));
+
+    exportJsonBtn.addEventListener("click", exportJSON);
+    exportTxtBtn.addEventListener("click", exportTXT);
+
+    importFile.addEventListener("change", async (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      await importJSONFile(f);
+      importFile.value = "";
+    });
+
+    deleteAllBtn.addEventListener("click", () => {
+      if (!confirm("Delete ALL entries?")) return;
+      entries = [];
+      saveEntries();
+      renderAll();
+      toast("Deleted all");
+    });
+
+    const applyFiltersDebounced = debounce(() => renderEntriesList(), 200);
+    searchInput.addEventListener("input", applyFiltersDebounced);
+    fromDate.addEventListener("change", () => renderEntriesList());
+    toDate.addEventListener("change", () => renderEntriesList());
+
+    clearTagFilterBtn.addEventListener("click", () => {
+      tagFilter.clear();
+      renderTagFilterChips();
+      renderEntriesList();
+      toast("Tag filter cleared");
+    });
+
+    resetFiltersBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      fromDate.value = "";
+      toDate.value = "";
+      tagFilter.clear();
+      renderTagFilterChips();
+      renderEntriesList();
+      toast("Filters reset");
+    });
+
+    /* ========= Init ========= */
+    (function init(){
+      dateLine.textContent = new Date().toLocaleString(undefined, { weekday:"short", year:"numeric", month:"short", day:"numeric" });
+
+      const savedTheme = localStorage.getItem(K.THEME) || "pastel";
+      themeSelect.value = savedTheme;
+      applyTheme(savedTheme);
+
+      const savedBg = localStorage.getItem(K.BG) || "bg-pastel";
+      bgSelect.value = savedBg;
+      applyBg(savedBg);
+
+      const zenSaved = localStorage.getItem(K.ZEN) === "1";
+      if (zenSaved) toggleZen(true);
+
+      entryDate.value = ymd(new Date());
+
+      loadEntries();
+
+      selectedMood = "😐";
+      renderMoodButtons();
+      renderTagSuggestions();
+      renderActiveTags();
+
+      setStressUI(stressRange.value);
+
+      loadDraft();
+      updateEditorStats();
+      renderPromptHistory();
+      renderAll();
+
+      setPreviewVisible(true);
+
+      setInterval(() => {
+        if (journalText.value.length > 0) saveDraftSoon();
+      }, 1500);
+
+      toast("Ready");
+    })();
+
+    /* ========= Storage funcs (after init uses them) ========= */
+    function loadEntries(){
+      entries = safeJSONParse(localStorage.getItem(K.ENTRIES) || "[]", []);
+      if (!Array.isArray(entries)) entries = [];
+    }
+    function saveEntries(){
+      localStorage.setItem(K.ENTRIES, JSON.stringify(entries));
+    }
+  </script>
+</body>
+</html>

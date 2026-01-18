@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Minimal Affirmations</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Library for Insta-Cards -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --text-main: #2c3e50;
+      --text-muted: #95a5a6;
+      --accent: #2c3e50; /* Deep Slate */
+      --glass-bg: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --radius: 32px;
+      --font-main: 'Outfit', sans-serif;
+    }
+
+    body {
+      margin: 0; padding: 0;
+      font-family: var(--font-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+      overflow: hidden;
+      
+      /* Alive Background */
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Overlay to soften the colors */
+    body::before {
+        content: ""; position: absolute; inset: 0;
+        background: rgba(255,255,255,0.3);
+        backdrop-filter: blur(60px); /* Massive blur for soft dreamy look */
+        z-index: -1;
+    }
+
+    .wrap {
+      width: 90%; max-width: 480px;
+      display: flex; flex-direction: column; gap: 20px;
+      position: relative; z-index: 10;
+    }
+
+    /* Header */
+    header { 
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 0 10px;
+    }
+    .header-text h1 { 
+        font-size: 20px; font-weight: 600; margin: 0; 
+        color: rgba(0,0,0,0.7); letter-spacing: -0.5px;
+    }
+    .date { font-size: 12px; font-weight: 500; color: rgba(0,0,0,0.4); text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Audio Toggle (Minimal Circle) */
+    .audio-toggle {
+        width: 44px; height: 44px; border-radius: 50%;
+        background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.6);
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: rgba(0,0,0,0.6);
+    }
+    .audio-toggle:hover { transform: scale(1.1); background: #fff; }
+    .audio-toggle.active { background: #fff; color: #e73c7e; box-shadow: 0 8px 20px rgba(231, 60, 126, 0.25); }
+
+    /* Main Glass Card */
+    .card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 50px 30px;
+      text-align: center;
+      box-shadow: 0 20px 50px -10px rgba(0,0,0,0.1);
+      position: relative;
+      transition: transform 0.4s ease;
+    }
+    .card:hover { transform: translateY(-5px); }
+
+    /* Typography */
+    .quote-area { min-height: 140px; display: flex; flex-direction: column; justify-content: center; margin-bottom: 40px; }
+    
+    .quote-text { 
+      font-size: 26px; font-weight: 400; line-height: 1.4; color: #2d3436; 
+      transition: opacity 0.3s ease;
+    }
+    
+    .tag { 
+      display: inline-block; margin-top: 15px;
+      font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+      color: rgba(0,0,0,0.4); padding: 5px 12px;
+      border: 1px solid rgba(0,0,0,0.05); border-radius: 20px;
+    }
+
+    /* Minimal Buttons */
+    .actions { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; }
+    
+    button.btn {
+      border: none; outline: none;
+      padding: 14px 24px; border-radius: 16px;
+      font-family: var(--font-main); font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    button.primary {
+      background: #2d3436; color: #fff;
+      box-shadow: 0 10px 20px -5px rgba(45, 52, 54, 0.3);
+    }
+    button.secondary {
+      background: rgba(255,255,255,0.6); color: #2d3436;
+    }
+    
+    button.btn:hover { transform: translateY(-2px); }
+    button.btn:active { transform: scale(0.95); }
+
+    /* Small Link Buttons */
+    .link-btns { display: flex; justify-content: center; gap: 20px; }
+    .link-btn {
+        background: none; border: none; font-size: 12px; font-weight: 500;
+        color: rgba(0,0,0,0.4); cursor: pointer; transition: color 0.2s;
+    }
+    .link-btn:hover { color: #2d3436; }
+
+    /* Vent Input */
+    .vent-box { display: none; text-align: left; animation: fadeIn 0.4s ease; }
+    .vent-box.active { display: block; }
+    
+    textarea {
+        width: 100%; height: 120px;
+        background: rgba(255,255,255,0.5); border: 2px solid transparent;
+        border-radius: 18px; padding: 15px;
+        font-family: var(--font-main); font-size: 16px; color: #2d3436;
+        outline: none; resize: none; margin: 15px 0 20px 0;
+        transition: all 0.3s; box-sizing: border-box;
+    }
+    textarea:focus { background: #fff; border-color: rgba(0,0,0,0.1); }
+
+    /* Watermark */
+    .watermark { position: absolute; bottom: 20px; right: 20px; opacity: 0; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: rgba(0,0,0,0.3); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 20px);
+      background: rgba(0,0,0,0.8); color: white; padding: 12px 24px;
+      border-radius: 50px; font-size: 13px; font-weight: 500; opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <header>
+      <div class="header-text">
+          <h1>Mind Sanctuary</h1>
+          <div class="date" id="dateDisplay">Today</div>
+      </div>
+      <div class="audio-toggle" id="soundBtn" title="Play Ambient Noise">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+      </div>
+    </header>
+
+    <main class="card" id="captureArea">
+      
+      <!-- Affirmation View -->
+      <div id="affirmationView">
+        <div class="quote-area">
+          <div class="quote-text" id="affirmText">Loading...</div>
+          <div id="tags"></div>
+        </div>
+        
+        <div class="watermark">Mind Sanctuary</div>
+
+        <div class="actions" data-html2canvas-ignore="true">
+          <button class="btn primary" id="nextBtn">New Affirmation</button>
+          <button class="btn secondary" id="ventModeBtn">✨ AI Heal</button>
+        </div>
+
+        <div class="link-btns" data-html2canvas-ignore="true">
+            <button class="link-btn" onclick="shareCard()">Share Card</button>
+            <button class="link-btn" onclick="saveCurrent()" id="saveBtn">Save to List</button>
+        </div>
+      </div>
+
+      <!-- Vent View -->
+      <div id="ventView" class="vent-box">
+          <h2 style="font-size:20px; font-weight:600; margin:0 0 5px 0;">What's on your mind?</h2>
+          <p style="font-size:13px; color:rgba(0,0,0,0.5); margin:0;">Our AI companion is here to listen.</p>
+          
+          <textarea id="ventInput" placeholder="I am feeling..."></textarea>
+          
+          <div class="actions" style="justify-content: flex-start;">
+              <button class="btn primary" id="generateBtn">Heal Me</button>
+              <button class="btn secondary" onclick="toggleView('affirmation')">Back</button>
+          </div>
+      </div>
+
+      <div style="margin-top:20px; border-top:1px solid rgba(0,0,0,0.05); padding-top:15px;" data-html2canvas-ignore="true">
+          <button class="link-btn" onclick="window.location.href='dashboard.html'">&larr; Back to Dashboard</button>
+      </div>
+
+    </main>
+  </div>
+
+  <div id="toast" class="toast">Saved to Collection</div>
+
+  <script>
+    // --- DATA ---
+    const BASE_AFFIRMATIONS = [
+      { id:"a1", mood:"Calm", text:"Peace begins when I pause." },
+      { id:"a2", mood:"Calm", text:"I am exactly where I need to be." },
+      { id:"a3", mood:"Strength", text:"I can handle this, one breath at a time." },
+      { id:"a4", mood:"Safety", text:"I am safe. I am loved. I am held." },
+      { id:"a5", mood:"Trust", text:"I trust the timing of my life." },
+    ];
+
+    let current = null;
+    let audioCtx = null;
+    let isPlaying = false;
+
+    // --- UI LOGIC ---
+    function renderDate() {
+      const options = { weekday: 'short', month: 'short', day: 'numeric' };
+      document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', options);
+    }
+
+    function renderCurrent() {
+      const textEl = document.getElementById('affirmText');
+      const tagEl = document.getElementById('tags');
+      
+      textEl.style.opacity = 0;
+      tagEl.style.opacity = 0;
+      
+      setTimeout(() => {
+        textEl.textContent = current.text;
+        tagEl.innerHTML = `<span class="tag">${current.mood}</span>`;
+        textEl.style.opacity = 1;
+        tagEl.style.opacity = 1;
+      }, 200);
+      
+      document.getElementById('saveBtn').textContent = "Save to List";
+    }
+
+    function nextAffirmation() {
+      const list = BASE_AFFIRMATIONS; 
+      let next;
+      do { next = list[Math.floor(Math.random() * list.length)]; } 
+      while (list.length > 1 && current && next.id === current.id);
+      current = next;
+      renderCurrent();
+    }
+
+    function toggleView(view) {
+        document.getElementById('affirmationView').style.display = view === 'vent' ? 'none' : 'block';
+        const ventBox = document.getElementById('ventView');
+        if (view === 'vent') ventBox.classList.add('active');
+        else ventBox.classList.remove('active');
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // --- AUDIO (Brown Noise) ---
+    function toggleAudio() {
+        const btn = document.getElementById('soundBtn');
+        if (isPlaying) { audioCtx.suspend(); isPlaying = false; btn.classList.remove('active'); return; }
+        
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const bufferSize = 4096;
+            const node = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+            node.onaudioprocess = e => {
+                const out = e.outputBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    out[i] = (Math.random() * 2 - 1) * 0.08; // Simply white noise at low volume for simplicity
+                }
+            };
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass'; filter.frequency.value = 400; // Filter to make it "Brown/Pink"ish
+            node.connect(filter); filter.connect(audioCtx.destination);
+        }
+        audioCtx.resume(); isPlaying = true; btn.classList.add('active');
+    }
+
+    // --- AI (Pollinations) ---
+    async function generateAIResponse() {
+        const input = document.getElementById('ventInput').value;
+        const btn = document.getElementById('generateBtn');
+        if (!input.trim()) return showToast("Please share your thoughts first...");
+
+        btn.textContent = "Connecting..."; btn.disabled = true;
+        
+        const prompt = `Write a short, soothing affirmation (max 12 words) for someone feeling: ${input}`;
+        try {
+            const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);
+            const text = await res.text();
+            current = { id: "ai_"+Date.now(), mood: "AI Companion", text: text.replace(/"/g,'') };
+            renderCurrent();
+            toggleView('affirmation');
+            showToast("Your custom affirmation is ready.");
+        } catch (e) { showToast("AI is busy. Please try again."); }
+        finally { btn.textContent = "Heal Me"; btn.disabled = false; }
+    }
+
+    // --- SHARE ---
+    function shareCard() {
+        document.querySelector('.watermark').style.opacity = 1;
+        html2canvas(document.getElementById('captureArea'), { backgroundColor: null, scale:2, useCORS:true })
+        .then(canvas => {
+            const a = document.createElement('a');
+            a.download = 'mind-sanctuary.png'; a.href = canvas.toDataURL(); a.click();
+            document.querySelector('.watermark').style.opacity = 0;
+            showToast("Card downloaded!");
+        });
+    }
+
+    // --- INIT ---
+    document.getElementById('nextBtn').addEventListener('click', nextAffirmation);
+    document.getElementById('soundBtn').addEventListener('click', toggleAudio);
+    document.getElementById('ventModeBtn').addEventListener('click', () => toggleView('vent'));
+    document.getElementById('generateBtn').addEventListener('click', generateAIResponse);
+    renderDate(); nextAffirmation();
+  </script>
+</body>
+</html>

@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mind Sanctuary | Vibrant</title>
+
+  <!-- Google Font: Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet"><!-- [web:39][web:36] -->
+
+  <!-- Font Awesome 6 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"><!-- [web:31][web:34] -->
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    :root {
+      --bg-color: #f6f7fb;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --radius: 20px;
+      --card-shadow: 0 16px 40px -20px rgba(15, 23, 42, 0.5);
+      --card-bg-soft: rgba(255, 255, 255, 0.9);
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-color);
+      background-image:
+        radial-gradient(at 0% 0%, rgba(129, 140, 248, 0.16) 0, transparent 55%),
+        radial-gradient(at 100% 0%, rgba(248, 113, 113, 0.14) 0, transparent 55%),
+        radial-gradient(at 50% 90%, rgba(52, 211, 153, 0.12) 0, transparent 60%);
+      color: var(--text-main);
+      padding: 32px 20px 120px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 1080px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    /* Topbar */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 16px;
+    }
+
+    .greeting-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+    }
+
+    .greeting-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .title {
+      font-size: clamp(28px, 5vw, 34px);
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.04em;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .quick-btn {
+      padding: 10px 18px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(12px);
+      transition: all 0.2s;
+      box-shadow: 0 6px 16px -8px rgba(15, 23, 42, 0.3);
+    }
+
+    .quick-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px -10px rgba(15, 23, 42, 0.4);
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: none;
+      background: var(--card-bg-soft);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 10px 24px -14px rgba(15, 23, 42, 0.5);
+      font-size: 14px;
+      backdrop-filter: blur(14px);
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 12px 26px -16px rgba(15, 23, 42, 0.6);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.98);
+    }
+
+    .icon-btn.danger {
+      color: #ef4444;
+      background: rgba(254, 242, 242, 0.95);
+    }
+
+    .icon-btn.danger:hover {
+      background: rgba(254, 226, 226, 0.98);
+    }
+
+    .streak-badge {
+      padding: 7px 14px;
+      background: linear-gradient(120deg, #fb923c, #facc15);
+      color: white;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 12px;
+      box-shadow: 0 10px 24px -12px rgba(245, 158, 11, 0.7);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      animation: pulse 2s infinite;
+    }
+
+    .streak-badge span.sub {
+      font-size: 11px;
+      font-weight: 400;
+      opacity: 0.85;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 10px 24px -12px rgba(245, 158, 11, 0.7);
+      }
+      50% {
+        box-shadow: 0 10px 24px -12px rgba(245, 158, 11, 0.9);
+      }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .card {
+      border-radius: var(--radius);
+      padding: 18px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      background: var(--card-bg-soft);
+      box-shadow: var(--card-shadow);
+      transition: all 0.26s cubic-bezier(0.25, 0.8, 0.25, 1);
+      min-height: 160px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(18px);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 46px -22px rgba(15, 23, 42, 0.8);
+    }
+
+    .card:focus {
+      outline: 2px solid var(--text-main);
+      outline-offset: 2px;
+    }
+
+    .card:active {
+      transform: scale(0.98);
+    }
+
+    .card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      z-index: 2;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      z-index: 2;
+      line-height: 1.45;
+    }
+
+    .card-icon-bg {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      box-shadow: 0 10px 22px -14px rgba(15, 23, 42, 0.6);
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      transition: 0.3s;
+    }
+
+    .card:hover .card-icon-bg {
+      transform: translateY(-1px) scale(1.02);
+    }
+
+    /* Gradients */
+    .theme-blue {
+      background: linear-gradient(135deg, rgba(191, 219, 254, 0.92), rgba(129, 199, 245, 0.94));
+    }
+
+    .theme-blue .card-icon-bg {
+      color: #0ea5e9;
+    }
+
+    .theme-purple {
+      background: linear-gradient(135deg, rgba(237, 233, 254, 0.92), rgba(215, 196, 250, 0.94));
+    }
+
+    .theme-purple .card-icon-bg {
+      color: #7c3aed;
+    }
+
+    .theme-green {
+      background: linear-gradient(135deg, rgba(220, 252, 231, 0.93), rgba(167, 243, 208, 0.95));
+    }
+
+    .theme-green .card-icon-bg {
+      color: #16a34a;
+    }
+
+    .theme-orange {
+      background: linear-gradient(135deg, rgba(255, 237, 213, 0.93), rgba(253, 186, 116, 0.95));
+    }
+
+    .theme-orange .card-icon-bg {
+      color: #ea580c;
+    }
+
+    .theme-rose {
+      background: linear-gradient(135deg, rgba(254, 226, 226, 0.93), rgba(252, 165, 165, 0.95));
+    }
+
+    .theme-rose .card-icon-bg {
+      color: #e11d48;
+    }
+
+    .theme-indigo {
+      background: linear-gradient(135deg, rgba(224, 231, 255, 0.93), rgba(165, 180, 252, 0.96));
+    }
+
+    .theme-indigo .card-icon-bg {
+      color: #4f46e5;
+    }
+
+    .theme-games {
+      background: linear-gradient(135deg, rgba(237, 233, 254, 0.93), rgba(219, 234, 254, 0.95));
+    }
+
+    .theme-games .card-icon-bg {
+      color: #6d28d9;
+    }
+
+    /* Daily Progress Hero */
+    #cardDailyProgress {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(238, 242, 255, 0.96), rgba(219, 234, 254, 0.98));
+      border: 1px solid rgba(129, 140, 248, 0.28);
+      min-height: 180px;
+      position: relative;
+    }
+
+    #cardDailyProgress::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: inherit;
+      border-radius: inherit;
+      filter: blur(12px);
+      z-index: -1;
+    }
+
+    #cardDailyProgress h3 {
+      font-size: 20px;
+    }
+
+    /* Mood buttons */
+    .mood-select {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      justify-content: center;
+    }
+
+    .mood-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    .mood-btn:hover,
+    .mood-btn.active {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-track {
+      height: 6px;
+      width: 100%;
+      background: rgba(241, 245, 249, 0.9);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4f46e5, #6366f1);
+      width: 0%;
+      border-radius: 999px;
+      transition: 0.45s;
+      box-shadow: 0 0 12px rgba(79, 70, 229, 0.6);
+    }
+
+    .progress-stat {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      font-weight: 600;
+      color: #4f46e5;
+      font-size: 13px;
+    }
+
+    /* SOS Card */
+    #cardSOS {
+      background: linear-gradient(135deg, rgba(254, 226, 226, 0.97), rgba(248, 113, 113, 0.98));
+      border: 1px solid rgba(248, 113, 113, 0.55);
+      min-height: 150px;
+      position: relative;
+      z-index: 1;
+      grid-column: span 1;
+    }
+
+    #cardSOS h3 {
+      color: #b91c1c;
+    }
+
+    #cardSOS .card-sub {
+      color: #7f1d1d;
+    }
+
+    #cardSOS .card-icon-bg {
+      background: rgba(255, 255, 255, 0.98);
+      color: #dc2626;
+    }
+
+    @media (max-width: 650px) {
+      body {
+        padding-top: 80px;
+      }
+      #cardSOS {
+        position: fixed !important;
+        right: 20px;
+        top: 20px;
+        bottom: auto;
+        width: 280px;
+        max-width: 90vw;
+        min-height: auto;
+        padding: 16px;
+        animation: slideDownFade 0.4s ease-out;
+      }
+    }
+
+    @keyframes slideDownFade {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Calendar card */
+    .calendar-card {
+      grid-column: span 1;
+      grid-row: span 2;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .calendar-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .calendar-title {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .calendar-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      width: 100%;
+    }
+
+    .cal-day {
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      border-radius: 7px;
+      margin: 0 auto;
+    }
+
+    .cal-today {
+      background: #111827;
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.35);
+    }
+
+    /* Stress Banner */
+    #stressBanner {
+      grid-column: 1 / -1;
+      background: linear-gradient(120deg, #22c55e, #0ea5e9);
+      border-radius: 16px;
+      padding: 12px 16px;
+      color: white;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 12px 30px -14px rgba(16, 185, 129, 0.65);
+      font-size: 14px;
+    }
+
+    #stressBanner i {
+      font-size: 16px;
+    }
+
+    /* Continue banner */
+    .continue-banner {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.9));
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 16px;
+      padding: 16px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      backdrop-filter: blur(12px);
+    }
+
+    .continue-card {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .continue-card:hover {
+      transform: translateY(-1px);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .card-offline {
+      background: linear-gradient(135deg, rgba(229, 231, 235, 0.96), rgba(226, 232, 240, 0.98));
+      color: #4b5563;
+    }
+
+    .card-offline .card-icon-bg {
+      color: #6b7280;
+    }
+
+    #langSelect {
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      outline: none;
+      cursor: pointer;
+      margin-left: 4px;
+      padding: 3px 4px;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+
+    /* Skeleton loading */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      #cardDailyProgress {
+        grid-column: 1 / -1;
+      }
+      
+      .calendar-card {
+        grid-row: span 1;
+        min-height: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      
+      #cardDailyProgress,
+      #cardSOS,
+      .calendar-card,
+      #stressBanner,
+      .continue-banner {
+        grid-column: 1;
+      }
+      
+      .calendar-card {
+        grid-row: span 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="greeting-area">
+      <div class="user-avatar" id="userAvatar">AS</div>
+      <div class="greeting-text">
+        <div class="subtitle" id="subtitleText">Welcome Back</div>
+        <div class="title" id="pageTitle">Mind Sanctuary</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="streak-badge" title="Gentle daily consistency">
+        <i class="fas fa-fire"></i>
+        <span id="streakCount">0</span>
+        <span class="sub">day streak</span>
+      </div>
+
+      <button class="icon-btn" id="btnBadges" title="Badges">
+        <i class="fas fa-trophy" style="color:#f59e0b"></i>
+      </button>
+      <button class="icon-btn danger" onclick="resetAllProgress()" title="Reset progress gently">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+
+      <select id="langSelect" onchange="changeLanguage(this.value)">
+        <option value="en">EN</option>
+        <option value="fr">FR</option>
+        <option value="kn">KN</option>
+        <option value="mr">MR</option>
+        <option value="hi">HI</option>
+        <option value="ja">JA</option>
+        <option value="ko">KO</option>
+        <option value="es">ES</option>
+        <option value="de">DE</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <a href="#" class="quick-btn" onclick="quickBreathe()">🫁 Quick Breathe</a>
+    <a href="#" class="quick-btn" onclick="quickJournal()">📝 1min Journal</a>
+    <a href="#" class="quick-btn" onclick="deepBreath()">🌬️ Deep Breath</a>
+  </div>
+
+  <div class="grid">
+    <!-- Continue Where You Left Off -->
+    <div class="continue-banner" id="continueBanner">
+      <div>↻ Continue where you left off:</div>
+      <a class="continue-card" id="lastTool1"><i class="fas fa-music"></i> Music</a>
+      <a class="continue-card" id="lastTool2"><i class="fas fa-spa"></i> Meditation</a>
+    </div>
+
+    <!-- Stress Banner -->
+    <div id="stressBanner" class="hidden">
+      <i class="fas fa-sparkles"></i>
+      <span id="stressRecText"></span>
+    </div>
+
+    <!-- HERO Daily Progress -->
+    <a href="daily-report.html" class="card" id="cardDailyProgress">
+      <div>
+        <h3 id="cardDailyCheckinText">Daily Check-in</h3>
+        <p class="card-sub" id="cardDailySub">Take 1 minute to notice how you feel today</p>
+        <div class="mood-select" id="moodSelect">
+          <button class="mood-btn" data-mood="happy" title="Great">😊</button>
+          <button class="mood-btn" data-mood="okay" title="Okay">🙂</button>
+          <button class="mood-btn active" data-mood="neutral" title="Neutral">😐</button>
+          <button class="mood-btn" data-mood="sad" title="Low">☹️</button>
+          <button class="mood-btn" data-mood="very-sad" title="Tough">😢</button>
+        </div>
+      </div>
+      <div class="card-icon-bg" style="color:#4f46e5; background:#e0e7ff;">
+        <i class="fas fa-check"></i>
+      </div>
+      <div class="progress-stat" id="dailyProgressText">0%</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="dailyProgressFill"></div>
+      </div>
+    </a>
+
+    <!-- SOS -->
+    <a href="sos.html" class="card" id="cardSOS">
+      <h3 id="cardSosText">SOS Help</h3>
+      <p class="card-sub" id="cardSosSub">If things feel heavy, tap here for immediate support</p>
+      <div class="card-icon-bg">
+        <i class="fas fa-heart-pulse"></i>
+      </div>
+    </a>
+
+    <!-- Feature cards -->
+    <a href="foryou.html" class="card theme-purple">
+      <h3 id="cardForYouText">For You</h3>
+      <p class="card-sub">Personalized tools chosen for your current mood</p>
+      <div class="card-icon-bg"><i class="fas fa-magic"></i></div>
+    </a>
+
+    <a href="memories.html" class="card theme-rose">
+      <h3 id="cardNostalgiaText">Nostalgia</h3>
+      <p class="card-sub">Revisit comforting memories and favorite moments</p>
+      <div class="card-icon-bg"><i class="fas fa-heart"></i></div>
+    </a>
+
+    <a href="affirmations-page.html" class="card theme-orange">
+      <h3 id="cardAffirmText">Affirmations</h3>
+      <p class="card-sub">Gentle phrases to reframe your thoughts</p>
+      <div class="card-icon-bg"><i class="fas fa-sun"></i></div>
+    </a>
+
+    <a href="planner.html" class="card theme-blue">
+      <h3 id="cardFocusText">Focus Timer</h3>
+      <p class="card-sub">Stay present with structured, calm work sessions</p>
+      <div class="card-icon-bg"><i class="fas fa-stopwatch"></i></div>
+    </a>
+
+    <a href="yoga.html" class="card theme-green">
+      <h3 id="cardYogaText">Yoga Flow</h3>
+      <p class="card-sub">Gentle movement to release stored tension</p>
+      <div class="card-icon-bg"><i class="fas fa-leaf"></i></div>
+    </a>
+
+    <a href="meditation.html" class="card theme-indigo">
+      <h3 id="cardMeditationText">Meditation</h3>
+      <p class="card-sub">Short guided moments to breathe and reset</p>
+      <div class="card-icon-bg"><i class="fas fa-spa"></i></div>
+    </a>
+
+    <a href="counsellor.html" class="card theme-blue">
+      <h3 id="cardCounsellorText">Counsellor</h3>
+      <p class="card-sub">Find someone you can talk to when you need</p>
+      <div class="card-icon-bg"><i class="fas fa-user-md"></i></div>
+    </a>
+
+    <a href="music.html" class="card theme-rose">
+      <h3 id="cardMusicText">Music</h3>
+      <p class="card-sub">Calming tracks to match your current state</p>
+      <div class="card-icon-bg"><i class="fas fa-headphones"></i></div>
+    </a>
+
+    <a href="games.html" class="card theme-games">
+      <h3 id="cardGamesText">Mind Games</h3>
+      <p class="card-sub">Light, stress-relief games to gently distract you</p>
+      <div class="card-icon-bg"><i class="fas fa-puzzle-piece"></i></div>
+    </a>
+
+    <div class="card card-offline">
+      <h3 id="cardOfflineText">Offline</h3>
+      <p class="card-sub" id="cardOfflineSub">
+        Download sessions so you can still take care of yourself without internet
+      </p>
+      <div class="card-icon-bg"><i class="fas fa-cloud-download-alt"></i></div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="card calendar-card">
+      <div class="calendar-header">
+        <div class="calendar-title" id="calendarMonth">December</div>
+        <div class="calendar-label">This week at a glance</div>
+      </div>
+      <div class="cal-grid">
+        <span id="calSun" class="cal-day">S</span><span id="calMon" class="cal-day">M</span><span id="calTue" class="cal-day">T</span><span id="calWed" class="cal-day">W</span><span id="calThu" class="cal-day">T</span><span id="calFri" class="cal-day">F</span><span id="calSat" class="cal-day">S</span>
+        <span></span><span></span><span></span><span>1</span><span>2</span><span>3</span><span>4</span>
+        <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span>
+        <span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span>
+        <span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span class="cal-day cal-today">25</span>
+        <span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const TRANSLATIONS = {
+    en: {
+      title: "Mind Sanctuary",
+      subtitle: "Welcome Back",
+      dailyCheckin: "Daily Check-in",
+      dailySub: "Take 1 minute to notice how you feel today",
+      sos: "SOS Help",
+      sosSub: "If things feel heavy, tap here for immediate support",
+      month: "December",
+      days: ["S","M","T","W","T","F","S"],
+      forYou: "For You",
+      nostalgia: "Nostalgia",
+      affirm: "Affirmations",
+      focus: "Focus Timer",
+      yoga: "Yoga Flow",
+      meditation: "Meditation",
+      counsellor: "Counsellor",
+      music: "Music",
+      games: "Mind Games",
+      offline: "Offline",
+      offlineSub: "Download sessions so you can still take care of yourself without internet"
+    },
+    hi: { title: "मन की शांति", subtitle: "वापस स्वागत है" },
+    kn: { title: "ಮನಸ್ಸು ಸಾಂತ್ವನ", subtitle: "ಮತ್ತೆ ಸ್ವಾಗತ" }
+  };
+
+  // Debounced streak updates
+  let streakTimeout;
+  function debouncedStreak() {
+    clearTimeout(streakTimeout);
+    streakTimeout = setTimeout(() => {
+      const today = new Date().toISOString().split('T')[0];
+      const lastActive = localStorage.getItem("lastActiveDate");
+      if (lastActive !== today) {
+        localStorage.setItem("lastActiveDate", today);
+        let streak = parseInt(localStorage.getItem('streakCount') || 0) + 1;
+        localStorage.setItem('streakCount', streak);
+        document.getElementById("streakCount").innerText = streak;
+      }
+    }, 500);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadUserProfile();
+
+    document.getElementById("btnBadges").onclick = () => window.location.href = 'badges.html';
+    initActivityTracking();
+    computeStreak();
+    loadStressBanner();
+    updateDailyProgress();
+    loadContinueBanner();
+
+    const savedLang = localStorage.getItem('dashLang') || 'en';
+    document.getElementById('langSelect').value = savedLang;
+    applyLanguage(savedLang);
+
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.onclick = (e) => setMood(e.target.dataset.mood);
+    });
+  });
+
+  function loadUserProfile() {
+    const name = localStorage.getItem('userName') || 'User';
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    document.getElementById('userAvatar').innerText = initials;
+    document.getElementById('subtitleText').innerText = `Welcome back, ${name.split(' ')[0]}!`;
+  }
+
+  function setMood(mood) {
+    document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const moodValues = { happy: 100, okay: 75, neutral: 50, sad: 25, 'very-sad': 10 };
+    const progress = moodValues[mood];
+    localStorage.setItem('dailyProgressPercent', progress);
+    localStorage.setItem('todayMood', mood);
+    updateDailyProgress();
+  }
+
+  function quickBreathe() {
+    window.location.href = 'breathing.html';
+  }
+  function quickJournal() {
+    window.location.href = 'journal.html';
+  }
+  function deepBreath() {
+    window.location.href = 'deep-breath.html';
+  }
+
+  function loadContinueBanner() {
+    const recent = JSON.parse(localStorage.getItem('recentTools') || '[]');
+    const banner = document.getElementById('continueBanner');
+    if (recent.length >= 2) {
+      document.getElementById('lastTool1').innerHTML = `<i class="fas fa-${recent[0].icon}"></i> ${recent[0].name}`;
+      document.getElementById('lastTool1').onclick = () => window.location.href = recent[0].url;
+      document.getElementById('lastTool2').innerHTML = `<i class="fas fa-${recent[1].icon}"></i> ${recent[1].name}`;
+      document.getElementById('lastTool2').onclick = () => window.location.href = recent[1].url;
+      banner.style.display = 'flex';
+    }
+  }
+
+  function initActivityTracking() {
+    document.querySelectorAll(".card").forEach(c => {
+      c.addEventListener("click", (e) => {
+        debouncedStreak();
+        const iconEl = c.querySelector('.card-icon-bg i') || c.querySelector('i');
+        const iconClass = iconEl ? iconEl.className.split(' ')[1] : 'circle';
+        const tool = {
+          name: c.querySelector('h3').innerText,
+          url: c.href,
+          icon: iconClass
+        };
+        let recent = JSON.parse(localStorage.getItem('recentTools') || '[]');
+        recent = recent.filter(t => t.url !== tool.url).slice(0, 4);
+        recent.unshift(tool);
+        localStorage.setItem('recentTools', JSON.stringify(recent.slice(0, 5)));
+      });
+    });
+  }
+
+  function computeStreak() {
+    document.getElementById("streakCount").innerText = localStorage.getItem('streakCount') || 0;
+  }
+
+  function updateDailyProgress() {
+    const percent = localStorage.getItem('dailyProgressPercent') || 0;
+    document.getElementById("dailyProgressFill").style.width = percent + "%";
+    document.getElementById("dailyProgressText").innerText = percent + "%";
+  }
+
+  function loadStressBanner() {
+    const recs = localStorage.getItem('userRecs');
+    if (recs) {
+      const list = JSON.parse(recs);
+      if (list && list.length > 0) {
+        document.getElementById("stressRecText").innerText = "Gentle suggestion: " + list[0];
+        document.getElementById("stressBanner").classList.remove("hidden");
+      }
+    }
+  }
+
+  function resetAllProgress() {
+    if (confirm("Reset all progress gently? You can always begin again.")) {
+      localStorage.removeItem('streakCount');
+      localStorage.removeItem('lastActiveDate');
+      localStorage.removeItem('dailyProgressPercent');
+      localStorage.removeItem('userRecs');
+      localStorage.removeItem('recentTools');
+      computeStreak();
+      updateDailyProgress();
+      document.getElementById("stressBanner").classList.add("hidden");
+      document.getElementById('continueBanner').style.display = 'none';
+    }
+  }
+
+  function applyLanguage(lang) {
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    document.getElementById("pageTitle").innerText = t.title;
+    document.getElementById("cardDailyCheckinText").innerText = t.dailyCheckin || "Daily Check-in";
+    document.getElementById("cardDailySub").innerText = t.dailySub || "Take 1 minute to notice how you feel today";
+    document.getElementById("cardSosText").innerText = t.sos || "SOS Help";
+    document.getElementById("cardSosSub").innerText = t.sosSub || "If things feel heavy, tap here for immediate support";
+    document.getElementById("cardForYouText").innerText = t.forYou || "For You";
+    document.getElementById("cardNostalgiaText").innerText = t.nostalgia || "Nostalgia";
+    document.getElementById("cardAffirmText").innerText = t.affirm || "Affirmations";
+    document.getElementById("cardFocusText").innerText = t.focus || "Focus Timer";
+    document.getElementById("cardYogaText").innerText = t.yoga || "Yoga Flow";
+    document.getElementById("cardMeditationText").innerText = t.meditation || "Meditation";
+    document.getElementById("cardCounsellorText").innerText = t.counsellor || "Counsellor";
+    document.getElementById("cardMusicText").innerText = t.music || "Music";
+    document.getElementById("cardGamesText").innerText = t.games || "Mind Games";
+    document.getElementById("cardOfflineText").innerText = t.offline || "Offline";
+    document.getElementById("cardOfflineSub").innerText = t.offlineSub || "Download sessions so you can still take care of yourself without internet";
+    document.getElementById("calendarMonth").innerText = t.month || "December";
+  }
+
+  function changeLanguage(val) {
+    localStorage.setItem('dashLang', val);
+    applyLanguage(val);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mental Health Calendar</title>
+
+<style>
+:root{
+  --bg:#0b1220;
+  --panel: rgba(255,255,255,.06);
+  --panel2: rgba(255,255,255,.10);
+  --ring: rgba(255,255,255,.14);
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.70);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.wrap{max-width:1100px;margin:auto;padding:18px}
+header{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:14px;border-radius:16px;border:1px solid var(--ring);background:var(--panel)
+}
+.btn{
+  padding:10px 12px;border-radius:12px;border:1px solid var(--ring);
+  background:var(--panel2);color:var(--text);cursor:pointer
+}
+.grid{display:grid;grid-template-columns:1.3fr .7fr;gap:14px;margin-top:14px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+.card{
+  border:1px solid var(--ring);
+  background:var(--panel);
+  border-radius:16px;
+  overflow:hidden;
+}
+.cal-head{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid var(--ring)}
+.weekdays,.days{display:grid;grid-template-columns:repeat(7,1fr)}
+.weekdays{padding:10px;color:var(--muted)}
+.days{padding:12px;gap:8px}
+.day{
+  min-height:84px;padding:10px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(0,0,0,.2);cursor:pointer
+}
+.day.muted{opacity:.35;cursor:default}
+.day.today{outline:2px solid #60a5fa}
+.num{font-weight:700}
+
+.side{padding:12px}
+label{font-size:.85rem;color:var(--muted)}
+input{
+  width:100%;padding:10px;border-radius:12px;
+  border:1px solid var(--ring);background:rgba(0,0,0,.25);color:var(--text)
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <strong>Mental Health Calendar</strong>
+    <div style="color:var(--muted);font-size:.9rem">Date-safe & timezone-proof</div>
+  </div>
+  <div>
+    <button class="btn" id="prevBtn">Prev</button>
+    <button class="btn" id="todayBtn">Today</button>
+    <button class="btn" id="nextBtn">Next</button>
+  </div>
+</header>
+
+<div class="grid">
+
+<section class="card">
+  <div class="cal-head">
+    <div id="monthLabel"></div>
+    <div id="selectedLabel"></div>
+  </div>
+  <div class="weekdays">
+    <div>Sun</div><div>Mon</div><div>Tue</div>
+    <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+  </div>
+  <div class="days" id="daysGrid"></div>
+</section>
+
+<aside class="card side">
+  <label>Date</label>
+  <input type="date" id="dateInput">
+</aside>
+
+</div>
+</div>
+
+<script>
+/* ========= DATE UTILITIES (SAFE) ========= */
+
+// Always returns YYYY-MM-DD in local time
+function todayYMD(){
+  return new Intl.DateTimeFormat("en-CA").format(new Date());
+}
+
+function ymdFromParts(y,m,d){
+  return `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+}
+
+const monthNames = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December"
+];
+
+/* ========= STATE ========= */
+
+const TODAY = todayYMD();              // STRING, NOT Date
+let selectedDate = TODAY;
+
+const [ty, tm] = TODAY.split("-").map(Number);
+let view = new Date(ty, tm - 1, 1);
+
+/* ========= DOM ========= */
+
+const daysGrid = document.getElementById("daysGrid");
+const monthLabel = document.getElementById("monthLabel");
+const selectedLabel = document.getElementById("selectedLabel");
+const dateInput = document.getElementById("dateInput");
+
+dateInput.value = TODAY;
+
+/* ========= RENDER ========= */
+
+function renderMonth(){
+  const y = view.getFullYear();
+  const m = view.getMonth();
+
+  monthLabel.textContent = `${monthNames[m]} ${y}`;
+  selectedLabel.textContent = `Selected: ${selectedDate}`;
+  daysGrid.innerHTML = "";
+
+  const firstDow = new Date(y,m,1).getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+
+  for(let i=0;i<42;i++){
+    const cell = document.createElement("div");
+    cell.className = "day";
+
+    const d = i - firstDow + 1;
+
+    if(d < 1 || d > daysInMonth){
+      cell.classList.add("muted");
+    } else {
+      const ymd = ymdFromParts(y, m+1, d);
+      cell.innerHTML = `<div class="num">${d}</div>`;
+
+      if(ymd === TODAY) cell.classList.add("today");
+
+      cell.onclick = () => {
+        selectedDate = ymd;
+        dateInput.value = ymd;
+        selectedLabel.textContent = `Selected: ${ymd}`;
+      };
+    }
+
+    daysGrid.appendChild(cell);
+  }
+}
+
+/* ========= CONTROLS ========= */
+
+document.getElementById("prevBtn").onclick = () => {
+  view.setMonth(view.getMonth() - 1);
+  renderMonth();
+};
+
+document.getElementById("nextBtn").onclick = () => {
+  view.setMonth(view.getMonth() + 1);
+  renderMonth();
+};
+
+document.getElementById("todayBtn").onclick = () => {
+  const [y,m] = TODAY.split("-").map(Number);
+  view = new Date(y, m - 1, 1);
+  selectedDate = TODAY;
+  dateInput.value = TODAY;
+  renderMonth();
+};
+
+/* ========= INIT ========= */
+renderMonth();
+</script>
+
+</body>
+</html>

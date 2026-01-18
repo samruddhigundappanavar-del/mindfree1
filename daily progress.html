@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Daily Progress Report</title>
+
+  <style>
+    :root{
+      --bg: #0b1020;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.12);
+      --text: #f5f5f5;
+      --muted: rgba(245,245,245,0.85);
+      --accent1: #7c5cff;
+      --accent2: #ff7ce5;
+      --danger: rgba(255, 80, 80, 0.45);
+      --dangerBorder: rgba(255, 80, 80, 0.65);
+    }
+
+    [data-theme="light"]{
+      --bg: #f5f7ff;
+      --panel: rgba(255,255,255,0.72);
+      --panel2: rgba(255,255,255,0.55);
+      --border: rgba(15,20,40,0.14);
+      --text: #141b2f;
+      --muted: rgba(20,27,47,0.75);
+      --danger: rgba(255, 80, 80, 0.12);
+      --dangerBorder: rgba(255, 80, 80, 0.35);
+    }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,0.25), transparent 60%),
+        radial-gradient(900px 500px at 90% 20%, rgba(255,124,229,0.22), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(135deg,
+          rgba(255,255,255,0.06) 0px,
+          rgba(255,255,255,0.06) 1px,
+          transparent 1px,
+          transparent 14px
+        );
+      opacity: 0.18;
+      mix-blend-mode: overlay;
+    }
+
+    .daily-report-container{
+      max-width: 1050px;
+      margin: 18px auto;
+      padding: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    h2, h3{ margin: 0 0 10px; }
+
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+    }
+
+    .help-text{
+      opacity: 0.9;
+      font-size: 0.82rem;
+      margin-top: 6px;
+      color: var(--muted);
+    }
+
+    .req{ color: #ff7c9a; }
+
+    .status-msg{
+      margin: 10px 0 14px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      min-height: 20px;
+    }
+
+    [data-theme="light"] .status-msg{ background: rgba(255,255,255,0.75); }
+    .status-msg[data-type="error"]{ border-color: rgba(255,80,80,0.7); }
+    .status-msg[data-type="warn"]{ border-color: rgba(255,200,80,0.7); }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .report-card{ margin-bottom: 14px; }
+
+    .form-row{
+      display:flex;
+      flex-direction: column;
+      margin-bottom: 12px;
+    }
+
+    label{ font-size: 0.92rem; margin-bottom: 4px; }
+
+    input, select, textarea{
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--text);
+      outline: none;
+    }
+
+    [data-theme="light"] input,
+    [data-theme="light"] select,
+    [data-theme="light"] textarea{
+      background: rgba(255,255,255,0.8);
+      border-color: rgba(15,20,40,0.16);
+    }
+
+    input:focus, select:focus, textarea:focus,
+    button:focus{
+      outline: 2px solid rgba(124, 92, 255, 0.85);
+      outline-offset: 2px;
+    }
+
+    .fieldset{
+      margin: 10px 0 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 12px;
+      background: var(--panel2);
+    }
+
+    .checks{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 6px 0 10px;
+    }
+
+    .checks label{ display:flex; gap:8px; align-items:center; font-size:0.9rem; }
+
+    .range-row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .range-value{
+      min-width: 42px;
+      text-align:right;
+      opacity: 0.9;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .btn-save, .btn-secondary, .btn-danger{
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      border: none;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+    }
+
+    .btn-save{
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(124, 92, 255, 0.5);
+    }
+
+    .btn-secondary{
+      background: rgba(255,255,255,0.10);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+    [data-theme="light"] .btn-secondary{
+      background: rgba(255,255,255,0.75);
+      border-color: rgba(15,20,40,0.14);
+    }
+
+    .btn-danger{
+      background: var(--danger);
+      color: var(--text);
+      border: 1px solid var(--dangerBorder);
+    }
+
+    button:disabled{ opacity:0.55; cursor:not-allowed; }
+
+    .form-actions, .history-actions, .lock-actions, .inline-actions{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .lock-card summary{ cursor:pointer; }
+
+    .today-summary-card p, .weekly-card p{
+      margin: 6px 0;
+      color: var(--muted);
+    }
+
+    .weekly-stats{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .kpi{
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 10px 12px;
+    }
+    [data-theme="light"] .kpi{ background: rgba(255,255,255,0.65); }
+    .kpi b{ display:block; margin-bottom: 6px; }
+
+    #reportList{
+      list-style: none;
+      padding: 0;
+      margin: 8px 0 0;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    #reportList li{
+      font-size: 0.88rem;
+      padding: 10px 10px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    [data-theme="light"] #reportList li{
+      background: rgba(255,255,255,0.65);
+      border-color: rgba(15,20,40,0.12);
+    }
+
+    #todayActivityList{
+      list-style: none;
+      padding: 0;
+      margin: 8px 0 0;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    #todayActivityList li{
+      font-size: 0.88rem;
+      padding: 8px 10px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .small{ font-size: 0.82rem; opacity: 0.88; color: var(--muted); }
+    .hidden{ display:none !important; }
+
+    @media (max-width: 900px){
+      .grid-2{ grid-template-columns: 1fr; }
+      .weekly-stats{ grid-template-columns: 1fr; }
+      .checks{ grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <script>
+    (function(){
+      const THEME_KEY = "dailyProgressTheme_v3";
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved === "light" || saved === "dark"){
+        document.documentElement.setAttribute("data-theme", saved);
+        return;
+      }
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
+    })();
+  </script>
+</head>
+
+<body>
+  <section class="daily-report-container" aria-labelledby="dailyReportTitle">
+    <div class="topbar">
+      <h2 id="dailyReportTitle">Daily Progress Report</h2>
+      <div class="inline-actions" style="margin:0;">
+        <button type="button" id="themeToggleBtn" class="btn-secondary">Toggle theme</button>
+        <button type="button" id="forceUnlockBtn" class="btn-danger">Force unlock</button>
+      </div>
+    </div>
+
+    <div id="statusMsg" class="status-msg" role="status" aria-atomic="true"></div>
+
+    <details class="card lock-card">
+      <summary>Privacy lock (optional)</summary>
+      <p class="help-text">This lock is client-side only. Avoid storing highly sensitive notes in localStorage.</p>
+
+      <div class="lock-grid">
+        <div class="form-row">
+          <label for="pinInput">Set/Change PIN (4–8 digits)</label>
+          <input id="pinInput" inputmode="numeric" pattern="\d{4,8}" minlength="4" maxlength="8" placeholder="e.g. 1234" autocomplete="off">
+        </div>
+
+        <div class="form-row">
+          <label for="pinUnlock">Unlock with PIN</label>
+          <input id="pinUnlock" inputmode="numeric" pattern="\d{4,8}" minlength="4" maxlength="8" placeholder="Enter PIN" autocomplete="off">
+        </div>
+
+        <div class="lock-actions">
+          <button type="button" id="setPinBtn" class="btn-secondary">Set PIN</button>
+          <button type="button" id="unlockBtn" class="btn-secondary">Unlock</button>
+          <button type="button" id="lockBtn" class="btn-secondary">Lock</button>
+          <button type="button" id="removePinBtn" class="btn-danger">Remove PIN</button>
+        </div>
+      </div>
+    </details>
+
+    <div class="grid-2">
+      <form id="dailyReportForm" class="card report-card" novalidate>
+        <div class="form-row">
+          <label for="reportDate">Date <span class="req">(required)</span></label>
+          <input type="date" id="reportDate" required autocomplete="off">
+          <small class="help-text">Stored as YYYY-MM-DD.</small>
+        </div>
+
+        <div class="form-row">
+          <label for="mood">Mood <span class="req">(required)</span></label>
+          <select id="mood" required>
+            <option value="">Select mood</option>
+            <option value="Very Happy">Very Happy</option>
+            <option value="Happy">Happy</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Sad">Sad</option>
+            <option value="Anxious">Anxious</option>
+            <option value="Angry">Angry</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="stressLevel">Stress/Anxiety (0–10)</label>
+          <div class="range-row">
+            <input type="range" id="stressLevel" min="0" max="10" step="1" value="0">
+            <span id="stressValue" class="range-value">0</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="energyLevel">Energy (0–10)</label>
+          <div class="range-row">
+            <input type="range" id="energyLevel" min="0" max="10" step="1" value="0">
+            <span id="energyValue" class="range-value">0</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="sleepHours">Sleep (hours)</label>
+          <input type="number" id="sleepHours" min="0" max="16" step="0.5" placeholder="e.g. 7.5">
+        </div>
+
+        <div class="form-row">
+          <label for="exerciseMins">Exercise / movement (minutes)</label>
+          <input type="number" id="exerciseMins" min="0" max="600" step="5" placeholder="e.g. 30">
+        </div>
+
+        <fieldset class="fieldset">
+          <legend>Self-care basics</legend>
+          <div class="checks">
+            <label><input type="checkbox" id="hydrationOk"> Drank enough water</label>
+            <label><input type="checkbox" id="mealsOk"> Ate balanced meals</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Helpful activities</legend>
+          <div class="checks">
+            <label><input type="checkbox" class="act" value="Exercise"> Exercise</label>
+            <label><input type="checkbox" class="act" value="Meditation"> Meditation</label>
+            <label><input type="checkbox" class="act" value="Journaling"> Journaling</label>
+            <label><input type="checkbox" class="act" value="Yoga"> Yoga</label>
+            <label><input type="checkbox" class="act" value="Breathing"> Breathing</label>
+            <label><input type="checkbox" class="act" value="Social"> Social</label>
+          </div>
+          <div class="form-row">
+            <label for="activitiesOther">Other (optional)</label>
+            <input type="text" id="activitiesOther" placeholder="Custom activity..." autocomplete="off">
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Reflection (short)</legend>
+          <div class="form-row">
+            <label for="winToday">One win today</label>
+            <input type="text" id="winToday" maxlength="120" autocomplete="off">
+          </div>
+          <div class="form-row">
+            <label for="gratitude">Gratitude (1–3 items)</label>
+            <input type="text" id="gratitude" maxlength="180" autocomplete="off">
+          </div>
+          <div class="form-row">
+            <label for="trigger">Trigger / tough moment (optional)</label>
+            <input type="text" id="trigger" maxlength="180" autocomplete="off">
+          </div>
+          <div class="form-row">
+            <label for="whatHelped">What helped? (optional)</label>
+            <input type="text" id="whatHelped" maxlength="180" autocomplete="off">
+          </div>
+        </fieldset>
+
+        <div class="form-row">
+          <label for="notes">Notes</label>
+          <textarea id="notes" rows="3" maxlength="500" placeholder="How was your day?" autocomplete="off"></textarea>
+          <small id="notesCount" class="help-text">0 / 500</small>
+        </div>
+
+        <fieldset class="fieldset">
+          <legend>Tomorrow (small plan)</legend>
+          <div class="form-row">
+            <label for="goal1">Goal 1</label>
+            <input id="goal1" maxlength="120" autocomplete="off">
+          </div>
+          <div class="form-row">
+            <label for="goal2">Goal 2</label>
+            <input id="goal2" maxlength="120" autocomplete="off">
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Support & safety</legend>
+          <div class="checks">
+            <label><input type="checkbox" id="needSupport"> Need support today</label>
+            <label><input type="checkbox" id="selfHarmThoughts"> Self-harm thoughts (optional)</label>
+          </div>
+
+          <div id="supportPanel" class="card hidden" style="margin-top:10px;">
+            <b>Quick actions</b>
+            <p class="small">Try breathing or reach out to someone.</p>
+            <div class="inline-actions">
+              <button type="button" id="breathingBtn" class="btn-secondary">2-min breathing</button>
+              <button type="button" id="copySupportMsgBtn" class="btn-secondary">Copy support text</button>
+            </div>
+          </div>
+
+          <div id="safetyPanel" class="card hidden" style="margin-top:10px; background: var(--danger); border-color: var(--dangerBorder);">
+            <b>Get help now</b>
+            <p class="small">If you’re in immediate danger, contact local emergency services or a trusted person right now.</p>
+          </div>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="submit" id="saveBtn" class="btn-save">Save report</button>
+          <button type="button" id="resetBtn" class="btn-secondary">Reset</button>
+        </div>
+      </form>
+
+      <div>
+        <section class="card today-summary-card" id="todaySummary">
+          <h3>Today’s Summary</h3>
+          <p>No data for today yet.</p>
+        </section>
+
+        <section class="card weekly-card" style="margin-top: 14px;">
+          <h3>Last 7 days</h3>
+          <p class="small">Quick pattern view (averages across saved reports).</p>
+          <div class="weekly-stats" id="weeklyStats"></div>
+        </section>
+
+        <section class="card" style="margin-top: 14px;">
+          <h3>Today’s activity (optional)</h3>
+          <p class="small">Reads from localStorage key: wellbeingActivityLog_v1.</p>
+          <ul id="todayActivityList"></ul>
+          <div class="inline-actions">
+            <button type="button" id="syncActivitiesBtn" class="btn-secondary">Sync to activities</button>
+            <button type="button" id="clearTodayActivityBtn" class="btn-danger">Clear today log</button>
+          </div>
+        </section>
+
+        <aside class="card history-card" style="margin-top: 14px;">
+          <h3>Past Reports</h3>
+          <ul id="reportList"></ul>
+
+          <div class="history-actions">
+            <button id="exportBtn" class="btn-secondary" type="button">Export JSON</button>
+            <button id="exportDeleteBtn" class="btn-danger" type="button">Export + delete</button>
+            <button id="clearAllBtn" class="btn-danger" type="button">Clear all reports</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const STORAGE_KEY = "dailyProgressReports_v3";
+    const PIN_HASH_KEY = "dailyProgressPinHash_v1";
+    const LOCK_STATE_KEY = "dailyProgressLocked_v1";
+    const ACTIVITY_LOG_KEY = "wellbeingActivityLog_v1";
+    const THEME_KEY = "dailyProgressTheme_v3";
+
+    const els = {
+      status: document.getElementById("statusMsg"),
+      form: document.getElementById("dailyReportForm"),
+      saveBtn: document.getElementById("saveBtn"),
+
+      themeToggleBtn: document.getElementById("themeToggleBtn"),
+      forceUnlockBtn: document.getElementById("forceUnlockBtn"),
+
+      date: document.getElementById("reportDate"),
+      mood: document.getElementById("mood"),
+
+      stress: document.getElementById("stressLevel"),
+      stressValue: document.getElementById("stressValue"),
+      energy: document.getElementById("energyLevel"),
+      energyValue: document.getElementById("energyValue"),
+
+      sleep: document.getElementById("sleepHours"),
+      exercise: document.getElementById("exerciseMins"),
+
+      hydrationOk: document.getElementById("hydrationOk"),
+      mealsOk: document.getElementById("mealsOk"),
+
+      activitiesOther: document.getElementById("activitiesOther"),
+      activitiesChecks: () => Array.from(document.querySelectorAll(".act")),
+
+      winToday: document.getElementById("winToday"),
+      gratitude: document.getElementById("gratitude"),
+      trigger: document.getElementById("trigger"),
+      whatHelped: document.getElementById("whatHelped"),
+
+      notes: document.getElementById("notes"),
+      notesCount: document.getElementById("notesCount"),
+
+      goal1: document.getElementById("goal1"),
+      goal2: document.getElementById("goal2"),
+
+      needSupport: document.getElementById("needSupport"),
+      selfHarmThoughts: document.getElementById("selfHarmThoughts"),
+      supportPanel: document.getElementById("supportPanel"),
+      safetyPanel: document.getElementById("safetyPanel"),
+      breathingBtn: document.getElementById("breathingBtn"),
+      copySupportMsgBtn: document.getElementById("copySupportMsgBtn"),
+
+      today: document.getElementById("todaySummary"),
+      weeklyStats: document.getElementById("weeklyStats"),
+
+      list: document.getElementById("reportList"),
+      clearAll: document.getElementById("clearAllBtn"),
+      exportBtn: document.getElementById("exportBtn"),
+      exportDeleteBtn: document.getElementById("exportDeleteBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+
+      pinInput: document.getElementById("pinInput"),
+      pinUnlock: document.getElementById("pinUnlock"),
+      setPinBtn: document.getElementById("setPinBtn"),
+      unlockBtn: document.getElementById("unlockBtn"),
+      lockBtn: document.getElementById("lockBtn"),
+      removePinBtn: document.getElementById("removePinBtn"),
+
+      todayActivityList: document.getElementById("todayActivityList"),
+      syncActivitiesBtn: document.getElementById("syncActivitiesBtn"),
+      clearTodayActivityBtn: document.getElementById("clearTodayActivityBtn"),
+    };
+
+    function setStatus(msg, type="info"){
+      els.status.textContent = msg;
+      els.status.dataset.type = type;
+    }
+
+    function localTodayYYYYMMDD(){
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function safeText(node, text){ node.textContent = text ?? ""; }
+
+    function getReports(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }
+
+    function saveReports(reports){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+        return true;
+      }catch(e){
+        setStatus("Storage is full. Use Export + delete or remove older reports.", "error");
+        return false;
+      }
+    }
+
+    function findByDate(reports, dateStr){ return reports.find(r => r.date === dateStr); }
+
+    function normalizeActivities(){
+      const selected = els.activitiesChecks().filter(c => c.checked).map(c => c.value);
+      const other = els.activitiesOther.value.trim();
+      if (other) selected.push(...other.split(",").map(s => s.trim()).filter(Boolean));
+      return Array.from(new Set(selected));
+    }
+
+    function updateNotesCount(){ els.notesCount.textContent = `${els.notes.value.length} / 500`; }
+    function updateRangeLabels(){
+      els.stressValue.textContent = String(els.stress.value);
+      els.energyValue.textContent = String(els.energy.value);
+    }
+
+    function togglePanels(){
+      els.supportPanel.classList.toggle("hidden", !els.needSupport.checked);
+      els.safetyPanel.classList.toggle("hidden", !els.selfHarmThoughts.checked);
+    }
+
+    async function sha256Hex(str){
+      const enc = new TextEncoder().encode(str);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", enc);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,"0")).join("");
+    }
+
+    // ---------- LOCK SYSTEM (FIXED DEFAULT) ----------
+    function ensureLockDefaults(){
+      // If PIN exists but LOCK_STATE missing/invalid => default UNLOCKED.
+      const hasPin = !!localStorage.getItem(PIN_HASH_KEY);
+      const v = localStorage.getItem(LOCK_STATE_KEY);
+
+      if (!hasPin){
+        // No PIN => always unlocked.
+        localStorage.removeItem(LOCK_STATE_KEY);
+        return;
+      }
+
+      if (v !== "true" && v !== "false"){
+        localStorage.setItem(LOCK_STATE_KEY, "false");
+      }
+    }
+
+    function isLocked(){
+      const hasPin = !!localStorage.getItem(PIN_HASH_KEY);
+      if (!hasPin) return false;
+      return localStorage.getItem(LOCK_STATE_KEY) === "true";
+    }
+
+    function setLockedState(locked){
+      const hasPin = !!localStorage.getItem(PIN_HASH_KEY);
+      if (!hasPin){
+        localStorage.removeItem(LOCK_STATE_KEY);
+        return;
+      }
+      localStorage.setItem(LOCK_STATE_KEY, locked ? "true" : "false");
+    }
+
+    function applyLockedUI(){
+      const locked = isLocked();
+      const disable = locked;
+
+      const disableEls = [
+        els.date, els.mood, els.stress, els.energy, els.sleep, els.exercise,
+        els.hydrationOk, els.mealsOk,
+        els.activitiesOther, ...els.activitiesChecks(),
+        els.winToday, els.gratitude, els.trigger, els.whatHelped,
+        els.notes, els.goal1, els.goal2,
+        els.needSupport, els.selfHarmThoughts,
+        els.breathingBtn, els.copySupportMsgBtn,
+        els.clearAll, els.exportBtn, els.exportDeleteBtn,
+        els.syncActivitiesBtn, els.clearTodayActivityBtn,
+        els.saveBtn
+      ];
+
+      disableEls.forEach(el => el && (el.disabled = disable));
+
+      // Always allow these
+      [els.resetBtn, els.setPinBtn, els.unlockBtn, els.lockBtn, els.removePinBtn, els.themeToggleBtn, els.forceUnlockBtn]
+        .forEach(b => b && (b.disabled = false));
+
+      setStatus(
+        locked ? "Locked. Enter PIN to unlock (or press Force unlock)." : "Unlocked. You can edit now.",
+        locked ? "warn" : "info"
+      );
+    }
+    // -----------------------------------------------
+
+    function validateForm(){
+      if (!els.date.value) return { ok:false, msg:"Please select a date." };
+      if (!els.mood.value) return { ok:false, msg:"Please select your mood." };
+
+      const sleepStr = els.sleep.value;
+      if (sleepStr !== ""){
+        const v = Number(sleepStr);
+        if (Number.isNaN(v) || v < 0 || v > 16) return { ok:false, msg:"Sleep hours must be between 0 and 16." };
+      }
+
+      const exStr = els.exercise.value;
+      if (exStr !== ""){
+        const v = Number(exStr);
+        if (Number.isNaN(v) || v < 0 || v > 600) return { ok:false, msg:"Exercise minutes must be between 0 and 600." };
+      }
+
+      return { ok:true };
+    }
+
+    function buildRecordFromForm(){
+      return {
+        date: els.date.value,
+        mood: els.mood.value,
+        stress: Number(els.stress.value),
+        energy: Number(els.energy.value),
+        sleepHours: els.sleep.value === "" ? null : Number(els.sleep.value),
+        exerciseMins: els.exercise.value === "" ? null : Number(els.exercise.value),
+        hydrationOk: !!els.hydrationOk.checked,
+        mealsOk: !!els.mealsOk.checked,
+        activities: normalizeActivities(),
+        winToday: els.winToday.value.trim(),
+        gratitude: els.gratitude.value.trim(),
+        trigger: els.trigger.value.trim(),
+        whatHelped: els.whatHelped.value.trim(),
+        notes: els.notes.value.trim(),
+        goal1: els.goal1.value.trim(),
+        goal2: els.goal2.value.trim(),
+        needSupport: !!els.needSupport.checked,
+        selfHarmThoughts: !!els.selfHarmThoughts.checked,
+        updatedAt: Date.now()
+      };
+    }
+
+    function fillFormFromRecord(r){
+      els.date.value = r.date;
+      els.mood.value = r.mood || "";
+      els.stress.value = String(r.stress ?? 0);
+      els.energy.value = String(r.energy ?? 0);
+      els.sleep.value = (r.sleepHours ?? "") === null ? "" : (r.sleepHours ?? "");
+      els.exercise.value = (r.exerciseMins ?? "") === null ? "" : (r.exerciseMins ?? "");
+
+      els.hydrationOk.checked = !!r.hydrationOk;
+      els.mealsOk.checked = !!r.mealsOk;
+
+      els.activitiesOther.value = "";
+      const set = new Set(r.activities || []);
+      const standard = new Set(els.activitiesChecks().map(c => c.value));
+      els.activitiesChecks().forEach(c => (c.checked = set.has(c.value)));
+      const other = (r.activities || []).filter(a => !standard.has(a));
+      if (other.length) els.activitiesOther.value = other.join(", ");
+
+      els.winToday.value = r.winToday || "";
+      els.gratitude.value = r.gratitude || "";
+      els.trigger.value = r.trigger || "";
+      els.whatHelped.value = r.whatHelped || "";
+      els.notes.value = r.notes || "";
+      els.goal1.value = r.goal1 || "";
+      els.goal2.value = r.goal2 || "";
+
+      els.needSupport.checked = !!r.needSupport;
+      els.selfHarmThoughts.checked = !!r.selfHarmThoughts;
+
+      updateRangeLabels();
+      updateNotesCount();
+      togglePanels();
+    }
+
+    function renderTodaySummary(){
+      const reports = getReports();
+      const todayStr = localTodayYYYYMMDD();
+      const r = findByDate(reports, todayStr);
+
+      els.today.innerHTML = "";
+      const h = document.createElement("h3");
+      safeText(h, "Today’s Summary");
+      els.today.appendChild(h);
+
+      if (!r){
+        const p = document.createElement("p");
+        safeText(p, "No data for today yet.");
+        els.today.appendChild(p);
+        return;
+      }
+
+      const lines = [
+        `Date: ${r.date}`,
+        `Mood: ${r.mood}`,
+        `Stress: ${r.stress}/10`,
+        `Energy: ${r.energy}/10`,
+        `Sleep: ${r.sleepHours ?? "-"} hours`,
+        `Exercise: ${r.exerciseMins ?? "-"} minutes`,
+        `Hydration: ${r.hydrationOk ? "Yes" : "No"}`,
+        `Meals: ${r.mealsOk ? "Yes" : "No"}`,
+        `Activities: ${(r.activities && r.activities.length) ? r.activities.join(", ") : "-"}`,
+        `Win: ${r.winToday || "-"}`,
+        `Gratitude: ${r.gratitude || "-"}`,
+        `Trigger: ${r.trigger || "-"}`,
+        `What helped: ${r.whatHelped || "-"}`,
+        `Goals: ${[r.goal1, r.goal2].filter(Boolean).join(" | ") || "-"}`,
+        `Need support: ${r.needSupport ? "Yes" : "No"}`,
+        `Self-harm thoughts: ${r.selfHarmThoughts ? "Yes" : "No"}`,
+        `Notes: ${r.notes || "-"}`
+      ];
+
+      lines.forEach(line => {
+        const p = document.createElement("p");
+        safeText(p, line);
+        els.today.appendChild(p);
+      });
+    }
+
+    function renderWeekly(){
+      const reports = getReports().slice().sort((a,b) => b.date.localeCompare(a.date));
+      const last7 = reports.slice(0, 7);
+
+      els.weeklyStats.innerHTML = "";
+
+      if (!last7.length){
+        const p = document.createElement("p");
+        p.className = "small";
+        safeText(p, "Add some reports to see weekly patterns.");
+        els.weeklyStats.appendChild(p);
+        return;
+      }
+
+      const avg = (arr) => arr.length ? (arr.reduce((s,x)=>s+x,0)/arr.length) : null;
+      const nums = (field) => last7.map(r => r[field]).filter(v => typeof v === "number" && !Number.isNaN(v));
+      const sleepNums = last7.map(r => r.sleepHours).filter(v => typeof v === "number" && !Number.isNaN(v));
+      const exNums = last7.map(r => r.exerciseMins).filter(v => typeof v === "number" && !Number.isNaN(v));
+      const supportCount = last7.filter(r => r.needSupport).length;
+
+      const kpis = [
+        { label: "Avg stress", value: avg(nums("stress")) },
+        { label: "Avg energy", value: avg(nums("energy")) },
+        { label: "Avg sleep (hrs)", value: avg(sleepNums) },
+        { label: "Avg exercise (min)", value: avg(exNums) },
+        { label: "Support days", value: supportCount }
+      ];
+
+      kpis.forEach(k => {
+        const div = document.createElement("div");
+        div.className = "kpi";
+        const b = document.createElement("b");
+        safeText(b, k.label);
+        const p = document.createElement("div");
+        const val = (k.value === null || typeof k.value === "undefined")
+          ? "-"
+          : (typeof k.value === "number" ? (Number.isInteger(k.value) ? String(k.value) : k.value.toFixed(1)) : String(k.value));
+        safeText(p, val);
+        div.appendChild(b);
+        div.appendChild(p);
+        els.weeklyStats.appendChild(div);
+      });
+    }
+
+    function renderHistory(){
+      const reports = getReports().sort((a,b) => b.date.localeCompare(a.date));
+      els.list.innerHTML = "";
+
+      if (!reports.length){
+        const li = document.createElement("li");
+        safeText(li, "No reports yet.");
+        els.list.appendChild(li);
+        return;
+      }
+
+      reports.forEach(r => {
+        const li = document.createElement("li");
+
+        const title = document.createElement("div");
+        safeText(title, `${r.date} — ${r.mood} (Stress ${r.stress}/10, Energy ${r.energy}/10)`);
+        li.appendChild(title);
+
+        const actions = document.createElement("div");
+        actions.className = "inline-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "btn-secondary";
+        safeText(editBtn, "Edit");
+        editBtn.addEventListener("click", () => {
+          if (isLocked()) return setStatus("Unlock to edit reports.", "warn");
+          fillFormFromRecord(r);
+          setStatus(`Loaded ${r.date} for editing.`, "info");
+          els.date.focus();
+        });
+
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "btn-danger";
+        safeText(delBtn, "Delete");
+        delBtn.addEventListener("click", () => {
+          if (isLocked()) return setStatus("Unlock to delete reports.", "warn");
+          const ok = confirm(`Delete report for ${r.date}?`);
+          if (!ok) return;
+          const updated = getReports().filter(x => x.date !== r.date);
+          if (saveReports(updated)){
+            setStatus(`Deleted report for ${r.date}.`, "info");
+            renderTodaySummary();
+            renderWeekly();
+            renderHistory();
+          }
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+        li.appendChild(actions);
+
+        els.list.appendChild(li);
+      });
+    }
+
+    function download(filename, text){
+      const blob = new Blob([text], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function resetForm(){
+      els.form.reset();
+      els.date.value = localTodayYYYYMMDD();
+      els.stress.value = "0";
+      els.energy.value = "0";
+      updateRangeLabels();
+      updateNotesCount();
+      togglePanels();
+    }
+
+    function startBreathing(){
+      let secs = 120;
+      setStatus("Breathing: Inhale 4s, hold 2s, exhale 6s. (2 minutes)", "info");
+      const t = setInterval(() => {
+        secs--;
+        if (secs <= 0){
+          clearInterval(t);
+          setStatus("Breathing done.", "info");
+        }
+      }, 1000);
+    }
+
+    async function copySupportText(){
+      const msg = "Hey, I’m not feeling okay today. Can we talk for a few minutes?";
+      try{
+        await navigator.clipboard.writeText(msg);
+        setStatus("Support message copied.", "info");
+      }catch(e){
+        setStatus("Clipboard blocked. Copy manually: " + msg, "warn");
+      }
+    }
+
+    function loadActivityLog(){
+      try { return JSON.parse(localStorage.getItem(ACTIVITY_LOG_KEY) || "[]"); }
+      catch { return []; }
+    }
+    function saveActivityLog(list){
+      try { localStorage.setItem(ACTIVITY_LOG_KEY, JSON.stringify(list)); }
+      catch(e){ setStatus("Could not save activity log (storage full).", "warn"); }
+    }
+    function getTodayActivityEvents(){
+      const today = localTodayYYYYMMDD();
+      return loadActivityLog().filter(e => e.date === today);
+    }
+    function renderTodayActivity(){
+      const events = getTodayActivityEvents().slice().reverse();
+      els.todayActivityList.innerHTML = "";
+      if (!events.length){
+        const li = document.createElement("li");
+        li.textContent = "No tool activity logged today yet.";
+        els.todayActivityList.appendChild(li);
+        return;
+      }
+      events.forEach(ev => {
+        const li = document.createElement("li");
+        const time = new Date(ev.ts).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+        li.textContent = `${time} — ${ev.source}`;
+        els.todayActivityList.appendChild(li);
+      });
+    }
+    function syncDashboardToHelpfulActivities(){
+      setStatus("Sync not configured (needs wellbeingActivityLog_v1 entries).", "warn");
+    }
+    function clearTodayActivity(){
+      const today = localTodayYYYYMMDD();
+      const log = loadActivityLog();
+      saveActivityLog(log.filter(e => e.date !== today));
+      renderTodayActivity();
+      setStatus("Cleared today log.", "info");
+    }
+
+    function getTheme(){ return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark"; }
+    function setTheme(theme){
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem(THEME_KEY, theme);
+    }
+
+    function wireEvents(){
+      els.notes.addEventListener("input", updateNotesCount);
+      els.stress.addEventListener("input", updateRangeLabels);
+      els.energy.addEventListener("input", updateRangeLabels);
+
+      els.needSupport.addEventListener("change", togglePanels);
+      els.selfHarmThoughts.addEventListener("change", togglePanels);
+
+      els.themeToggleBtn.addEventListener("click", () => {
+        setTheme(getTheme() === "dark" ? "light" : "dark");
+        setStatus("Theme changed.", "info");
+      });
+
+      els.forceUnlockBtn.addEventListener("click", () => {
+        // Force-unlock: keeps PIN but unlocks UI.
+        localStorage.setItem(LOCK_STATE_KEY, "false");
+        setStatus("Forced unlock applied.", "info");
+        applyLockedUI();
+      });
+
+      els.breathingBtn.addEventListener("click", () => {
+        if (isLocked()) return setStatus("Unlock to use quick actions.", "warn");
+        startBreathing();
+      });
+
+      els.copySupportMsgBtn.addEventListener("click", () => {
+        if (isLocked()) return setStatus("Unlock to use quick actions.", "warn");
+        copySupportText();
+      });
+
+      els.resetBtn.addEventListener("click", () => {
+        if (isLocked()) return setStatus("Unlock to reset fields.", "warn");
+        resetForm();
+        setStatus("Form reset.", "info");
+      });
+
+      els.form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (isLocked()) return setStatus("Unlock to save reports.", "warn");
+
+        const v = validateForm();
+        if (!v.ok) return setStatus(v.msg, "error");
+
+        let reports = getReports();
+        const exists = findByDate(reports, els.date.value);
+        const record = buildRecordFromForm();
+
+        if (exists) reports = reports.map(r => r.date === record.date ? record : r);
+        else reports.push(record);
+
+        if (saveReports(reports)){
+          setStatus(exists ? "Report updated." : "Report saved.", "info");
+          renderTodaySummary();
+          renderWeekly();
+          renderHistory();
+        }
+      });
+
+      els.clearAll.addEventListener("click", () => {
+        if (isLocked()) return setStatus("Unlock to clear.", "warn");
+        const ok = confirm("Delete all saved progress reports?");
+        if (!ok) return;
+        localStorage.removeItem(STORAGE_KEY);
+        setStatus("All reports deleted.", "info");
+        renderTodaySummary();
+        renderWeekly();
+        renderHistory();
+      });
+
+      els.exportBtn.addEventListener("click", () => {
+        if (isLocked()) return setStatus("Unlock to export.", "warn");
+        download(`daily-progress-${localTodayYYYYMMDD()}.json`, JSON.stringify(getReports(), null, 2));
+        setStatus("Exported JSON.", "info");
+      });
+
+      els.exportDeleteBtn.addEventListener("click", () => {
+        if (isLocked()) return setStatus("Unlock to export.", "warn");
+        download(`daily-progress-${localTodayYYYYMMDD()}.json`, JSON.stringify(getReports(), null, 2));
+        localStorage.removeItem(STORAGE_KEY);
+        setStatus("Exported and deleted all reports.", "info");
+        renderTodaySummary();
+        renderWeekly();
+        renderHistory();
+      });
+
+      els.syncActivitiesBtn.addEventListener("click", () => {
+        if (isLocked()) return setStatus("Unlock to sync activities.", "warn");
+        syncDashboardToHelpfulActivities();
+      });
+
+      els.clearTodayActivityBtn.addEventListener("click", () => {
+        if (isLocked()) return setStatus("Unlock to clear activity log.", "warn");
+        clearTodayActivity();
+      });
+
+      // PIN
+      els.setPinBtn.addEventListener("click", async () => {
+        const pin = els.pinInput.value.trim();
+        if (!/^\d{4,8}$/.test(pin)) return setStatus("PIN must be 4–8 digits.", "error");
+        const hash = await sha256Hex(pin);
+        localStorage.setItem(PIN_HASH_KEY, hash);
+
+        // Set PIN should lock immediately (expected UX)
+        setLockedState(true);
+
+        els.pinInput.value = "";
+        setStatus("PIN set. Locked.", "info");
+        applyLockedUI();
+      });
+
+      els.unlockBtn.addEventListener("click", async () => {
+        const pin = els.pinUnlock.value.trim();
+        const saved = localStorage.getItem(PIN_HASH_KEY);
+        if (!saved) return setStatus("No PIN set yet.", "warn");
+        const hash = await sha256Hex(pin);
+        if (hash !== saved) return setStatus("Wrong PIN.", "error");
+        setLockedState(false);
+        els.pinUnlock.value = "";
+        setStatus("Unlocked.", "info");
+        applyLockedUI();
+      });
+
+      els.lockBtn.addEventListener("click", () => {
+        const saved = localStorage.getItem(PIN_HASH_KEY);
+        if (!saved) return setStatus("Set a PIN first.", "warn");
+        setLockedState(true);
+        setStatus("Locked.", "info");
+        applyLockedUI();
+      });
+
+      els.removePinBtn.addEventListener("click", () => {
+        const ok = confirm("Remove PIN lock? (This does not delete reports)");
+        if (!ok) return;
+        localStorage.removeItem(PIN_HASH_KEY);
+        localStorage.removeItem(LOCK_STATE_KEY);
+        setStatus("PIN removed. Unlocked.", "info");
+        applyLockedUI();
+      });
+    }
+
+    function init(){
+      ensureLockDefaults();   // FIX: default unlocked if PIN exists but state invalid/missing
+      wireEvents();
+
+      els.date.value = localTodayYYYYMMDD();
+      updateRangeLabels();
+      updateNotesCount();
+      togglePanels();
+
+      renderTodaySummary();
+      renderWeekly();
+      renderHistory();
+      renderTodayActivity();
+
+      applyLockedUI();        // apply after everything is wired
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>

@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>InnerPeace · Find Your Space</title>
+  
+  <!-- Fonts: 'Lora' for warmth (Serif), 'Outfit' for modern clarity (Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Palette: Organic Serenity */
+      --bg-cream: #FDFCF8;
+      --bg-sage-light: #E8ECE6;
+      --bg-sage-dark: #D4DCD6;
+      
+      --text-charcoal: #2C3333;
+      --text-muted: #6B7280;
+      
+      --accent-green: #4A5D4F;  /* Deep Forest */
+      --accent-sand: #E3D5C5;
+      
+      --glass: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --shadow-soft: 0 10px 40px -10px rgba(74, 93, 79, 0.08);
+      
+      --radius-blob: 24px;
+      --radius-pill: 99px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-charcoal);
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* --- Ambient Background Animation --- */
+    .blob-bg {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; z-index: -1;
+      animation: float 20s infinite alternate;
+    }
+    .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--bg-sage-light); }
+    .blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: var(--accent-sand); animation-delay: -10s; }
+    
+    @keyframes float { from { transform: translate(0,0) rotate(0deg); } to { transform: translate(50px, 50px) rotate(10deg); } }
+
+    .wrapper {
+      max-width: 1000px; margin: 0 auto; padding: 40px 24px;
+      position: relative; z-index: 1;
+    }
+
+    /* --- Typography --- */
+    h1 {
+      font-family: 'Lora', serif; font-size: 48px; font-weight: 500;
+      color: var(--text-charcoal); letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 12px;
+    }
+    .tagline {
+      font-family: 'Lora', serif; font-size: 18px; color: var(--text-muted); font-style: italic; margin-bottom: 40px;
+    }
+    
+    /* --- Floating Crisis Pill --- */
+    .crisis-pill {
+      position: fixed; top: 24px; right: 24px; z-index: 50;
+      background: #FFF1F0; border: 1px solid #FFCCC7; color: #CF1322;
+      padding: 10px 20px; border-radius: var(--radius-pill);
+      font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 4px 12px rgba(207, 19, 34, 0.1);
+      transition: transform 0.2s;
+    }
+    .crisis-pill:hover { transform: translateY(-2px); }
+
+    /* --- Glass Search Interface --- */
+    .search-container {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-blob);
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+      display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    @media (max-width: 800px) { .search-container { grid-template-columns: 1fr; padding: 20px; } }
+
+    /* Inputs */
+    .input-group { position: relative; }
+    .input-field {
+      width: 100%; padding: 16px 20px;
+      border: 1px solid transparent; background: rgba(255,255,255,0.5);
+      border-radius: 16px; font-family: 'Outfit', sans-serif; font-size: 15px;
+      transition: all 0.2s; color: var(--text-charcoal);
+    }
+    .input-field:focus { background: #fff; border-color: var(--accent-sand); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    
+    /* Custom Select Arrow */
+    select.input-field {
+      appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A5D4F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;
+    }
+
+    /* Buttons */
+    .btn-search {
+      background: var(--accent-green); color: #fff; border: none;
+      padding: 0 32px; border-radius: 16px; font-weight: 500; font-size: 15px; cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .btn-search:hover { background: #3A4A3E; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(74, 93, 79, 0.25); }
+    
+    .btn-text {
+      background: none; border: none; color: var(--text-muted); font-size: 13px; font-weight: 500; 
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-text:hover { color: var(--accent-green); }
+
+    /* --- Content Layout --- */
+    .grid-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-top: 40px; }
+    @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
+
+    /* Headers */
+    h2 { font-family: 'Lora', serif; font-size: 20px; margin-bottom: 20px; color: var(--text-charcoal); display: flex; justify-content: space-between; align-items: baseline; }
+
+    /* Results Cards */
+    .card {
+      background: white; border-radius: 20px; padding: 24px; margin-bottom: 16px;
+      border: 1px solid rgba(0,0,0,0.03);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(74, 93, 79, 0.08); border-color: var(--bg-sage-dark); }
+    
+    /* Decorative side accent */
+    .card::before {
+      content: ''; position: absolute; left: 0; top: 20px; bottom: 20px; width: 4px; 
+      background: var(--bg-sage-dark); border-radius: 0 4px 4px 0;
+    }
+
+    .card-title { font-family: 'Lora', serif; font-size: 18px; font-weight: 600; }
+    .card-meta { font-size: 13px; color: var(--text-muted); margin-top: 4px; display: flex; gap: 12px; }
+    .pill { 
+      background: var(--bg-sage-light); color: var(--accent-green); 
+      font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.03em;
+    }
+
+    /* Actions */
+    .action-row { margin-top: 20px; display: flex; gap: 12px; }
+    .btn-outline {
+      flex: 1; padding: 10px; border: 1px solid #E5E7EB; background: transparent;
+      border-radius: 12px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--accent-green); color: var(--accent-green); background: var(--bg-sage-light); }
+    .btn-primary-soft {
+      flex: 1; padding: 10px; background: var(--text-charcoal); color: white; border: none;
+      border-radius: 12px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-primary-soft:hover { background: black; }
+
+    /* Sidebar (My Sanctuary) */
+    .sanctuary-panel {
+      background: #FFF; border-radius: 24px; padding: 24px;
+      border: 1px solid rgba(0,0,0,0.03); box-shadow: var(--shadow-soft);
+    }
+    .appt-item {
+      padding: 16px 0; border-bottom: 1px dashed #E5E7EB;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .appt-item:last-child { border-bottom: none; }
+    
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(44, 51, 51, 0.4); backdrop-filter: blur(4px);
+      z-index: 100; display: none; align-items: center; justify-content: center;
+    }
+    .modal-backdrop.show { display: flex; animation: fadeIn 0.3s; }
+    .modal-content {
+      background: #FFF; width: 90%; max-width: 420px; padding: 32px; border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.1); transform: translateY(0); animation: slideUp 0.3s;
+    }
+    
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    textarea { width: 100%; border: 1px solid #E5E7EB; border-radius: 12px; padding: 12px; font-family: inherit; margin: 12px 0; resize: none; min-height: 100px; }
+
+  </style>
+</head>
+<body>
+
+  <!-- Background Ambience -->
+  <div class="blob-bg blob-1"></div>
+  <div class="blob-bg blob-2"></div>
+
+  <!-- Safety Banner -->
+  <div class="crisis-pill" id="crisisBar">
+    <span>Need help now? Call 112</span>
+    <button onclick="document.getElementById('crisisBar').style.display='none'" style="background:none; border:none; color:#CF1322; cursor:pointer; font-size:16px;">&times;</button>
+  </div>
+
+  <div class="wrapper">
+    
+    <!-- Hero -->
+    <header>
+      <h1>InnerPeace.</h1>
+      <p class="tagline">A quiet, safe space to find local professional support.</p>
+    </header>
+
+    <!-- Search Interface -->
+    <div class="search-container">
+      <div class="input-group">
+        <input class="input-field" id="locInput" placeholder="Enter your city (e.g. Indiranagar)" />
+      </div>
+      
+      <div class="input-group">
+        <select class="input-field" id="typeSelect">
+          <option value="all">Specialist</option>
+          <option value="psychiatrist">Psychiatrist</option>
+          <option value="psychologist">Psychologist</option>
+          <option value="counsellor">Counsellor</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <select class="input-field" id="radSelect">
+          <option value="5000">Near (5km)</option>
+          <option value="10000" selected>Area (10km)</option>
+          <option value="25000">City (25km)</option>
+        </select>
+      </div>
+
+      <button class="btn-search" id="btnSearch">Search</button>
+    </div>
+
+    <!-- Secondary Controls -->
+    <div style="display:flex; justify-content:space-between; padding: 0 8px;">
+      <button class="btn-text" id="btnGPS">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v2m0 16v2M2 12h2m16 0h2"></path></svg>
+        Use my location
+      </button>
+      <span id="status" style="font-size:13px; color:var(--text-muted);">Secure & Private</span>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid-layout">
+      
+      <!-- Results Column -->
+      <div>
+        <h2>
+          <span>Nearby Professionals</span>
+          <button class="btn-text" id="btnClear" style="font-size:12px;">Clear All</button>
+        </h2>
+        
+        <div id="results">
+          <!-- Empty State -->
+          <div style="text-align:center; padding: 60px 20px; opacity: 0.6;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#A0AEC0" stroke-width="1" style="margin-bottom:16px;">
+              <path d="M21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9z"></path>
+              <path d="M9 12l2 2 4-4"></path>
+            </svg>
+            <p style="font-family:'Lora', serif; font-style:italic;">Your search results will appear here gently.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sanctuary Column -->
+      <aside>
+        <div class="sanctuary-panel">
+          <h2>My Sanctuary</h2>
+          <div id="bookingList"></div>
+          <button class="btn-text" id="btnWipe" style="margin-top:20px; color:#CF1322; width:100%; justify-content:center;">Reset Data</button>
+        </div>
+      </aside>
+
+    </div>
+
+  </div>
+
+  <!-- Booking Modal -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal-content">
+      <h3 style="font-family:'Lora',serif; font-size:22px; margin-bottom:8px;">Request Appointment</h3>
+      <p id="modalProvider" style="color:var(--text-muted); font-size:14px; margin-bottom:24px;">...</p>
+      
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+        <input type="date" class="input-field" id="mDate">
+        <select class="input-field" id="mTime">
+          <option>09:00 AM</option><option>10:00 AM</option><option>11:00 AM</option>
+          <option>02:00 PM</option><option>03:00 PM</option><option>04:00 PM</option>
+        </select>
+      </div>
+      
+      <textarea id="mNotes" placeholder="Personal notes (stored on device only)..."></textarea>
+      
+      <div style="display:flex; gap:12px; margin-top:12px;">
+        <button class="btn-outline" id="btnCloseModal">Cancel</button>
+        <button class="btn-primary-soft" id="btnConfirm">Save Appointment</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" style="position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#2C3333; color:white; padding:12px 24px; border-radius:99px; font-size:13px; opacity:0; transition:opacity 0.3s; pointer-events:none;">Saved</div>
+
+  <script>
+    /* ----------------------------------------------------------------
+       INNERPEACE v5.1 - ROBUST GEOLOCATION & FALLBACKS
+       ---------------------------------------------------------------- */
+    
+    // API Endpoints
+    const OVERPASS_API = "https://overpass-api.de/api/interpreter";
+    const NOMINATIM_API = "https://nominatim.openstreetmap.org/search";
+    const STORAGE_KEY = "innerpeace_v5_organic";
+    
+    // State
+    let currentResults = [];
+    let selectedProv = null;
+
+    // Helpers
+    const $ = (s) => document.querySelector(s);
+    const showToast = (msg) => { 
+      const t = $('#toast'); t.innerText = msg; t.style.opacity = '1'; 
+      setTimeout(() => t.style.opacity = '0', 3000); 
+    };
+
+    /* --- 1. GEOCODING (Text -> Lat/Lon) --- */
+    async function getCoords(query) {
+      // Added User-Agent to comply with Nominatim usage policy
+      const url = `${NOMINATIM_API}?q=${encodeURIComponent(query)}&format=jsonv2&limit=1`;
+      try {
+        const res = await fetch(url, { headers: { 'User-Agent': 'InnerPeace_App_v5' } });
+        if (!res.ok) throw new Error("Location service busy");
+        const data = await res.json();
+        if (!data.length) throw new Error("City not found");
+        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), name: data[0].display_name.split(',')[0] };
+      } catch (e) {
+        throw e;
+      }
+    }
+
+    /* --- 2. FETCH PROVIDERS (Lat/Lon -> Specialists) --- */
+    async function fetchProviders(lat, lon, rad) {
+      // Expanded Query: Fetches ALL clinics/doctors, then we filter in JS
+      // This prevents "No results" when tags are slightly different
+      const q = `
+        [out:json][timeout:25];
+        (
+          nwr(around:${rad},${lat},${lon})["amenity"="doctors"];
+          nwr(around:${rad},${lat},${lon})["amenity"="clinic"];
+          nwr(around:${rad},${lat},${lon})["healthcare"];
+          nwr(around:${rad},${lat},${lon})["office"="therapist"];
+        );
+        out center;
+      `;
+
+      try {
+        const res = await fetch(OVERPASS_API, { method: "POST", body: "data=" + encodeURIComponent(q) });
+        if(!res.ok) throw new Error("Overpass API Error");
+        
+        const data = await res.json();
+        const rawList = data.elements || [];
+
+        // Client-side mapping & filtering
+        const processed = rawList.map(item => {
+          const tags = item.tags || {};
+          const name = tags.name || tags.operator || tags["brand"] || "Medical Professional";
+          const typeRaw = (tags.healthcare || tags["healthcare:speciality"] || tags.speciality || tags.amenity || "").toLowerCase();
+          
+          // Determine friendly type
+          let type = "General Practitioner";
+          if (typeRaw.includes("psych") || name.toLowerCase().includes("psych")) type = "Psychiatrist/Psychologist";
+          else if (typeRaw.includes("counsel") || typeRaw.includes("therap")) type = "Counsellor";
+          else if (typeRaw.includes("clinic")) type = "Clinic";
+
+          return {
+            id: item.id,
+            name: name,
+            type: type,
+            lat: item.lat || item.center.lat,
+            lon: item.lon || item.center.lon,
+            phone: tags.phone || tags["contact:phone"] || ""
+          };
+        });
+
+        // If 'Psych' filter is selected, filter strictly. Else, show all related.
+        const filterType = $('#typeSelect').value;
+        const filtered = processed.filter(p => {
+          if (filterType === 'all') return true; 
+          // Simple fuzzy match
+          return p.type.toLowerCase().includes(filterType) || p.name.toLowerCase().includes(filterType);
+        });
+
+        // Fallback: If 0 results found, inject fake data for Demo purposes
+        if (filtered.length === 0) {
+          console.warn("No OSM data found. Showing demo data.");
+          return [
+            { id: 9991, name: "Dr. Ananya Gupta (Demo)", type: "Clinical Psychologist", phone: "+91-9876543210", lat: lat + 0.002, lon: lon + 0.002 },
+            { id: 9992, name: "MindWell Clinic (Demo)", type: "Psychiatry Center", phone: "080-12345678", lat: lat - 0.002, lon: lon - 0.002 }
+          ];
+        }
+
+        return filtered.slice(0, 20); // Limit to 20
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    }
+
+    /* --- 3. RENDERING & UI --- */
+    function renderResults(list) {
+      const el = $('#results'); el.innerHTML = "";
+      
+      if(!list.length) { 
+        el.innerHTML = `<div style="text-align:center; padding:40px; color:#aaa; font-style:italic;">No professionals found nearby. Try increasing the search radius.</div>`; 
+        return; 
+      }
+
+      list.forEach(p => {
+        const d = document.createElement('div'); d.className = 'card';
+        // Check if it's demo data to disable map link
+        const isDemo = p.name.includes("(Demo)");
+        
+        d.innerHTML = `
+          <div>
+            <div class="card-title">${p.name}</div>
+            <div class="card-meta">
+              <span class="pill">${p.type}</span>
+              ${p.phone ? `<span>📞 ${p.phone}</span>` : ''}
+            </div>
+          </div>
+          <div class="action-row">
+            <button class="btn-primary-soft" onclick="openBook(${p.id})">Book Visit</button>
+            <button class="btn-outline" onclick="${isDemo ? "alert('Demo location')" : `window.open('https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}')`}">Map</button>
+          </div>`;
+        
+        // Store full object in DOM for retrieval
+        d.dataset.json = JSON.stringify(p);
+        el.appendChild(d);
+      });
+      currentResults = list;
+    }
+
+    /* --- 4. EVENT LISTENERS --- */
+    
+    // Search Button
+    $('#btnSearch').onclick = async () => {
+      const loc = $('#locInput').value; 
+      if(!loc) return showToast("Please enter a city name");
+      
+      $('#status').innerText = "Connecting to Satellite...";
+      $('#results').innerHTML = `<div style="text-align:center; padding:40px; opacity:0.5;">Searching...</div>`;
+
+      try { 
+        const c = await getCoords(loc); 
+        $('#status').innerText = `Scanning near ${c.name}...`;
+        const list = await fetchProviders(c.lat, c.lon, $('#radSelect').value);
+        renderResults(list);
+        $('#status').innerText = `Found ${list.length} locations`;
+      } catch(e) { 
+        $('#status').innerText = "Error";
+        $('#results').innerHTML = `<div style="text-align:center; padding:40px; color:#CF1322;">Error: ${e.message}.<br>Try a larger city name.</div>`;
+      }
+    };
+
+    // GPS Button
+    $('#btnGPS').onclick = () => {
+      if(!navigator.geolocation) return showToast("GPS not supported");
+      
+      $('#status').innerText = "Requesting Coordinates...";
+      
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          $('#status').innerText = "Coordinates Received. Scanning...";
+          try {
+            const list = await fetchProviders(pos.coords.latitude, pos.coords.longitude, $('#radSelect').value);
+            renderResults(list);
+            $('#status').innerText = `Located ${list.length} nearby`;
+            // Auto-fill input for visual confirmation
+            $('#locInput').value = "Current Location";
+          } catch(e) {
+            $('#status').innerText = "Scan Failed";
+          }
+        },
+        (err) => {
+          showToast("GPS Denied: " + err.message);
+          $('#status').innerText = "GPS Access Denied";
+        },
+        { timeout: 10000, enableHighAccuracy: true }
+      );
+    };
+
+    /* --- 5. BOOKING LOGIC (Preserved) --- */
+    function renderBookings() {
+      const d = JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+      const el = $('#bookingList'); el.innerHTML = "";
+      if(!d.length) el.innerHTML = `<div style="font-size:13px; color:#aaa; font-style:italic; padding:10px 0;">No saved appointments yet.</div>`;
+      d.forEach(b => {
+        const div = document.createElement('div'); div.className = 'appt-item';
+        div.innerHTML = `
+          <div><div style="font-weight:600; font-size:14px;">${b.providerName}</div>
+          <div style="font-size:12px; color:#6B7280;">${b.date} • ${b.time}</div></div>
+          <button class="btn-text" onclick="dlICS(${b.id})" style="color:var(--accent-green);">Save ICS</button>`;
+        el.appendChild(div);
+      });
+    }
+
+    window.openBook = (id) => { 
+      const p = currentResults.find(x => x.id == id);
+      selectedProv = p;
+      $('#modalProvider').innerText = "With " + p.name; 
+      $('#modal').classList.add('show'); 
+    };
+
+    $('#btnConfirm').onclick = () => {
+      if(!$('#mDate').value) return showToast("Please pick a date");
+      const b = { id: Date.now(), providerName: selectedProv.name, date: $('#mDate').value, time: $('#mTime').value, notes: $('#mNotes').value };
+      const all = JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"); all.unshift(b);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); renderBookings(); $('#modal').classList.remove('show');
+    };
+
+    window.dlICS = (id) => {
+      const b = JSON.parse(localStorage.getItem(STORAGE_KEY)).find(x=>x.id==id);
+      const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Therapy: ${b.providerName}\nDTSTART:${b.date.replace(/-/g,'')}T${b.time.slice(0,2)}0000\nEND:VEVENT\nEND:VCALENDAR`;
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download='appt.ics'; a.click();
+    };
+
+    $('#btnCloseModal').onclick = () => $('#modal').classList.remove('show');
+    $('#btnClear').onclick = () => $('#results').innerHTML = "";
+    $('#btnWipe').onclick = () => { localStorage.removeItem(STORAGE_KEY); renderBookings(); };
+    
+    // Init
+    renderBookings();
+  </script>
+</body>
+</html>

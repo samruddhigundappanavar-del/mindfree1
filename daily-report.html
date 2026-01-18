@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Check-in | Mind Sanctuary</title>
+
+  <!-- Aesthetic Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* --- HOPEFUL MINIMAL CSS --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+    
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.45);
+      --glass-card: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --text-main: #334155; 
+      --text-muted: #64748b;
+      --accent-color: #6366f1; /* Indigo */
+      --success-color: #10b981;
+      --warm-shadow: 0 20px 40px rgba(100, 116, 139, 0.08);
+      --radius: 24px;
+    }
+
+    /* Living Background */
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fdfbf7 0%, #e0e7ff 100%);
+      background-size: 400% 400%;
+      animation: sunriseFlow 20s ease infinite;
+      color: var(--text-main);
+      padding: 20px;
+      display: flex; justify-content: center; align-items: flex-start;
+    }
+    @keyframes sunriseFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+    /* Main Container */
+    .wrap {
+      width: 100%; max-width: 900px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 30px;
+      box-shadow: var(--warm-shadow);
+      margin-top: 20px;
+    }
+
+    /* Header */
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .backBtn {
+      text-decoration: none; color: var(--text-muted); font-weight: 600; 
+      display: flex; align-items: center; gap: 8px; transition: color 0.2s;
+    }
+    .backBtn:hover { color: var(--accent-color); }
+
+    .title {
+      font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700;
+      color: var(--text-main); text-align: center; margin-bottom: 5px;
+    }
+    .subtitle { text-align: center; color: var(--text-muted); font-size: 15px; margin-bottom: 30px; }
+
+    /* Forms */
+    .card {
+      background: white; border-radius: 20px; padding: 25px;
+      border: 1px solid #f1f5f9; box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-family: 'Playfair Display'; font-size: 18px; color: var(--text-main);
+      margin-bottom: 15px; font-weight: 600;
+    }
+
+    label { display: block; font-size: 14px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+    
+    input, select, textarea {
+      width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;
+      background: #f8fafc; outline: none; font-size: 14px; color: var(--text-main);
+      transition: 0.2s; font-family: 'Outfit', sans-serif;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent-color); background: white; }
+
+    /* Range Sliders */
+    input[type="range"] { padding: 0; height: 6px; background: #e2e8f0; appearance: none; cursor: pointer; }
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-color);
+      cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* Checkboxes Grid */
+    .checks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+    .check-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-main); }
+    input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-color); }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 24px; border-radius: 50px; border: none; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: 0.2s; text-align: center; display: inline-block;
+    }
+    .btn-primary { background: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); width: 100%; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); }
+    
+    .btn-secondary { background: white; color: var(--text-muted); border: 1px solid #e2e8f0; padding: 8px 16px; font-size: 13px; }
+    .btn-danger { background: #fee2e2; color: #ef4444; padding: 8px 16px; font-size: 13px; }
+
+    /* History List */
+    .history-list { list-style: none; padding: 0; margin-top: 10px; }
+    .history-item {
+      background: rgba(255,255,255,0.5); padding: 15px; border-radius: 12px; margin-bottom: 10px;
+      border: 1px solid white; display: flex; justify-content: space-between; align-items: center;
+    }
+    .history-meta { font-size: 14px; color: var(--text-main); font-weight: 500; }
+    .history-sub { font-size: 12px; color: var(--text-muted); }
+
+    /* Status Msg */
+    .status-msg {
+      padding: 10px; border-radius: 10px; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;
+      font-size: 13px; margin-bottom: 15px; display: none; text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<main class="wrap">
+  <div class="topbar">
+    <a class="backBtn" href="dashboard.html">← Back to Dashboard</a>
+  </div>
+
+  <div class="title">Daily Check-in</div>
+  <div class="subtitle">Reflect on your day and track your progress.</div>
+
+  <div id="statusMsg" class="status-msg"></div>
+
+  <!-- CHECK-IN FORM -->
+  <div class="card">
+    <div class="section-title">Today's Report</div>
+    
+    <div style="margin-bottom: 15px;">
+      <label>Date</label>
+      <input type="date" id="reportDate" />
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+      <div>
+        <label>Mood</label>
+        <select id="moodSelect">
+          <option value="Happy">😊 Happy</option>
+          <option value="Calm">😌 Calm</option>
+          <option value="Neutral">😐 Neutral</option>
+          <option value="Sad">😔 Sad</option>
+          <option value="Anxious">😰 Anxious</option>
+        </select>
+      </div>
+      <div>
+        <label>Sleep (Hours)</label>
+        <input type="number" id="sleepHours" placeholder="e.g. 7.5" step="0.5" />
+      </div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label>Stress Level (0-10)</label>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <input type="range" id="stressRange" min="0" max="10" value="3" oninput="document.getElementById('stressVal').innerText=this.value">
+        <span id="stressVal" style="font-weight:600; min-width:20px;">3</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label>Energy Level (0-10)</label>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <input type="range" id="energyRange" min="0" max="10" value="5" oninput="document.getElementById('energyVal').innerText=this.value">
+        <span id="energyVal" style="font-weight:600; min-width:20px;">5</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label>Healthy Habits (Check all that apply)</label>
+      <div class="checks-grid">
+        <label class="check-item"><input type="checkbox" id="chk_meditate"> 🧘 Meditated</label>
+        <label class="check-item"><input type="checkbox" id="chk_exercise"> 🏃 Exercised</label>
+        <label class="check-item"><input type="checkbox" id="chk_journal"> 📓 Journaled</label>
+        <label class="check-item"><input type="checkbox" id="chk_water"> 💧 Drank Water</label>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <label>Notes / Gratitude</label>
+      <textarea id="notes" rows="3" placeholder="What are you grateful for today?"></textarea>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveReport()">Save Report</button>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <div class="section-title" style="margin:0;">History</div>
+      <button class="btn btn-secondary" onclick="exportData()">📥 Backup</button>
+    </div>
+    <ul class="history-list" id="historyList">
+      <li style="text-align:center; color:#94a3b8; padding:20px;">No reports yet.</li>
+    </ul>
+  </div>
+
+</main>
+
+<script>
+  const DB_KEY = "mind_daily_reports";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("reportDate").value = new Date().toISOString().split('T')[0];
+    renderHistory();
+  });
+
+  function saveReport() {
+    const date = document.getElementById("reportDate").value;
+    if(!date) return alert("Please select a date.");
+
+    const report = {
+      date: date,
+      mood: document.getElementById("moodSelect").value,
+      sleep: document.getElementById("sleepHours").value,
+      stress: document.getElementById("stressRange").value,
+      energy: document.getElementById("energyRange").value,
+      notes: document.getElementById("notes").value,
+      habits: {
+        meditate: document.getElementById("chk_meditate").checked,
+        exercise: document.getElementById("chk_exercise").checked,
+        journal: document.getElementById("chk_journal").checked,
+        water: document.getElementById("chk_water").checked
+      }
+    };
+
+    const reports = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
+    
+    // Remove existing report for same date if any
+    const existingIdx = reports.findIndex(r => r.date === date);
+    if(existingIdx > -1) reports.splice(existingIdx, 1);
+    
+    reports.push(report);
+    // Sort descending by date
+    reports.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    localStorage.setItem(DB_KEY, JSON.stringify(reports));
+
+    // Update Dashboard Progress (Simple: 1 report = 100% for today, just for demo)
+    localStorage.setItem("dailyProgressPercent", "100"); 
+    localStorage.setItem("lastActiveDate", date);
+
+    showStatus("Report saved successfully!");
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const reports = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
+    const list = document.getElementById("historyList");
+    list.innerHTML = "";
+
+    if(reports.length === 0) {
+      list.innerHTML = '<li style="text-align:center; color:#94a3b8; padding:20px;">No reports yet.</li>';
+      return;
+    }
+
+    reports.forEach(r => {
+      const li = document.createElement("li");
+      li.className = "history-item";
+      li.innerHTML = `
+        <div>
+          <div class="history-meta">${r.date} — ${r.mood}</div>
+          <div class="history-sub">Stress: ${r.stress}/10 • Energy: ${r.energy}/10</div>
+        </div>
+        <button class="btn btn-danger" onclick="deleteReport('${r.date}')">Delete</button>
+      `;
+      list.appendChild(li);
+    });
+  }
+
+  function deleteReport(date) {
+    if(!confirm("Are you sure?")) return;
+    let reports = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
+    reports = reports.filter(r => r.date !== date);
+    localStorage.setItem(DB_KEY, JSON.stringify(reports));
+    renderHistory();
+  }
+
+  function exportData() {
+    const data = localStorage.getItem(DB_KEY);
+    const blob = new Blob([data], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "daily-checkins.json";
+    a.click();
+  }
+
+  function showStatus(msg) {
+    const el = document.getElementById("statusMsg");
+    el.innerText = msg;
+    el.style.display = "block";
+    setTimeout(() => el.style.display = "none", 3000);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deep Breathe · InnerPeace</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* --- Ethereal Dark Theme --- */
+    :root {
+      --bg: #0f1014;            /* Deepest charcoal, almost black */
+      --surface: #181a20;       /* Slightly lighter surface */
+      --text-main: #e2e2e2;     /* Off-white text */
+      --text-mute: #888899;
+      --accent-glow: rgba(255, 255, 255, 0.15);
+      --accent-active: #ffffff;
+      
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Jost', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+      overflow: hidden;
+    }
+
+    /* Subtle background grain */
+    body::before {
+      content: ""; position: absolute; inset: 0; opacity: 0.04; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    .app-container {
+      width: 100%; max-width: 500px;
+      padding: 40px;
+      position: relative; z-index: 10;
+      display: flex; flex-direction: column; gap: 40px;
+    }
+
+    /* --- Typography --- */
+    header { text-align: center; }
+    h1 {
+      font-family: var(--font-display); font-size: 32px; letter-spacing: 0.05em;
+      margin-bottom: 8px; font-weight: 400; text-transform: uppercase;
+    }
+    .subtitle { font-size: 14px; color: var(--text-mute); letter-spacing: 0.05em; font-weight: 300; }
+
+    /* --- Visualizer (The Core) --- */
+    .visualizer {
+      height: 300px; position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    
+    .glow-ring {
+      position: absolute; width: 180px; height: 180px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 0 60px rgba(255,255,255,0.02);
+      transition: all 4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .core-circle {
+      width: 12px; height: 12px; background: #fff; border-radius: 50%;
+      box-shadow: 0 0 20px rgba(255,255,255,0.5);
+      opacity: 0.8; transition: all 4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .status-label {
+      position: absolute; bottom: 40px; width: 100%; text-align: center;
+      font-family: var(--font-display); font-size: 18px; letter-spacing: 0.1em;
+      opacity: 0; transition: opacity 1s;
+    }
+    .status-label.visible { opacity: 0.7; }
+
+    /* Animation States */
+    .state-inhale .glow-ring { transform: scale(1.6); border-color: rgba(255,255,255,0.3); box-shadow: 0 0 80px rgba(255,255,255,0.1); }
+    .state-inhale .core-circle { transform: scale(4); opacity: 0.3; }
+
+    .state-exhale .glow-ring { transform: scale(0.8); border-color: rgba(255,255,255,0.05); }
+    .state-exhale .core-circle { transform: scale(1); opacity: 0.9; }
+
+    /* --- Minimal Controls --- */
+    .controls-row {
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px;
+    }
+
+    .toggle-btn {
+      background: transparent; border: 1px solid var(--text-mute); color: var(--text-main);
+      padding: 12px 32px; font-family: var(--font-body); font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em;
+      border-radius: 50px; cursor: pointer; transition: all 0.3s;
+    }
+    .toggle-btn:hover { border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+
+    .sound-btn {
+      background: none; border: none; color: var(--text-mute); cursor: pointer;
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em;
+      display: flex; align-items: center; gap: 8px; transition: color 0.3s;
+    }
+    .sound-btn:hover { color: #fff; }
+    .sound-btn.active { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+    /* --- Hidden Settings Drawer --- */
+    .drawer {
+      max-height: 0; overflow: hidden; transition: max-height 0.5s ease;
+      background: var(--surface); border-radius: 12px;
+      margin-top: 20px;
+    }
+    .drawer.open { max-height: 200px; }
+    
+    .drawer-content { padding: 24px; display: grid; gap: 20px; }
+    
+    .setting-row { display: flex; justify-content: space-between; align-items: center; }
+    .setting-label { font-size: 12px; color: var(--text-mute); letter-spacing: 0.05em; }
+    
+    /* Elegant Slider */
+    input[type=range] {
+      -webkit-appearance: none; width: 120px; background: transparent;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%; height: 2px; background: rgba(255,255,255,0.2);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%;
+      background: #fff; margin-top: -5px; box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    /* File Upload Hidden */
+    input[type=file] { display: none; }
+    .upload-trigger { font-size: 11px; text-decoration: underline; cursor: pointer; color: var(--text-mute); }
+
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <a href="dashboard.html" style="text-decoration:none; color:#555; font-size:10px; text-transform:uppercase; letter-spacing:0.2em; display:block; margin-bottom:12px;">← Return</a>
+      <h1>Deep Breathe</h1>
+      <p class="subtitle">Center your mind in silence.</p>
+    </header>
+
+    <div class="visualizer" id="viz">
+      <div class="glow-ring"></div>
+      <div class="core-circle"></div>
+      <div class="status-label" id="statusText">Inhale</div>
+    </div>
+
+    <div class="controls-row">
+      <button class="sound-btn" id="ambienceBtn" onclick="toggleSettings()">
+        <span>Soundscapes</span>
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z"/></svg>
+      </button>
+
+      <button class="toggle-btn" id="mainBtn" onclick="toggleSession()">Begin</button>
+    </div>
+
+    <!-- Hidden Settings -->
+    <div class="drawer" id="settingsDrawer">
+      <div class="drawer-content">
+        
+        <!-- Brown Noise Generator -->
+        <div class="setting-row">
+          <span class="setting-label">Deep River (Brown Noise)</span>
+          <button class="sound-btn" id="brownBtn" onclick="toggleBrownNoise()">Play</button>
+        </div>
+
+        <!-- Pink Noise Generator -->
+        <div class="setting-row">
+          <span class="setting-label">Soft Rain (Pink Noise)</span>
+          <button class="sound-btn" id="pinkBtn" onclick="togglePinkNoise()">Play</button>
+        </div>
+
+        <!-- Volume -->
+        <div class="setting-row">
+          <span class="setting-label">Volume</span>
+          <input type="range" min="0" max="0.5" step="0.01" value="0.1" oninput="setVolume(this.value)">
+        </div>
+
+        <!-- Custom Upload -->
+        <div class="setting-row" style="border-top:1px solid rgba(255,255,255,0.05); padding-top:16px;">
+          <label class="upload-trigger">
+            Upload Custom MP3
+            <input type="file" accept="audio/*" onchange="loadUserAudio(event)">
+          </label>
+          <audio id="userAudio" loop></audio>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- APP STATE ---
+    let isBreathing = false;
+    let timer;
+    let audioCtx;
+    let brownNode, pinkNode, gainNode;
+
+    const viz = document.getElementById('viz');
+    const statusText = document.getElementById('statusText');
+    const mainBtn = document.getElementById('mainBtn');
+
+    // 1. Session Logic (Visuals)
+    function toggleSession() {
+      if (isBreathing) stopSession();
+      else startSession();
+    }
+
+    function startSession() {
+      isBreathing = true;
+      mainBtn.innerText = "End Session";
+      mainBtn.style.borderColor = "rgba(255,255,255,0.3)";
+      statusText.classList.add('visible');
+      runCycle();
+    }
+
+    function stopSession() {
+      isBreathing = false;
+      clearTimeout(timer);
+      mainBtn.innerText = "Begin";
+      mainBtn.style.borderColor = "";
+      viz.className = "visualizer"; // Reset classes
+      statusText.classList.remove('visible');
+    }
+
+    function runCycle() {
+      if (!isBreathing) return;
+
+      // Inhale (4s)
+      statusText.innerText = "Inhale";
+      viz.className = "visualizer state-inhale";
+
+      timer = setTimeout(() => {
+        if (!isBreathing) return;
+        
+        // Exhale (4s)
+        statusText.innerText = "Exhale";
+        viz.className = "visualizer state-exhale";
+
+        timer = setTimeout(runCycle, 4000);
+      }, 4000);
+    }
+
+    // 2. Audio Engine (Procedural Noise)
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.1; // Default low volume
+        gainNode.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    // Generator: Brown Noise (Deep/Rumbling)
+    function createBrownNoise() {
+      const bufferSize = audioCtx.sampleRate * 2; 
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      let lastOut = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        data[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = data[i];
+        data[i] *= 3.5; 
+      }
+      const node = audioCtx.createBufferSource();
+      node.buffer = buffer;
+      node.loop = true;
+      node.connect(gainNode);
+      return node;
+    }
+
+    // Generator: Pink Noise (Rain/Wind)
+    function createPinkNoise() {
+      const bufferSize = audioCtx.sampleRate * 2;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        data[i] *= 0.11; 
+        b6 = white * 0.115926;
+      }
+      const node = audioCtx.createBufferSource();
+      node.buffer = buffer;
+      node.loop = true;
+      node.connect(gainNode);
+      return node;
+    }
+
+    function toggleBrownNoise() {
+      initAudio();
+      const btn = document.getElementById('brownBtn');
+      
+      if (brownNode) {
+        brownNode.stop(); brownNode = null;
+        btn.classList.remove('active'); btn.innerText = "Play";
+      } else {
+        // Stop others first
+        if(pinkNode) togglePinkNoise();
+        
+        brownNode = createBrownNoise();
+        brownNode.start();
+        btn.classList.add('active'); btn.innerText = "Stop";
+      }
+    }
+
+    function togglePinkNoise() {
+      initAudio();
+      const btn = document.getElementById('pinkBtn');
+      
+      if (pinkNode) {
+        pinkNode.stop(); pinkNode = null;
+        btn.classList.remove('active'); btn.innerText = "Play";
+      } else {
+        // Stop others first
+        if(brownNode) toggleBrownNoise();
+        
+        pinkNode = createPinkNoise();
+        pinkNode.start();
+        btn.classList.add('active'); btn.innerText = "Stop";
+      }
+    }
+
+    function setVolume(val) {
+      if (gainNode) gainNode.gain.value = val;
+      const userAudio = document.getElementById('userAudio');
+      if (userAudio) userAudio.volume = val * 2; // boost mp3 slightly
+    }
+
+    // 3. UI Toggles
+    function toggleSettings() {
+      document.getElementById('settingsDrawer').classList.toggle('open');
+      document.getElementById('ambienceBtn').classList.toggle('active');
+    }
+
+    // Custom Audio
+    function loadUserAudio(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      // Stop generators
+      if (brownNode) toggleBrownNoise();
+      if (pinkNode) togglePinkNoise();
+
+      const player = document.getElementById('userAudio');
+      player.src = URL.createObjectURL(file);
+      player.play();
+    }
+  </script>
+</body>
+</html>

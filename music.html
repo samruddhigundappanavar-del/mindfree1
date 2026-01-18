@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music Therapy | Mind Sanctuary</title>
+  
+  <!-- Aesthetic Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* --- HOPEFUL MINIMAL CSS --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+    
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.4);
+      --glass-card: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --text-main: #334155; 
+      --text-muted: #64748b;
+      --accent-color: #6366f1;
+      --warm-shadow: 0 20px 40px rgba(100, 116, 139, 0.08);
+      --radius: 24px;
+    }
+
+    /* Living Background */
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fdfbf7 0%, #e0e7ff 100%);
+      background-size: 400% 400%;
+      animation: sunriseFlow 20s ease infinite;
+      color: var(--text-main);
+      padding: 20px;
+      display: flex; justify-content: center;
+    }
+    @keyframes sunriseFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+    /* Main Container */
+    .wrap {
+      width: 100%; max-width: 1100px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 30px;
+      box-shadow: var(--warm-shadow);
+      position: relative; z-index: 1;
+    }
+
+    /* Header */
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .backBtn {
+      text-decoration: none; color: var(--text-muted); font-weight: 600; 
+      display: flex; align-items: center; gap: 8px; transition: color 0.2s;
+    }
+    .backBtn:hover { color: var(--accent-color); }
+
+    .title {
+      font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700;
+      color: var(--text-main); text-align: center; margin-bottom: 10px;
+    }
+
+    .banner {
+      background: #ecfdf5; border: 1px solid #a7f3d0; padding: 15px; border-radius: 16px; 
+      margin-bottom: 25px; color: #065f46; font-size: 14px; text-align: center;
+    }
+
+    /* Tabs */
+    .toolbar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; }
+    .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tab {
+      padding: 8px 16px; border-radius: 50px; border: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.5); color: var(--text-muted); font-weight: 500; cursor: pointer;
+      transition: all 0.2s; font-size: 14px;
+    }
+    .tab:hover { background: white; color: var(--text-main); }
+    .tab.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+
+    .searchBox input {
+      padding: 10px 15px; border-radius: 50px; border: 1px solid var(--glass-border);
+      background: white; width: 250px; outline: none; font-size: 14px; color: var(--text-main);
+    }
+
+    /* Content */
+    .section { display: none; animation: fadeIn 0.4s ease; }
+    .section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .sectionHead { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+    .sectionHead h3 { font-family: 'Playfair Display'; font-size: 24px; color: var(--text-main); }
+    
+    .miniPill {
+      padding: 4px 10px; border-radius: 8px; background: #e0e7ff; color: var(--accent-color); 
+      font-size: 12px; font-weight: 600;
+    }
+
+    /* Song Grid */
+    .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+
+    .song {
+      background: white; border: 1px solid #f1f5f9; border-radius: 16px; padding: 16px;
+      display: flex; flex-direction: column; gap: 10px; transition: transform 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+    .song:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+    .songTop { display: flex; justify-content: space-between; align-items: flex-start; }
+    .songName { font-weight: 600; color: var(--text-main); font-size: 15px; }
+    .songTag { font-size: 11px; color: var(--text-muted); background: #f8fafc; padding: 4px 8px; border-radius: 6px; }
+
+    .songActions { display: flex; gap: 8px; margin-top: auto; }
+    .btn {
+      flex: 1; padding: 8px; text-align: center; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500;
+      transition: 0.2s; cursor: pointer; border: none;
+    }
+    .btn-primary { background: var(--accent-color); color: white; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-secondary { background: #f1f5f9; color: var(--text-muted); }
+    .btn-secondary:hover { background: #e2e8f0; color: var(--text-main); }
+    
+    .bgBox { display: none; } /* Hidden Logic */
+  </style>
+</head>
+
+<body>
+
+<main class="wrap">
+  <div class="topbar">
+    <a class="backBtn" href="dashboard.html">← Back to Dashboard</a>
+    <div class="bgBox"><select id="bgChoice"></select></div>
+  </div>
+
+  <div class="title">Music Therapy</div>
+
+  <div class="banner">
+    <b>Tip:</b> If your stress score is high, start with "Meditation" or "Stress Level 1".
+  </div>
+
+  <div class="toolbar">
+    <div class="tabs" id="tabs"></div>
+    <div class="searchBox">
+      <input id="searchInput" type="text" placeholder="Search tracks..." />
+    </div>
+  </div>
+
+  <div id="sections"></div>
+</main>
+
+<script>
+  // --- COMPLETE DATA RESTORED ---
+  const data = [
+    {
+      id: "meditation", title: "🧘 Meditation", desc: "Slow down racing thoughts.", pill: "Calm",
+      songs: [
+        { name: "Meditation Track 1", url: "https://youtu.be/jqnAaUOFOyE?si=Bf98VptZwH2HEs61", tag: "Meditation" },
+        { name: "Meditation Track 2", url: "https://youtu.be/pFenlzgBEns?si=bagvzEYw07qL-_Pg", tag: "Meditation" }
+      ]
+    },
+    {
+      id: "sleep", title: "🌙 Sleep", desc: "Wind down your body.", pill: "Relax",
+      songs: [
+        { name: "Sleep/Relax 1", url: "https://youtu.be/ggfebQ-5-UE?si=oxscgtVNFDXybGD_", tag: "Sleep" },
+        { name: "Sleep/Relax 2", url: "https://youtu.be/utcDd13hz4g?si=jacNsxo7nnkGEnJC", tag: "Sleep" },
+        { name: "Sleep/Relax 3", url: "https://youtu.be/8715GvmhKjU?si=gX2mfjD26AXzn5Jn", tag: "Sleep" },
+        { name: "Sleep/Relax 4", url: "https://youtu.be/oUxQ0KUU-eY?si=p_dpaKDBF9zh2e4r", tag: "Sleep" },
+        { name: "Sleep/Relax 5", url: "https://youtu.be/6o5npd-KS5s?si=H6H_GN-RBNBTOvM1", tag: "Sleep" },
+        { name: "Sleep/Relax 6", url: "https://youtu.be/hNn2tBohjxE?si=a0ORmMIz7s0_zU8e", tag: "Sleep" },
+        { name: "Sleep/Relax 7", url: "https://youtu.be/jMcMLAyddzU?si=hLvjv2iCymnKsC7G", tag: "Sleep" },
+        { name: "Sleep/Relax 8", url: "https://youtu.be/1loVfme-8hc?si=CdbuspRaNUqWuy26", tag: "Sleep" }
+      ]
+    },
+    {
+      id: "stress1", title: "🍃 Stress Lvl 1", desc: "For mild stress.", pill: "Level 1",
+      songs: [
+        { name: "Stress L1 - Track 1", url: "https://youtu.be/1loVfme-8hc?si=CdbuspRaNUqWuy26", tag: "Level 1" },
+        { name: "Stress L1 - Track 2", url: "https://youtu.be/IaWMS9vmWRM?si=40vP0aPRPD6wrps2", tag: "Level 1" },
+        { name: "Stress L1 - Track 3", url: "https://youtu.be/CG4hbwjzBkw?si=mnG1jRlorwoVPBpL", tag: "Level 1" },
+        { name: "Stress L1 - Track 4", url: "https://youtu.be/z0Jpoyv-T7E?si=lO3X8Qa7FZOF_-Kx", tag: "Level 1" },
+        { name: "Stress L1 - Track 5", url: "https://youtu.be/9tHmbMWStuM?si=o7_SX760JtxtZjHw", tag: "Level 1" }
+      ]
+    },
+    {
+      id: "stress2", title: "🌊 Stress Lvl 2", desc: "For moderate stress.", pill: "Level 2",
+      songs: [
+        { name: "Stress L2 - Track 1", url: "https://youtu.be/4XluDP8Ob54?si=YpqK3LJIcLpnMARa", tag: "Level 2" },
+        { name: "Stress L2 - Track 2", url: "https://youtu.be/7wTsD8Q9SyI?si=1w1Ezuti-xeKvBPg", tag: "Level 2" },
+        { name: "Stress L2 - Track 3", url: "https://youtu.be/OL6IJfX-N2g?si=ccaTtgfoDCOKTq7L", tag: "Level 2" },
+        { name: "Stress L2 - Track 4", url: "https://youtu.be/BTN61VCCQqo?si=KDIUyPOCpsQcwrug", tag: "Level 2" }
+      ]
+    },
+    {
+      id: "stress3", title: "🔥 Stress Lvl 3", desc: "For heavy stress.", pill: "Level 3",
+      songs: [
+        { name: "Stress L3 - Track 1", url: "https://youtu.be/nl_7H8UYGDk?si=s8PZ9AKgbsiCpzqR", tag: "Level 3" }
+      ]
+    },
+    {
+      id: "calm", title: "✨ Mood Boost", desc: "Uplifting & soothing.", pill: "Happy",
+      songs: [
+        { name: "Track 1", url: "https://youtu.be/ggfebQ-5-UE?si=oxscgtVNFDXybGD_", tag: "Calm" },
+        { name: "Track 2", url: "https://youtu.be/utcDd13hz4g?si=jacNsxo7nnkGEnJC", tag: "Calm" },
+        { name: "Track 3", url: "https://youtu.be/8715GvmhKjU?si=gX2mfjD26AXzn5Jn", tag: "Calm" },
+        { name: "Track 4", url: "https://youtu.be/ujyu7tkyxtw?si=OEP-iNF4cZxJAC2i", tag: "Calm" },
+        { name: "Track 5", url: "https://youtu.be/C9hMaqQFKXk?si=9_jk67ihnKoxCMZJ", tag: "Calm" },
+        { name: "Track 6", url: "https://youtu.be/-4rtl36Cz48?si=FQN31d0wYmi92Ib5", tag: "Calm" }
+      ]
+    }
+  ];
+
+  // --- LOGIC ---
+  const STORAGE_LAST_TAB = "music_last_tab";
+
+  function buildUI() {
+    const tabs = document.getElementById("tabs");
+    const sectionsWrap = document.getElementById("sections");
+
+    tabs.innerHTML = data.map(c => `
+      <button class="tab" data-tab="${c.id}">${c.title}</button>
+    `).join("");
+
+    sectionsWrap.innerHTML = data.map(c => `
+      <section class="section" id="sec_${c.id}" data-sec="${c.id}">
+        <div class="sectionHead">
+          <div>
+            <h3>${c.title}</h3>
+            <p style="font-size:14px; color:#64748b;">${c.desc}</p>
+          </div>
+          <div class="miniPill">${c.pill}</div>
+        </div>
+        <div class="list">
+          ${c.songs.map(s => `
+            <div class="song" data-search="${(s.name + " " + s.tag).toLowerCase()}">
+              <div class="songTop">
+                <div class="songName">${s.name}</div>
+                <div class="songTag">${s.tag}</div>
+              </div>
+              <div class="songActions">
+                <a class="btn btn-primary" href="${s.url}" target="_blank">Play</a>
+                <button class="btn btn-secondary" onclick="copyLink('${s.url}', this)">Copy</button>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `).join("");
+
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => setActive(btn.dataset.tab));
+    });
+
+    const saved = localStorage.getItem(STORAGE_LAST_TAB);
+    setActive(saved && data.some(d => d.id === saved) ? saved : data[0].id);
+  }
+
+  function setActive(tabId) {
+    document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tabId));
+    document.querySelectorAll(".section").forEach(s => s.classList.toggle("active", s.dataset.sec === tabId));
+    localStorage.setItem(STORAGE_LAST_TAB, tabId);
+  }
+
+  function copyLink(url, btn) {
+    navigator.clipboard.writeText(url);
+    const originalText = btn.innerText;
+    btn.innerText = "Copied!";
+    setTimeout(() => btn.innerText = originalText, 1500);
+  }
+
+  document.getElementById("searchInput").addEventListener("input", (e) => {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll(".song").forEach(card => {
+      card.style.display = card.dataset.search.includes(term) ? "flex" : "none";
+    });
+  });
+
+  buildUI();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aesthetic Focus | Ultimate Edition</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --glass-bg: rgba(20, 20, 25, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --accent-pink: #f472b6;
+            --kaizen-orange: #fb923c;
+            --forest-green: #4ade80;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+
+        body {
+            height: 100vh; width: 100vw; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            color: var(--text-main);
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        /* Cinematic Grain */
+        body::after {
+            content: ""; position: absolute; inset: 0;
+            background: url("https://grainy-gradients.vercel.app/noise.svg");
+            opacity: 0.05; pointer-events: none; z-index: 5; mix-blend-mode: overlay;
+        }
+        body::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%);
+            z-index: 1; pointer-events: none;
+        }
+
+        /* --- LANDING CHOICE SCREEN --- */
+        #landing-screen {
+            position: absolute; inset: 0; z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(20px);
+            transition: opacity 0.5s ease;
+        }
+        .choice-container { display: flex; gap: 40px; margin-top: 30px; }
+        .choice-card {
+            width: 220px; height: 280px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
+        .choice-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.1); border-color: var(--accent-pink); }
+        .choice-icon { font-size: 4rem; margin-bottom: 20px; color: var(--accent-pink); }
+        .choice-title { font-size: 1.5rem; font-weight: 700; }
+        .choice-desc { font-size: 0.9rem; color: var(--text-muted); margin-top: 10px; font-weight: 300; }
+        .landing-title { font-size: 2.5rem; font-weight: 800; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+
+        /* --- MAIN SECTIONS (Hidden by default) --- */
+        .app-section { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* --- POMODORO CARD --- */
+        .glass-card {
+            position: relative; z-index: 10;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(120%);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255,255,255,0.15);
+            border-radius: 40px;
+            padding: 40px 60px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; align-items: center;
+            width: 760px; max-width: 95%;
+            transition: all 0.5s ease;
+        }
+        /* (Existing Pomodoro CSS) */
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.03); }
+        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 10px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { background: rgba(255,255,255,0.1); color: white; font-weight: 700; }
+        .task-container { width: 100%; text-align: center; margin-bottom: 10px; position: relative; }
+        .task-input { background: transparent; border: none; color: white; font-size: 1.5rem; font-weight: 500; text-align: center; width: 100%; outline: none; padding-bottom: 5px; border-bottom: 2px solid transparent; }
+        .task-input:focus { border-bottom-color: rgba(255,255,255,0.3); }
+        .task-input::placeholder { color: rgba(255,255,255,0.3); font-weight: 300; }
+        .task-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); opacity: 0; color: #aaa; cursor: pointer; transition: 0.3s; }
+        .task-input:focus + .task-icon, .task-input:not(:placeholder-shown) + .task-icon { opacity: 1; }
+        .timer-row { display: flex; align-items: center; gap: 20px; position: relative; }
+        .timer-display { font-size: 14rem; font-weight: 800; line-height: 0.85; margin: 20px 0 40px 0; background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3)); font-variant-numeric: tabular-nums; letter-spacing: -8px; }
+        #tree-container { width: 80px; height: 100px; display: flex; align-items: flex-end; justify-content: center; opacity: 0.8; margin-top: 20px; }
+        .pixel-tree { font-size: 4rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); transition: 0.5s; }
+        .btn-main { background: white; color: #0f172a; border: none; padding: 22px 0; width: 100%; border-radius: 20px; font-size: 1.3rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; transition: 0.2s; text-transform: uppercase; margin-bottom: 30px; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        .btn-main:hover { transform: translateY(-2px); background: #f8fafc; }
+        .btn-main.running { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .controls-grid { width: 100%; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.08); display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; }
+        .music-wrapper { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 12px 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .dropdown-style { background: transparent; border: none; color: #e2e8f0; font-weight: 500; font-size: 1rem; cursor: pointer; outline: none; width: 150px; }
+        .dropdown-style option { background: #1a1a1a; color: #ccc; }
+        .nature-toggles { display: flex; gap: 10px; }
+        .nature-btn-group { position: relative; display: flex; align-items: center; justify-content: center; }
+        .nature-btn { width: 48px; height: 48px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: #64748b; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; position: relative; z-index: 2; }
+        .nature-btn.active { background: white; color: #1a1a1a; }
+        .vol-slider-container { position: absolute; bottom: 55px; left: 50%; transform: translateX(-50%); width: 30px; height: 100px; background: rgba(20,20,20,0.9); border-radius: 15px; display: none; align-items: center; justify-content: center; padding: 10px 0; border: 1px solid rgba(255,255,255,0.1); }
+        .nature-btn-group:hover .vol-slider-container { display: flex; }
+        .vol-slider { writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 6px; height: 80px; cursor: pointer; }
+        .japanese-controls { display: flex; gap: 15px; margin-top: -10px; margin-bottom: 25px; width: 100%; }
+        .jp-btn { flex: 1; padding: 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.3s; position: relative; overflow: hidden; }
+        .jp-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+        .jp-title { font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .jp-desc { font-size: 0.7rem; color: var(--text-muted); font-weight: 300; }
+        .btn-kaizen:hover { border-color: var(--kaizen-orange); } .btn-kaizen:hover .jp-title { color: var(--kaizen-orange); }
+        .btn-shinrin:hover { border-color: var(--forest-green); } .btn-shinrin:hover .jp-title { color: var(--forest-green); }
+        .top-icons { position: absolute; top: 30px; right: 40px; display: flex; gap: 20px; z-index: 20; }
+        .icon-btn { color: rgba(255,255,255,0.4); cursor: pointer; font-size: 1.4rem; transition: 0.2s; position: relative; }
+        .icon-btn:hover { color: white; transform: scale(1.1); }
+
+        /* --- JOURNAL CARD --- */
+        .journal-container-row {
+            display: flex; gap: 20px; width: 90%; height: 85vh;
+            max-width: 1400px;
+        }
+        .journal-card {
+            flex: 1;
+            background: rgba(20,20,20,0.85); backdrop-filter: blur(30px);
+            border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
+            padding: 40px; display: flex; flex-direction: column;
+            position: relative;
+        }
+        .jar-card {
+            width: 350px;
+            background: rgba(20,20,20,0.6); backdrop-filter: blur(30px);
+            border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
+            padding: 30px; display: flex; flex-direction: column; align-items: center;
+        }
+
+        .journal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
+        .journal-date { font-size: 2rem; font-weight: 700; }
+        .journal-time { font-size: 1rem; color: var(--text-muted); }
+        .journal-area {
+            flex: 1; background: transparent; border: none; color: #eee;
+            font-size: 1.2rem; line-height: 1.6; resize: none; outline: none;
+            padding: 10px; font-family: 'Outfit', sans-serif;
+        }
+        .journal-area::placeholder { color: rgba(255,255,255,0.2); }
+        .mood-row { display: flex; gap: 15px; margin-top: 20px; }
+        .mood-btn {
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+            background: transparent; cursor: pointer; font-size: 1.2rem; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .mood-btn:hover, .mood-btn.selected { background: white; transform: scale(1.1); border-color: white; }
+        .btn-save-journal {
+            background: var(--accent-pink); color: white; border: none;
+            padding: 12px 30px; border-radius: 20px; font-weight: 700;
+            cursor: pointer; align-self: flex-end; margin-top: 20px;
+        }
+
+        /* --- JAR STYLES --- */
+        .jar-container {
+            width: 140px; height: 180px; margin: 20px auto;
+            position: relative; cursor: pointer; transition: transform 0.3s;
+        }
+        .jar-container:hover { transform: scale(1.05); }
+        .jar-lid {
+            width: 100px; height: 20px; background: #555; border-radius: 5px;
+            margin: 0 auto; border: 1px solid #777;
+        }
+        .jar-body {
+            width: 120px; height: 150px; margin: -5px auto 0 auto;
+            border: 2px solid rgba(255,255,255,0.3); border-radius: 20px;
+            background: rgba(255,255,255,0.05); position: relative;
+            box-shadow: 0 0 20px rgba(255,255,255,0.05), inset 0 0 20px rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+        .jar-glass {
+            position: absolute; top: 10px; right: 10px; width: 10px; height: 60px;
+            background: rgba(255,255,255,0.2); border-radius: 10px;
+        }
+        .firefly {
+            position: absolute; width: 6px; height: 6px; background: var(--kaizen-orange);
+            border-radius: 50%; box-shadow: 0 0 10px var(--kaizen-orange), 0 0 20px yellow;
+            animation: fly 4s infinite alternate ease-in-out;
+            opacity: 0.8;
+        }
+        @keyframes fly {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(var(--mx), var(--my)); }
+        }
+        .worry-input-row { display: flex; gap: 5px; width: 100%; margin-top: auto; }
+        .worry-item {
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .worry-actions i { cursor: pointer; margin-left: 15px; opacity: 0.6; transition: 0.2s; }
+        .worry-actions i:hover { opacity: 1; transform: scale(1.2); }
+        .fa-trash:hover { color: #ef4444; }
+
+        /* --- BACK HOME BUTTON --- */
+        .home-btn-fixed {
+            position: absolute; top: 30px; left: 40px; z-index: 100;
+            color: rgba(255,255,255,0.5); font-size: 1.5rem; cursor: pointer;
+            transition: 0.3s;
+        }
+        .home-btn-fixed:hover { color: white; transform: translateX(-5px); }
+
+        /* --- BG PICKER (Shared) --- */
+        .bg-picker {
+            position: absolute; bottom: 30px; right: 30px; display: flex; gap: 10px;
+            background: rgba(0,0,0,0.6); padding: 10px; border-radius: 20px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); z-index: 50;
+        }
+        .bg-dot {
+            width: 34px; height: 34px; border-radius: 10px; cursor: pointer; border: 2px solid transparent; transition: 0.2s;
+            background-size: cover; background-position: center;
+        }
+        .bg-dot:hover { transform: scale(1.1); border-color: white; }
+        
+        /* Modals CSS (Same as before) */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(12px); }
+        .modal-card { background: #ffffff; color: #333; width: 600px; height: 700px; border-radius: 20px; padding: 0; position: relative; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column; }
+        .modal-header { display: flex; justify-content: space-between; padding: 20px 30px; border-bottom: 1px solid #eee; align-items: center; }
+        .modal-title { font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .close-modal { font-size: 1.2rem; color: #ccc; cursor: pointer; }
+        .modal-content { padding: 30px; overflow-y: auto; flex: 1; }
+        .report-tabs { display: flex; gap: 20px; }
+        .report-tab { font-size: 0.9rem; font-weight: 600; color: #aaa; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .report-tab.active { color: #f472b6; }
+        .summary-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 40px; }
+        .summary-card { background: #fdf2f8; border-radius: 12px; padding: 20px 15px; text-align: center; }
+        .sum-val { font-size: 1.8rem; font-weight: 700; color: #333; display: block; }
+        .sum-label { font-size: 0.75rem; color: #f472b6; font-weight: 600; text-transform: uppercase; }
+        .chart-wrapper { height: 250px; width: 100%; margin-top: 20px; }
+        .todo-input-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .todo-input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Outfit'; }
+        .todo-add-btn { background: #f472b6; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .todo-list { list-style: none; }
+        .todo-item { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .todo-check { width: 20px; height: 20px; cursor: pointer; accent-color: #f472b6; }
+        .todo-text { flex: 1; font-size: 1rem; }
+        .todo-item.done .todo-text { text-decoration: line-through; color: #aaa; }
+        .todo-del { color: #ccc; cursor: pointer; } .todo-del:hover { color: #f87171; }
+    </style>
+</head>
+<body>
+
+    <!-- LANDING CHOICE SCREEN -->
+    <div id="landing-screen">
+        <h1 class="landing-title">How do you want to grow today?</h1>
+        <div class="choice-container">
+            <div class="choice-card" onclick="openApp('pomodoro')">
+                <i class="fas fa-clock choice-icon"></i>
+                <div class="choice-title">Focus</div>
+                <div class="choice-desc">Deep Work & Flow</div>
+            </div>
+            <div class="choice-card" onclick="openApp('journal')">
+                <i class="fas fa-book-open choice-icon"></i>
+                <div class="choice-title">Reflect</div>
+                <div class="choice-desc">Journal & Clarity</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOME BUTTON (Visible in apps) -->
+    <i class="fas fa-arrow-left home-btn-fixed" id="btn-home" style="display:none;" onclick="goHome()"></i>
+
+    <!-- APP SECTION: POMODORO -->
+    <div id="section-pomodoro" class="app-section">
+        <div class="glass-card">
+            <div class="top-icons">
+                <i class="fas fa-check-square icon-btn" onclick="openTodo()" title="Tasks"></i>
+                <i class="fas fa-chart-bar icon-btn" onclick="openReport()" title="Stats"></i>
+            </div>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchMode('pomo')" id="btn-pomo">Focus</button>
+                <button class="tab-btn" onclick="switchMode('short')" id="btn-short">Short</button>
+                <button class="tab-btn" onclick="switchMode('long')" id="btn-long">Long</button>
+            </div>
+            <div class="timer-row">
+                <div class="timer-display" id="timer">25:00</div>
+                <div id="tree-container"><span id="tree-icon" class="pixel-tree">🌱</span></div>
+            </div>
+            <div class="task-container">
+                <input type="text" class="task-input" id="mainTaskInput" placeholder="What are you working on?">
+            </div>
+            <div class="japanese-controls">
+                <button class="jp-btn btn-kaizen" onclick="activateKaizen()">
+                    <span class="jp-title"><i class="fas fa-bolt"></i> Kaizen</span>
+                    <span class="jp-desc">Overcome laziness. Start with 1 min.</span>
+                </button>
+                <button class="jp-btn btn-shinrin" onclick="activateShinrin()">
+                    <span class="jp-title"><i class="fas fa-leaf"></i> Shinrin-yoku</span>
+                    <span class="jp-desc">Lower stress. Forest immersion.</span>
+                </button>
+            </div>
+            <button class="btn-main" id="mainBtn" onclick="toggleTimer()">Start Session</button>
+            <div class="controls-grid">
+                <div class="music-wrapper">
+                    <i class="fas fa-music"></i>
+                    <select class="dropdown-style" id="trackSelect" onchange="changeTrack()">
+                        <option value="none">No Music</option>
+                        <option value="lofi1">Lofi Chill</option>
+                        <option value="lofi2">Lofi Jazz</option>
+                    </select>
+                    <i class="fas fa-play" id="playIcon" onclick="toggleMusic()" style="cursor:pointer; margin-left:auto;"></i>
+                </div>
+                <div class="nature-toggles">
+                    <div class="nature-btn-group">
+                        <button class="nature-btn" onclick="toggleNature('rain', this)"><i class="fas fa-cloud-rain"></i></button>
+                        <div class="vol-slider-container">
+                            <input type="range" class="vol-slider" min="0" max="1" step="0.1" value="0.5" orient="vertical" oninput="setVolume('rain', this.value)">
+                        </div>
+                    </div>
+                    <div class="nature-btn-group">
+                        <button class="nature-btn" onclick="toggleNature('forest', this)"><i class="fas fa-tree"></i></button>
+                        <div class="vol-slider-container">
+                            <input type="range" class="vol-slider" min="0" max="1" step="0.1" value="0.5" orient="vertical" oninput="setVolume('forest', this.value)">
+                        </div>
+                    </div>
+                    <div class="nature-btn-group">
+                        <button class="nature-btn" onclick="toggleNature('fire', this)"><i class="fas fa-fire"></i></button>
+                        <div class="vol-slider-container">
+                            <input type="range" class="vol-slider" min="0" max="1" step="0.1" value="0.5" orient="vertical" oninput="setVolume('fire', this.value)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP SECTION: JOURNAL + WORRY JAR -->
+    <div id="section-journal" class="app-section">
+        <div class="journal-container-row">
+            
+            <!-- LEFT: JOURNAL CARD -->
+            <div class="journal-card">
+                <div class="journal-header">
+                    <div>
+                        <div class="journal-date" id="j-date">Today</div>
+                        <div class="journal-time" id="j-time">00:00 AM</div>
+                    </div>
+                    <div class="mood-row">
+                        <button class="mood-btn" onclick="setMood('happy')">😊</button>
+                        <button class="mood-btn" onclick="setMood('calm')">😌</button>
+                        <button class="mood-btn" onclick="setMood('tired')">😴</button>
+                        <button class="mood-btn" onclick="setMood('sad')">😔</button>
+                    </div>
+                </div>
+                <!-- Prompt -->
+                <div id="daily-prompt" style="color: var(--kaizen-orange); margin-bottom: 10px; font-style: italic; cursor: pointer; opacity: 0.9;" onclick="newPrompt()">
+                    ✨ Prompt: What are you grateful for right now? (Click for new)
+                </div>
+                <textarea class="journal-area" id="journalEntry" placeholder="Clear your mind. Start typing..."></textarea>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button class="btn-save-journal" style="background: #ef4444;" onclick="burnEntry()">🔥 Burn</button>
+                    <button class="btn-save-journal" onclick="saveJournal()">Save Entry</button>
+                </div>
+            </div>
+
+            <!-- RIGHT: WORRY JAR CARD -->
+            <div class="jar-card">
+                <h3 style="font-size: 1.5rem; margin-bottom: 5px;">Worry Jar 🏺</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; text-align: center;">Store worries for later.</p>
+                
+                <div id="theJar" class="jar-container" onclick="openJar()">
+                    <div class="jar-lid"></div>
+                    <div class="jar-body">
+                        <div class="jar-glass"></div>
+                        <div id="firefly-zone" style="width: 100%; height: 100%; position: relative;"></div>
+                    </div>
+                </div>
+
+                <div class="worry-input-row">
+                    <input type="text" id="worryInput" class="task-input" placeholder="Type a worry..." style="font-size: 1rem; text-align: left; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <button class="btn-main" style="width: auto; padding: 10px; font-size: 1rem;" onclick="addWorry()"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- BACKGROUND PICKER -->
+    <div class="bg-picker">
+        <div class="bg-dot" onclick="changeBg('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=2070&auto=format&fit=crop')" style="background-image:url('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=100&auto=format&fit=crop');"></div>
+        <div class="bg-dot" onclick="changeBg('https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=2070&auto=format&fit=crop')" style="background-image:url('https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=100&auto=format&fit=crop');"></div>
+        <div class="bg-dot" onclick="changeBg('https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=2070&auto=format&fit=crop')" style="background-image:url('https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=100&auto=format&fit=crop');"></div>
+        <div class="bg-dot" onclick="changeBg('https://images.unsplash.com/photo-1493314894560-5c412a56c17c?q=80&w=2070&auto=format&fit=crop')" style="background-image:url('https://images.unsplash.com/photo-1493314894560-5c412a56c17c?q=80&w=100&auto=format&fit=crop');"></div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="report-tabs"><div class="report-tab active" onclick="switchView('summary', this)">Summary</div><div class="report-tab" onclick="switchView('detail', this)">Log</div></div>
+                <i class="fas fa-times close-modal" onclick="closeModals()"></i>
+            </div>
+            <div class="modal-content">
+                <div id="view-summary">
+                    <div class="summary-row"><div class="summary-card"><span class="sum-val" id="disp-hours">0.0</span><span class="sum-label">Hours</span></div><div class="summary-card"><span class="sum-val" id="disp-days">0</span><span class="sum-label">Days</span></div><div class="summary-card"><span class="sum-val" id="disp-streak">0</span><span class="sum-label">Streak</span></div></div>
+                    <h4>Focus Activity</h4><div class="chart-wrapper"><canvas id="activityChart"></canvas></div>
+                </div>
+                <div id="view-detail" style="display:none;"><ul id="logList" style="list-style:none;"></ul></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="todoModal">
+        <div class="modal-card" style="height: 600px;">
+            <div class="modal-header"><div class="modal-title"><i class="fas fa-check-circle" style="color:#f472b6;"></i> Tasks</div><i class="fas fa-times close-modal" onclick="closeModals()"></i></div>
+            <div class="modal-content">
+                <div class="todo-input-row"><input type="text" class="todo-input" id="newTodoInput" placeholder="Add a new task..."><button class="todo-add-btn" onclick="addTodo()">Add</button></div>
+                <ul class="todo-list" id="todoListUI"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORRY JAR MODAL -->
+    <div class="modal-overlay" id="worryModal">
+        <div class="modal-card" style="background: #1e1e24; color: white; border: 1px solid rgba(255,255,255,0.1);">
+            <div class="modal-header" style="border-bottom-color: rgba(255,255,255,0.1);">
+                <div class="modal-title">🔥 Process Your Worries</div>
+                <i class="fas fa-times close-modal" onclick="document.getElementById('worryModal').style.display='none'"></i>
+            </div>
+            <div class="modal-content" id="worryListArea"></div>
+        </div>
+    </div>
+
+    <!-- AUDIO FILES -->
+    <audio id="music-lofi1" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3"></audio>
+    <audio id="music-lofi2" loop src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-chill-medium-version-159456.mp3"></audio>
+    <audio id="nature-rain" loop src="https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg"></audio>
+    <audio id="nature-forest" loop src="https://actions.google.com/sounds/v1/relax/forest_birds.ogg"></audio>
+    <audio id="nature-fire" loop src="https://actions.google.com/sounds/v1/ambiences/fire.ogg"></audio>
+    <audio id="alarm-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+    <script>
+        /* --- NAVIGATION --- */
+        function openApp(app) {
+            document.getElementById('landing-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('landing-screen').style.display = 'none';
+                document.getElementById('btn-home').style.display = 'block';
+                document.querySelectorAll('.app-section').forEach(el => el.style.display = 'none');
+                
+                if(app === 'pomodoro') {
+                    document.getElementById('section-pomodoro').style.display = 'flex';
+                } else {
+                    document.getElementById('section-journal').style.display = 'flex';
+                    initJournal();
+                    newPrompt(); 
+                    renderFireflies(); // Init Jar
+                }
+            }, 500);
+        }
+
+        function goHome() {
+            document.getElementById('section-pomodoro').style.display = 'none';
+            document.getElementById('section-journal').style.display = 'none';
+            document.getElementById('btn-home').style.display = 'none';
+            document.getElementById('landing-screen').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('landing-screen').style.opacity = '1';
+            }, 10);
+        }
+
+        /* --- POMODORO LOGIC --- */
+        const modes = { 'pomo': 25, 'short': 5, 'long': 15, 'kaizen': 1 };
+        let currentMode = 'pomo';
+        let timeLeft = modes.pomo * 60;
+        let timerId = null;
+        let isRunning = false;
+        
+        let sessionData = JSON.parse(localStorage.getItem('pomoUlt')) || {
+            totalMinutes: 0, daysAccessed: 1, streak: 0, lastDate: new Date().toISOString().split('T')[0],
+            daily: {}, logs: [], todos: []
+        };
+
+        const timerEl = document.getElementById('timer');
+        const mainBtn = document.getElementById('mainBtn');
+        const treeIcon = document.getElementById('tree-icon');
+
+        const savedBg = localStorage.getItem('pomoBg');
+        if(savedBg) document.body.style.backgroundImage = `url('${savedBg}')`;
+
+        function updateDisplay() {
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            timerEl.innerText = `${m}:${s}`;
+            document.title = isRunning ? `${m}:${s} - Focus` : 'Aesthetic Focus';
+            
+            const totalTime = modes[currentMode] * 60;
+            const progress = 1 - (timeLeft / totalTime);
+            if(progress < 0.1) treeIcon.innerText = "🌱";
+            else if(progress < 0.5) treeIcon.innerText = "🌿";
+            else if(progress < 0.9) treeIcon.innerText = "🌳";
+            else treeIcon.innerText = "🌸";
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timerId); isRunning = false;
+                mainBtn.innerText = "Resume"; mainBtn.classList.remove('running');
+            } else {
+                if(timeLeft === 0) return;
+                timerId = setInterval(() => {
+                    if (timeLeft > 0) { timeLeft--; updateDisplay(); } 
+                    else { completeSession(); }
+                }, 1000);
+                isRunning = true;
+                mainBtn.innerText = "Pause"; mainBtn.classList.add('running');
+            }
+        }
+
+        function completeSession() {
+            clearInterval(timerId); isRunning = false;
+            document.getElementById('alarm-sound').play();
+            mainBtn.innerText = "Start"; mainBtn.classList.remove('running');
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            if(currentMode === 'pomo') logSession(modes.pomo);
+            alert("Session Complete! Great Focus!");
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if(mode !== 'kaizen') document.getElementById(`btn-${mode}`).classList.add('active');
+            timeLeft = modes[mode] * 60;
+            updateDisplay();
+            if(isRunning) toggleTimer();
+        }
+
+        function activateKaizen() { switchMode('kaizen'); document.getElementById('mainTaskInput').value = "Kaizen: Just 1 minute start"; toggleTimer(); }
+        function activateShinrin() {
+            changeBg('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=1920');
+            const forest = document.getElementById('nature-forest');
+            const rain = document.getElementById('nature-rain');
+            if(forest.paused) forest.play(); if(rain.paused) rain.play();
+            switchMode('long'); 
+            document.getElementById('mainTaskInput').value = "Shinrin-yoku: Forest Bathing";
+        }
+
+        function changeBg(url) { document.body.style.backgroundImage = `url('${url}')`; localStorage.setItem('pomoBg', url); }
+
+        function logSession(mins) {
+            const today = new Date().toISOString().split('T')[0];
+            if(!sessionData.daily[today]) sessionData.daily[today] = 0;
+            sessionData.daily[today] += mins;
+            sessionData.totalMinutes += mins;
+            const taskName = document.getElementById('mainTaskInput').value || "Focus Session";
+            sessionData.logs.unshift({ name: taskName, date: new Date().toLocaleString(), duration: mins });
+            localStorage.setItem('pomoUlt', JSON.stringify(sessionData));
+        }
+
+        /* --- JOURNAL LOGIC --- */
+        let journalData = JSON.parse(localStorage.getItem('pomoJournal')) || [];
+        
+        function initJournal() {
+            const now = new Date();
+            document.getElementById('j-date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            document.getElementById('j-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const todayKey = now.toISOString().split('T')[0];
+            const entry = journalData.find(e => e.date === todayKey);
+            if(entry) document.getElementById('journalEntry').value = entry.text;
+        }
+
+        function saveJournal() {
+            const text = document.getElementById('journalEntry').value;
+            const todayKey = new Date().toISOString().split('T')[0];
+            const index = journalData.findIndex(e => e.date === todayKey);
+            if(index > -1) { journalData[index].text = text; } 
+            else { journalData.unshift({ date: todayKey, text: text, timestamp: new Date().toLocaleString() }); }
+            localStorage.setItem('pomoJournal', JSON.stringify(journalData));
+            alert("Journal Entry Saved!");
+        }
+
+        function setMood(mood) {
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        /* --- PROMPTS & BURN --- */
+        const prompts = [
+            "What is one thing that made you smile today?", "What is a challenge you overcame recently?",
+            "How are you feeling right now, really?", "What is one goal you want to focus on tomorrow?",
+            "Write about a place where you feel safe.", "Who is someone you appreciate and why?"
+        ];
+        function newPrompt() {
+            const r = Math.floor(Math.random() * prompts.length);
+            document.getElementById('daily-prompt').innerText = "✨ Prompt: " + prompts[r];
+        }
+        function burnEntry() {
+            const area = document.getElementById('journalEntry');
+            if(area.value.trim() === "") return;
+            if(confirm("Burn this entry? This deletes it permanently.")) {
+                var duration = 2 * 1000; var end = Date.now() + duration;
+                (function frame() {
+                    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ef4444', '#f97316'] });
+                    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ef4444', '#f97316'] });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                }());
+                area.style.transition = "0.5s"; area.style.opacity = "0";
+                setTimeout(() => { area.value = ""; area.style.opacity = "1"; }, 500);
+            }
+        }
+
+        /* --- WORRY JAR LOGIC --- */
+        let worries = JSON.parse(localStorage.getItem('worryJar')) || [];
+
+        function renderFireflies() {
+            const zone = document.getElementById('firefly-zone');
+            zone.innerHTML = ''; 
+            worries.forEach(w => {
+                const f = document.createElement('div');
+                f.className = 'firefly';
+                const x = Math.random() * 80 + 10 + '%';
+                const y = Math.random() * 80 + 10 + '%';
+                f.style.left = x; f.style.top = y;
+                f.style.setProperty('--mx', (Math.random()*40 - 20) + 'px');
+                f.style.setProperty('--my', (Math.random()*40 - 20) + 'px');
+                f.style.animationDelay = Math.random() + 's';
+                zone.appendChild(f);
+            });
+        }
+
+        function addWorry() {
+            const input = document.getElementById('worryInput');
+            const txt = input.value.trim();
+            if(!txt) return;
+            worries.push({ text: txt, date: Date.now() });
+            localStorage.setItem('worryJar', JSON.stringify(worries));
+            input.value = '';
+            renderFireflies();
+        }
+
+        function openJar() {
+            document.getElementById('worryModal').style.display = 'flex';
+            renderWorryList();
+        }
+
+        function renderWorryList() {
+            const list = document.getElementById('worryListArea');
+            if(worries.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:40px; color:#aaa;">The jar is empty. Your mind is clear. 🌿</div>';
+                return;
+            }
+            list.innerHTML = worries.map((w, i) => `
+                <div class="worry-item">
+                    <span>${w.text}</span>
+                    <div class="worry-actions">
+                        <i class="fas fa-trash" onclick="deleteWorry(${i})" title="Release (Delete)"></i>
+                        <i class="fas fa-book-open" onclick="journalWorry(${i})" title="Journal about this"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteWorry(index) {
+            if(confirm("Release this worry into the universe?")) {
+                worries.splice(index, 1);
+                localStorage.setItem('worryJar', JSON.stringify(worries));
+                renderWorryList();
+                renderFireflies(); 
+            }
+        }
+
+        function journalWorry(index) {
+            const w = worries[index];
+            document.getElementById('journalEntry').value += `\n\nReflecting on worry: "${w.text}"\n`;
+            document.getElementById('worryModal').style.display = 'none';
+            worries.splice(index, 1); 
+            localStorage.setItem('worryJar', JSON.stringify(worries));
+            renderFireflies();
+        }
+
+        /* --- UI & AUDIO --- */
+        function openTodo() { document.getElementById('todoModal').style.display = 'flex'; renderTodos(); }
+        function addTodo() {
+            const input = document.getElementById('newTodoInput');
+            if(!input.value.trim()) return;
+            sessionData.todos.push({ text: input.value, done: false });
+            input.value = ''; saveAndRenderTodos();
+        }
+        function toggleTodo(index) { sessionData.todos[index].done = !sessionData.todos[index].done; saveAndRenderTodos(); }
+        function deleteTodo(index) { sessionData.todos.splice(index, 1); saveAndRenderTodos(); }
+        function saveAndRenderTodos() { localStorage.setItem('pomoUlt', JSON.stringify(sessionData)); renderTodos(); }
+        function renderTodos() {
+            const list = document.getElementById('todoListUI'); list.innerHTML = '';
+            sessionData.todos.forEach((todo, i) => {
+                list.innerHTML += `<li class="todo-item ${todo.done?'done':''}"><input type="checkbox" class="todo-check" ${todo.done?'checked':''} onclick="toggleTodo(${i})"><span class="todo-text">${todo.text}</span><i class="fas fa-trash todo-del" onclick="deleteTodo(${i})"></i></li>`;
+            });
+        }
+
+        let chart = null;
+        function openReport() {
+            document.getElementById('reportModal').style.display = 'flex';
+            document.getElementById('disp-hours').innerText = (sessionData.totalMinutes/60).toFixed(1);
+            document.getElementById('disp-days').innerText = sessionData.daysAccessed;
+            document.getElementById('disp-streak').innerText = sessionData.streak;
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            if(chart) chart.destroy();
+            const labels = [], data = [];
+            for(let i=6; i>=0; i--) {
+                const d = new Date(); d.setDate(d.getDate()-i);
+                const str = d.toISOString().split('T')[0];
+                labels.push(d.toLocaleDateString('en-US',{weekday:'short'}));
+                data.push((sessionData.daily[str]||0)/60);
+            }
+            chart = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ data, backgroundColor: '#f472b6', borderRadius: 4 }] }, options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'#f0f0f0'}}} } });
+            document.getElementById('logList').innerHTML = sessionData.logs.map(l => `<li style="padding:10px 0; border-bottom:1px solid #eee;"><b>${l.name}</b> <span style="float:right; color:#999;">${l.duration}m</span><div style="font-size:0.8rem; color:#ccc;">${l.date}</div></li>`).join('');
+        }
+        function switchView(view, el) {
+            document.querySelectorAll('.report-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+            document.getElementById('view-summary').style.display = view === 'summary' ? 'block' : 'none';
+            document.getElementById('view-detail').style.display = view === 'detail' ? 'block' : 'none';
+        }
+        function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
+
+        let currentTrack = null;
+        function changeTrack() {
+            const val = document.getElementById('trackSelect').value;
+            if(currentTrack) { currentTrack.pause(); currentTrack.currentTime = 0; }
+            if(val !== 'none') { currentTrack = document.getElementById(`music-${val}`); currentTrack.volume = 0.5; currentTrack.play(); }
+        }
+        function toggleMusic() { if(currentTrack) currentTrack.paused ? currentTrack.play() : currentTrack.pause(); }
+        function toggleNature(type, btn) {
+            const audio = document.getElementById(`nature-${type}`);
+            if(audio.paused) { audio.play(); btn.classList.add('active'); } else { audio.pause(); btn.classList.remove('active'); }
+        }
+        function setVolume(type, val) { const audio = document.getElementById(`nature-${type}`); audio.volume = val; if(audio.paused && val > 0) audio.play(); }
+
+        updateDisplay();
+    </script>
+</body>
+</html>

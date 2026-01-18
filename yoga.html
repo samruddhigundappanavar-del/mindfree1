@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yoga | Whispering Nature</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Light Mode Colors (Default) */
+      --bg-base: #f4f5f0;        /* Soft Organic White */
+      --color-sage: #8fa394;     /* Muted Sage */
+      --color-stone: #d1cfc7;    /* Warm Grey */
+      --color-mist: #e0e6e9;     /* Cool Mist */
+      --color-text: #4a4a4a;     /* Soft Charcoal */
+      --color-text-light: #888;
+      --glass: rgba(255, 255, 255, 0.5);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --card-bg: #fff;
+      --card-shadow: 0 10px 30px rgba(0,0,0,0.02);
+      --card-hover-shadow: 0 15px 40px rgba(143,163,148,0.15);
+      --btn-bg: #fff;
+      --btn-border: #ddd;
+      --progress-bg: #e0e0e0;
+      
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'Jost', sans-serif;
+    }
+
+    /* Dark Mode Colors */
+    [data-theme="dark"] {
+      --bg-base: #1a1f1c;        /* Deep Charcoal */
+      --color-sage: #9cb6a2;     /* Lighter Sage */
+      --color-stone: #4a4e48;    /* Dark Grey */
+      --color-mist: #2a3430;     /* Dark Mist */
+      --color-text: #e8ebe6;     /* Soft Off-white */
+      --color-text-light: #a0a8a3;
+      --glass: rgba(40, 45, 42, 0.5);
+      --glass-border: rgba(60, 70, 65, 0.8);
+      --card-bg: #2a2f2c;
+      --card-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      --card-hover-shadow: 0 15px 40px rgba(100,120,110,0.25);
+      --btn-bg: #2a2f2c;
+      --btn-border: #444;
+      --progress-bg: #3a3f3c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+    
+    body {
+      min-height: 100vh;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background-color: var(--bg-base);
+      overflow-x: hidden;
+      position: relative;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    /* --- BACKGROUND LAYERS --- */
+    
+    /* 1. Moving Gradient Mesh (The "Alive" part) */
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: -3;
+      background: 
+        radial-gradient(at 0% 0%, rgba(143, 163, 148, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(209, 207, 199, 0.2) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(224, 230, 233, 0.2) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(143, 163, 148, 0.1) 0px, transparent 50%);
+      filter: blur(40px);
+      animation: breatheBg 20s infinite alternate;
+    }
+    
+    [data-theme="dark"] .bg-mesh {
+      background: 
+        radial-gradient(at 0% 0%, rgba(100, 120, 110, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(70, 75, 70, 0.2) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(50, 60, 55, 0.2) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(80, 100, 90, 0.1) 0px, transparent 50%);
+    }
+
+    /* 2. Grain Texture (Tactile Feel) */
+    .grain-overlay {
+      position: fixed; inset: 0; z-index: -2; opacity: 0.4; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+    }
+    
+    [data-theme="dark"] .grain-overlay {
+      opacity: 0.25;
+    }
+
+    /* 3. Floating Organic Blobs */
+    .blob {
+      position: absolute; border-radius: 50%; z-index: -1;
+      filter: blur(60px); opacity: 0.6;
+      animation: float 15s infinite ease-in-out;
+    }
+    .blob-1 { top: 10%; left: -5%; width: 400px; height: 400px; background: rgba(143, 163, 148, 0.2); animation-delay: 0s; }
+    .blob-2 { bottom: 20%; right: -10%; width: 500px; height: 500px; background: rgba(209, 207, 199, 0.25); animation-delay: -5s; }
+    
+    [data-theme="dark"] .blob-1 { background: rgba(100, 120, 110, 0.15); }
+    [data-theme="dark"] .blob-2 { background: rgba(70, 75, 70, 0.2); }
+
+    @keyframes breatheBg { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+    @keyframes float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(20px, -20px); } }
+
+    /* --- LAYOUT --- */
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 60px 20px; position: relative; }
+
+    /* --- HEADER & NAVIGATION --- */
+    .top-nav { 
+      display: flex; 
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px; 
+      flex-wrap: wrap;
+    }
+    
+    .nav-left {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .theme-toggle {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      width: 50px;
+      height: 26px;
+      border-radius: 13px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .theme-toggle::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--color-sage);
+      transition: transform 0.3s ease;
+    }
+    
+    [data-theme="dark"] .theme-toggle::after {
+      transform: translateX(24px);
+    }
+    
+    .theme-toggle svg {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      fill: var(--color-text);
+      pointer-events: none;
+    }
+    
+    .theme-toggle .sun {
+      left: 5px;
+      opacity: 1;
+    }
+    
+    .theme-toggle .moon {
+      right: 5px;
+      opacity: 0.5;
+    }
+    
+    [data-theme="dark"] .theme-toggle .sun {
+      opacity: 0.5;
+    }
+    
+    [data-theme="dark"] .theme-toggle .moon {
+      opacity: 1;
+    }
+    
+    .nav-btn {
+      background: none; 
+      border: none; 
+      font-family: var(--font-body);
+      color: var(--color-sage); 
+      cursor: pointer; 
+      font-size: 0.9rem;
+      padding: 5px 15px; 
+      border: 1px solid transparent; 
+      border-radius: 20px;
+      transition: 0.3s;
+    }
+    .nav-btn:hover { 
+      background: rgba(143,163,148,0.1); 
+      border-color: var(--color-sage); 
+    }
+    
+    [data-theme="dark"] .nav-btn:hover {
+      background: rgba(156, 182, 162, 0.1);
+    }
+
+    header { 
+      text-align: center; 
+      margin-bottom: 70px; 
+      position: relative; 
+    }
+    .title {
+      font-family: var(--font-display); 
+      font-size: 3.5rem; 
+      color: var(--color-text);
+      font-weight: 400; 
+      letter-spacing: -1px; 
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      font-family: var(--font-body); 
+      font-size: 0.9rem; 
+      color: var(--color-text-light); 
+      letter-spacing: 2px; 
+      text-transform: uppercase;
+    }
+    
+    /* Decorative Line */
+    .title::after {
+      content: ""; 
+      display: block; 
+      width: 60px; 
+      height: 1px;
+      background: var(--color-sage); 
+      margin: 20px auto 0;
+      opacity: 0.5;
+    }
+
+    /* --- GLASS CARDS --- */
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+      gap: 30px; 
+      margin-bottom: 60px; 
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px); 
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px; 
+      padding: 30px;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.3s, box-shadow 0.3s; 
+      position: relative; 
+      overflow: hidden;
+    }
+    .card:hover { 
+      transform: translateY(-5px); 
+      box-shadow: var(--card-hover-shadow); 
+    }
+    
+    /* Soft Gradient Inside Card */
+    .card::before {
+      content: ""; 
+      position: absolute; 
+      top: 0; 
+      left: 0; 
+      right: 0; 
+      height: 4px;
+      background: linear-gradient(90deg, transparent, var(--color-sage), transparent);
+      opacity: 0.5;
+    }
+
+    h4 {
+      font-family: var(--font-body); 
+      font-size: 0.75rem; 
+      color: var(--color-sage);
+      text-transform: uppercase; 
+      letter-spacing: 1.5px; 
+      margin-bottom: 20px; 
+      font-weight: 600; 
+      text-align: center;
+    }
+
+    /* Timer */
+    .timer-display { 
+      font-family: var(--font-display); 
+      font-size: 3rem; 
+      text-align: center; 
+      color: var(--color-text); 
+      margin-bottom: 15px; 
+    }
+    .controls { 
+      display: flex; 
+      justify-content: center; 
+      gap: 10px; 
+      flex-wrap: wrap;
+    }
+    .ctrl-btn {
+      background: var(--btn-bg); 
+      border: 1px solid var(--btn-border);
+      padding: 8px 16px; 
+      border-radius: 50px; 
+      cursor: pointer;
+      font-family: var(--font-body); 
+      font-size: 0.85rem; 
+      color: var(--color-text);
+      transition: 0.3s;
+    }
+    .ctrl-btn:hover { 
+      border-color: var(--color-sage); 
+      color: var(--color-sage); 
+    }
+
+    /* Breath */
+    .breath-widget { 
+      position: relative; 
+      width: 100px; 
+      height: 100px; 
+      margin: 0 auto 15px; 
+    }
+    .breath-circle {
+      position: absolute; 
+      inset: 0; 
+      border-radius: 50%;
+      border: 1px solid var(--color-stone);
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+    }
+    .breath-dot {
+      width: 12px; 
+      height: 12px; 
+      background: var(--color-sage); 
+      border-radius: 50%;
+      position: absolute; 
+      top: -6px; 
+      left: 50%; 
+      transform: translateX(-50%);
+      box-shadow: 0 0 10px rgba(143,163,148,0.5);
+    }
+    
+    [data-theme="dark"] .breath-dot {
+      box-shadow: 0 0 10px rgba(156, 182, 162, 0.5);
+    }
+    
+    .breath-label { 
+      position: absolute; 
+      top: 50%; 
+      left: 50%; 
+      transform: translate(-50%,-50%); 
+      font-family: var(--font-display); 
+      font-size: 1.2rem; 
+    }
+    .breath-anim { 
+      animation: rotateBreath 8s linear infinite; 
+    }
+    
+    @keyframes rotateBreath { 
+      0% { transform: rotate(0deg); } 
+      100% { transform: rotate(360deg); } 
+    }
+
+    /* --- POSE LIST --- */
+    .pose-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+    
+    .pose-card {
+      background: var(--card-bg); 
+      border-radius: 20px; 
+      padding: 25px;
+      display: flex; 
+      flex-direction: column;
+      gap: 20px; 
+      align-items: center;
+      border: 1px solid transparent;
+      transition: 0.3s; 
+      box-shadow: var(--card-shadow);
+      height: 100%;
+    }
+    
+    .pose-card:hover { 
+      border-color: var(--color-sage); 
+      transform: translateY(-3px);
+    }
+    
+    .pose-card.done { 
+      opacity: 0.7; 
+      background: var(--color-mist); 
+    }
+    
+    .pose-card.done .pose-thumb {
+      opacity: 0.7;
+    }
+
+    .pose-thumb {
+      width: 150px; 
+      height: 150px; 
+      border-radius: 50%; 
+      object-fit: cover;
+      border: 4px solid var(--bg-base); 
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .pose-card:hover .pose-thumb {
+      transform: scale(1.05);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    .pose-info { 
+      text-align: center;
+      width: 100%;
+    }
+    
+    .pose-info h3 { 
+      font-family: var(--font-display); 
+      font-size: 1.8rem; 
+      font-weight: 400; 
+      margin-bottom: 15px; 
+      color: var(--color-text);
+    }
+    
+    .pose-info .pose-type {
+      font-size: 0.75rem;
+      color: var(--color-sage);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      display: block;
+    }
+    
+    .pose-steps, .pose-benefits {
+      text-align: left;
+      margin-bottom: 15px;
+    }
+    
+    .pose-steps h5, .pose-benefits h5 {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--color-sage);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .pose-steps h5::before, .pose-benefits h5::before {
+      content: "•";
+      font-size: 1.2rem;
+    }
+    
+    .pose-steps p, .pose-benefits p { 
+      font-size: 0.9rem; 
+      color: var(--color-text-light); 
+      line-height: 1.5;
+      margin-bottom: 5px;
+      padding-left: 15px;
+    }
+    
+    .pose-steps p::before, .pose-benefits p::before {
+      content: "→";
+      margin-right: 5px;
+      color: var(--color-sage);
+    }
+    
+    /* Custom Checkbox */
+    .check-container { 
+      position: relative; 
+      width: 40px; 
+      height: 40px; 
+      cursor: pointer; 
+      margin-top: 10px;
+    }
+    
+    .check-box {
+      width: 100%; 
+      height: 100%; 
+      border: 2px solid var(--color-stone); 
+      border-radius: 50%;
+      transition: 0.3s; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      background: var(--bg-base);
+    }
+    
+    .check-container input:checked + .check-box { 
+      background: var(--color-sage); 
+      border-color: var(--color-sage); 
+    }
+    
+    .check-container input:checked + .check-box::after { 
+      content: "✓"; 
+      color: #fff; 
+      font-size: 18px; 
+      font-weight: bold;
+    }
+
+    /* Footer */
+    .progress-line {
+      height: 2px; 
+      background: var(--progress-bg); 
+      margin: 40px auto 10px; 
+      max-width: 200px;
+      position: relative; 
+      overflow: hidden; 
+      border-radius: 2px;
+    }
+    
+    .progress-fill {
+      position: absolute; 
+      top: 0; 
+      left: 0; 
+      height: 100%; 
+      width: 0%;
+      background: var(--color-sage); 
+      transition: 0.5s;
+    }
+    
+    .goal-text { 
+      text-align: center; 
+      font-size: 0.8rem; 
+      color: var(--color-sage); 
+      letter-spacing: 1px; 
+      text-transform: uppercase; 
+      margin-bottom: 20px;
+    }
+
+    @media(max-width: 768px) {
+      .pose-list {
+        grid-template-columns: 1fr;
+      }
+      
+      .pose-thumb {
+        width: 120px;
+        height: 120px;
+      }
+    }
+    
+    @media(max-width: 600px) {
+      .title { font-size: 2.5rem; }
+      .top-nav {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      .nav-left {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Background Ambience -->
+  <div class="bg-mesh"></div>
+  <div class="grain-overlay"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="wrap">
+    
+    <nav class="top-nav">
+      <div class="nav-left">
+        <div class="theme-toggle" id="themeToggle">
+          <svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-15a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 18a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1zM5.64 7.05a1 1 0 0 1 0 1.41l-1.42 1.42a1 1 0 1 1-1.41-1.41L4.22 7.05a1 1 0 0 1 1.42 0zm14.14 10l1.42 1.42a1 1 0 0 1-1.41 1.41l-1.42-1.42a1 1 0 0 1 1.41-1.41zM7.05 18.36a1 1 0 0 1 0-1.41l1.42-1.42a1 1 0 1 1 1.41 1.41l-1.42 1.42a1 1 0 0 1-1.41 0zM18.36 5.64a1 1 0 0 1-1.41 0l-1.42-1.42a1 1 0 0 1 1.41-1.41l1.42 1.42a1 1 0 0 1 0 1.41zM3 12a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2H4a1 1 0 0 1-1-1zm16 0a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2h-2a1 1 0 0 1-1-1z"/>
+          </svg>
+          <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M21.64 13.39a1 1 0 0 0-1.05-.14 8.05 8.05 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.6 8.6 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 0 0-4.74 7.5 10 10 0 0 0 10 10 10.14 10.14 0 0 0 7.5-4.74 1 1 0 0 0-.12-1.73z"/>
+          </svg>
+        </div>
+        
+        <button class="nav-btn" id="soundBtn">Sound: On</button>
+      </div>
+      
+      <a href="dashboard.html" class="nav-btn" style="text-decoration:none;">Close</a>
+    </nav>
+
+    <header>
+      <div class="title">Breathe & Flow</div>
+      <div class="subtitle">Mindful moments in nature</div>
+    </header>
+
+    <div class="grid">
+      <!-- Timer -->
+      <div class="card">
+        <h4>Meditation Timer</h4>
+        <div class="timer-display" id="timer">00:00</div>
+        <div class="controls">
+          <button class="ctrl-btn" onclick="startTimer(3)">3m</button>
+          <button class="ctrl-btn" onclick="startTimer(7)">7m</button>
+          <button class="ctrl-btn" onclick="startTimer(15)">15m</button>
+          <button class="ctrl-btn" onclick="stopTimer()">Stop</button>
+        </div>
+      </div>
+
+      <!-- Breath -->
+      <div class="card">
+        <h4>Breath Cycle</h4>
+        <div class="breath-widget">
+          <div class="breath-circle" id="breathCircle"></div>
+          <div class="breath-label" id="breathText">4</div>
+        </div>
+        <div class="controls">
+          <button class="ctrl-btn" id="breathBtn" onclick="toggleBreath()">Begin</button>
+          <button class="ctrl-btn" onclick="resetBreath()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poses -->
+    <div class="pose-list">
+      
+      <!-- Pose 1 -->
+      <div class="pose-card">
+        <img src="https://image2url.com/r2/default/images/1768371487711-791519f3-638c-4044-86d7-38de3a8e94f0.webp" class="pose-thumb" alt="Downward Dog">
+        <div class="pose-info">
+          <h3>Downward Dog</h3>
+          <span class="pose-type">Inversion • Strength</span>
+          
+          <div class="pose-steps">
+            <h5>Steps:</h5>
+            <p>Start on hands and knees</p>
+            <p>Tuck toes, lift hips upward</p>
+            <p>Press heels toward the floor</p>
+            <p>Keep spine long, head relaxed</p>
+            <p>Hold for 5-10 breaths</p>
+          </div>
+          
+          <div class="pose-benefits">
+            <h5>Benefits:</h5>
+            <p>Strengthens arms and legs</p>
+            <p>Stretches hamstrings and calves</p>
+            <p>Calms the mind, relieves stress</p>
+            <p>Improves digestion</p>
+            <p>Energizes the entire body</p>
+          </div>
+        </div>
+        <label class="check-container">
+          <input type="checkbox" style="display:none;" class="pose-check">
+          <div class="check-box"></div>
+        </label>
+      </div>
+
+      <!-- Pose 2 -->
+      <div class="pose-card">
+        <img src="https://image2url.com/r2/default/images/1768371533040-46d513c1-c282-4c1c-9ce2-9dce77f913d3.webp" class="pose-thumb" alt="Warrior II">
+        <div class="pose-info">
+          <h3>Warrior II</h3>
+          <span class="pose-type">Standing • Strength</span>
+          
+          <div class="pose-steps">
+            <h5>Steps:</h5>
+            <p>Stand with feet wide apart</p>
+            <p>Turn right foot out 90 degrees</p>
+            <p>Bend right knee over ankle</p>
+            <p>Extend arms parallel to floor</p>
+            <p>Gaze over right fingertips</p>
+            <p>Hold for 5-8 breaths each side</p>
+          </div>
+          
+          <div class="pose-benefits">
+            <h5>Benefits:</h5>
+            <p>Builds leg and core strength</p>
+            <p>Improves balance and stability</p>
+            <p>Opens hips and chest</p>
+            <p>Increases stamina</p>
+            <p>Promotes mental focus</p>
+          </div>
+        </div>
+        <label class="check-container">
+          <input type="checkbox" style="display:none;" class="pose-check">
+          <div class="check-box"></div>
+        </label>
+      </div>
+
+      <!-- Pose 3 -->
+      <div class="pose-card">
+        <img src="https://image2url.com/r2/default/images/1768371703034-d16741f2-c5c4-42d0-9d85-f97c6e4619cb.webp" class="pose-thumb" alt="Tree Pose">
+        <div class="pose-info">
+          <h3>Tree Pose</h3>
+          <span class="pose-type">Balance • Focus</span>
+          
+          <div class="pose-steps">
+            <h5>Steps:</h5>
+            <p>Stand tall with feet together</p>
+            <p>Shift weight to left foot</p>
+            <p>Place right foot on inner left thigh</p>
+            <p>Bring hands to heart center</p>
+            <p>Find a focal point to gaze at</p>
+            <p>Hold for 5-10 breaths each side</p>
+          </div>
+          
+          <div class="pose-benefits">
+            <h5>Benefits:</h5>
+            <p>Improves balance and coordination</p>
+            <p>Strengthens ankles and legs</p>
+            <p>Calms the mind, reduces anxiety</p>
+            <p>Enhances concentration</p>
+            <p>Improves posture and alignment</p>
+          </div>
+        </div>
+        <label class="check-container">
+          <input type="checkbox" style="display:none;" class="pose-check">
+          <div class="check-box"></div>
+        </label>
+      </div>
+
+      <!-- Pose 4 -->
+      <div class="pose-card">
+        <img src="https://image2url.com/r2/default/images/1768371768086-e606f356-5740-4338-aebe-0d8eea2c4b49.jpg" class="pose-thumb" alt="Cobra Pose">
+        <div class="pose-info">
+          <h3>Cobra Pose</h3>
+          <span class="pose-type">Backbend • Heart Opener</span>
+          
+          <div class="pose-steps">
+            <h5>Steps:</h5>
+            <p>Lie face down, legs extended</p>
+            <p>Place hands under shoulders</p>
+            <p>Press tops of feet into floor</p>
+            <p>Inhale, lift chest upward</p>
+            <p>Keep elbows slightly bent</p>
+            <p>Hold for 3-5 breaths</p>
+            <p>Release slowly on exhale</p>
+          </div>
+          
+          <div class="pose-benefits">
+            <h5>Benefits:</h5>
+            <p>Strengthens the spine</p>
+            <p>Opens the chest and lungs</p>
+            <p>Improves posture</p>
+            <p>Stretches abdominal muscles</p>
+            <p>Relieves stress and fatigue</p>
+            <p>Stimulates abdominal organs</p>
+          </div>
+        </div>
+        <label class="check-container">
+          <input type="checkbox" style="display:none;" class="pose-check">
+          <div class="check-box"></div>
+        </label>
+      </div>
+
+      <!-- Pose 5 -->
+      <div class="pose-card">
+        <img src="https://image2url.com/r2/default/images/1768371801884-a9a95ab0-9d46-4c7b-9602-d27085f156eb.png" class="pose-thumb" alt="Child's Pose">
+        <div class="pose-info">
+          <h3>Child's Pose</h3>
+          <span class="pose-type">Resting • Gentle</span>
+          
+          <div class="pose-steps">
+            <h5>Steps:</h5>
+            <p>Kneel on floor, big toes touching</p>
+            <p>Sit back on heels, knees apart</p>
+            <p>Fold forward, rest forehead on mat</p>
+            <p>Extend arms forward or alongside body</p>
+            <p>Relax shoulders, breathe deeply</p>
+            <p>Hold as long as comfortable</p>
+          </div>
+          
+          <div class="pose-benefits">
+            <h5>Benefits:</h5>
+            <p>Gently stretches hips and thighs</p>
+            <p>Calms the nervous system</p>
+            <p>Relieves stress and anxiety</p>
+            <p>Eases back and neck pain</p>
+            <p>Promotes relaxation and surrender</p>
+            <p>Restores energy when tired</p>
+          </div>
+        </div>
+        <label class="check-container">
+          <input type="checkbox" style="display:none;" class="pose-check">
+          <div class="check-box"></div>
+        </label>
+      </div>
+
+      <!-- Pose 6 -->
+      <div class="pose-card">
+        <img src="https://image2url.com/r2/default/images/1768371846072-134eae13-6ed2-46dc-a281-5e94b26006a5.jpg" class="pose-thumb" alt="Bridge Pose">
+        <div class="pose-info">
+          <h3>Bridge Pose</h3>
+          <span class="pose-type">Backbend • Energizing</span>
+          
+          <div class="pose-steps">
+            <h5>Steps:</h5>
+            <p>Lie on back, knees bent</p>
+            <p>Feet hip-width apart, near glutes</p>
+            <p>Arms alongside body, palms down</p>
+            <p>Inhale, lift hips toward ceiling</p>
+            <p>Roll shoulders under, clasp hands</p>
+            <p>Hold for 5-10 breaths</p>
+            <p>Release slowly, vertebra by vertebra</p>
+          </div>
+          
+          <div class="pose-benefits">
+            <h5>Benefits:</h5>
+            <p>Strengthens back and glutes</p>
+            <p>Opens chest and shoulders</p>
+            <p>Stretches hip flexors</p>
+            <p>Improves spinal flexibility</p>
+            <p>Calms the brain, reduces anxiety</p>
+            <p>Helps with mild depression</p>
+          </div>
+        </div>
+        <label class="check-container">
+          <input type="checkbox" style="display:none;" class="pose-check">
+          <div class="check-box"></div>
+        </label>
+      </div>
+
+      <!-- Pose 7 -->
+      <div class="pose-card">
+        <img src="https://image2url.com/r2/default/images/1768371864040-7edd8e56-b049-488e-bd57-f6c382ecd020.jpg" class="pose-thumb" alt="Seated Forward Bend">
+        <div class="pose-info">
+          <h3>Seated Forward Bend</h3>
+          <span class="pose-type">Forward Fold • Calming</span>
+          
+          <div class="pose-steps">
+            <h5>Steps:</h5>
+            <p>Sit with legs extended forward</p>
+            <p>Flex feet, engage thigh muscles</p>
+            <p>Inhale, lengthen spine upward</p>
+            <p>Exhale, hinge from hips forward</p>
+            <p>Hold shins, ankles, or feet</p>
+            <p>Keep spine long, don't round back</p>
+            <p>Hold for 5-10 deep breaths</p>
+          </div>
+          
+          <div class="pose-benefits">
+            <h5>Benefits:</h5>
+            <p>Stretches entire back body</p>
+            <p>Calms the mind and nervous system</p>
+            <p>Relieves stress and mild depression</p>
+            <p>Stimulates liver and kidneys</p>
+            <p>Improves digestion</p>
+            <p>Helps relieve menopause symptoms</p>
+            <p>Reduces fatigue and anxiety</p>
+          </div>
+        </div>
+        <label class="check-container">
+          <input type="checkbox" style="display:none;" class="pose-check">
+          <div class="check-box"></div>
+        </label>
+      </div>
+
+    </div>
+
+    <!-- Goal -->
+    <div class="progress-line"><div class="progress-fill" id="progFill"></div></div>
+    <div class="goal-text" id="goalText">Daily Goal: 0/7 poses</div>
+
+  </div>
+
+  <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    
+    // Check for saved theme or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme') || 
+                      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    
+    // Set initial theme
+    body.setAttribute('data-theme', savedTheme);
+    
+    // Update toggle position based on theme
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      body.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      // Play subtle sound for theme change
+      tone();
+    });
+
+    // Audio Context
+    let actx;
+    let soundEnabled = true;
+    
+    function tone(frequency = 220, duration = 200) {
+      if (!soundEnabled) return;
+      
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = actx.createOscillator();
+      oscillator.frequency.value = frequency;
+      
+      const gainNode = actx.createGain();
+      gainNode.gain.value = 0.05;
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(actx.destination);
+      
+      oscillator.start();
+      setTimeout(() => oscillator.stop(), duration);
+    }
+
+    // Sound Toggle
+    const soundBtn = document.getElementById('soundBtn');
+    soundBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      soundBtn.textContent = `Sound: ${soundEnabled ? 'On' : 'Off'}`;
+      tone(440, 100); // Feedback sound
+    });
+
+    // Timer
+    let tInt;
+    function startTimer(min) {
+      clearInterval(tInt);
+      let s = min * 60;
+      upd(s);
+      tInt = setInterval(() => {
+        s--;
+        upd(s);
+        if (s <= 0) {
+          clearInterval(tInt);
+          tone(330, 500); // Longer tone when timer ends
+        }
+      }, 1000);
+    }
+    
+    function upd(s) {
+      let m = Math.floor(s / 60);
+      let r = s % 60;
+      document.getElementById('timer').innerText = `${m}:${r < 10 ? '0' : ''}${r}`;
+    }
+    
+    function stopTimer() {
+      clearInterval(tInt);
+      document.getElementById('timer').innerText = "00:00";
+      tone(110, 100); // Lower tone for stop
+    }
+
+    // Breath
+    let bInt, bOn = false;
+    function toggleBreath() {
+      const btn = document.getElementById('breathBtn');
+      const txt = document.getElementById('breathText');
+      const circ = document.getElementById('breathCircle');
+      
+      if (bOn) {
+        clearInterval(bInt);
+        bOn = false;
+        btn.innerText = "Begin";
+        circ.innerHTML = "";
+        txt.innerText = "4";
+        return;
+      }
+      
+      bOn = true;
+      btn.innerText = "Stop";
+      
+      // Add moving dot
+      circ.innerHTML = '<div class="breath-dot"></div>';
+      circ.firstElementChild.classList.add('breath-anim');
+      
+      let c = 4, ph = 0; // 0=In, 1=Out
+      const tick = () => {
+        txt.innerText = ph === 0 ? "In" : "Out";
+        c--;
+        if (c < 0) {
+          ph = 1 - ph;
+          c = 4;
+          tone(ph === 0 ? 220 : 180); // Different tones for inhale/exhale
+        }
+      };
+      tick();
+      bInt = setInterval(tick, 1000);
+    }
+    
+    function resetBreath() {
+      if (bOn) toggleBreath(); // Stop if running
+      const txt = document.getElementById('breathText');
+      const circ = document.getElementById('breathCircle');
+      const btn = document.getElementById('breathBtn');
+      
+      txt.innerText = "4";
+      circ.innerHTML = "";
+      btn.innerText = "Begin";
+      tone(110, 100);
+    }
+
+    // Pose Checkboxes
+    document.querySelectorAll('.pose-check').forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        e.target.closest('.pose-card').classList.toggle('done', e.target.checked);
+        updateProg();
+        if (e.target.checked) tone(260, 150); // Gentle tone when checking a pose
+      });
+    });
+
+    function updateProg() {
+      const tot = document.querySelectorAll('.pose-check').length;
+      const chk = document.querySelectorAll('.pose-check:checked').length;
+      const progFill = document.getElementById('progFill');
+      const goalText = document.getElementById('goalText');
+      
+      progFill.style.width = (chk / tot * 100) + "%";
+      goalText.innerText = chk === tot ? 
+        "Harmony Achieved 🌿 Complete your practice!" : 
+        `Daily Goal: ${chk}/${tot} poses`;
+      
+      // If all poses are checked, celebrate with a special tone
+      if (chk === tot && tot > 0) {
+        setTimeout(() => tone(440, 300), 100);
+        setTimeout(() => tone(550, 300), 400);
+        setTimeout(() => tone(660, 500), 700);
+      }
+    }
+
+    // Initialize progress
+    updateProg();
+    
+    // Add image loading error handling
+    document.querySelectorAll('.pose-thumb').forEach(img => {
+      img.addEventListener('error', function() {
+        this.src = 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
+        this.alt = 'Yoga pose image';
+      });
+    });
+  </script>
+</body>
+</html>

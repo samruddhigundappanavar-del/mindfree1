@@ -1,0 +1,2795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Games - Wellness App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body{
+      font-family: 'Roboto', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: background 0.5s ease;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+
+      /* For image backgrounds */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    body.pastel{ background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+
+    /* Dark mode */
+    body.dark{
+      background: radial-gradient(circle at 20% 20%, #141428 0%, #0b0b12 60%, #07070c 100%);
+    }
+    body.dark .container{
+      background: rgba(0,0,0,0.45);
+      border-color: rgba(255,255,255,0.20);
+      color: #fff;
+    }
+    body.dark .tabs{ border-bottom-color: rgba(255,255,255,0.14); }
+    body.dark .tab-btn{
+      color: #fff;
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+    }
+    body.dark .info,
+    body.dark .word-display{
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+    }
+    body.dark canvas{ border-color: rgba(0,198,255,0.35); }
+
+    .theme-btn{
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 1000;
+      user-select: none;
+    }
+    .theme-btn.glass{ background: rgba(255,255,255,0.3); color: white; }
+    .theme-btn.pastel{ background: #ff9a9e; color: white; }
+
+    .sound-btn{
+      position: fixed;
+      top: 12px;
+      right: 110px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 1000;
+      user-select: none;
+      background: rgba(255,255,255,0.3);
+      color: #fff;
+    }
+    body.pastel .sound-btn{ background: #ff9a9e; color: #fff; }
+
+    .dark-btn{
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 1000;
+      user-select: none;
+      background: rgba(255,255,255,0.30);
+      color: #fff;
+    }
+    body.pastel .dark-btn{ background: #ff9a9e; color: #fff; }
+
+    /* ===== Added: Background dropdown ===== */
+    .bg-control{
+      position: fixed;
+      top: 54px;
+      right: 12px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+    .bg-control select{
+      padding: 8px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.30);
+      background: rgba(0,0,0,0.20);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      outline: none;
+      cursor: pointer;
+      max-width: 210px;
+    }
+    body.pastel .bg-control select{
+      background: rgba(255,255,255,0.55);
+      border-color: rgba(0,0,0,0.12);
+      color: #333;
+    }
+    body.dark .bg-control select{
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(255,255,255,0.20);
+      color: #fff;
+    }
+
+    .container{
+      flex: 1;
+      max-width: 100%;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.18);
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.35);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    body.pastel .container{ background: rgba(255,255,255,0.7); color: #333; }
+
+    .header{ text-align: center; margin-bottom: 12px; flex-shrink: 0; }
+    .header h1{ font-size: 22px; margin-bottom: 4px; }
+    .header p{ font-size: 11px; opacity: 0.85; }
+
+    /* Level HUD */
+    .level-hud{
+      margin-top: 8px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .chip{
+      font-size: 11px;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(0,0,0,0.18);
+      color: inherit;
+    }
+    body.pastel .chip{
+      border-color: rgba(0,0,0,0.12);
+      background: rgba(0,0,0,0.05);
+      color: #333;
+    }
+    body.dark .chip{
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+    }
+    .bar{
+      width: 220px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.25);
+      overflow: hidden;
+      background: rgba(0,0,0,0.18);
+    }
+    body.pastel .bar{
+      border-color: rgba(0,0,0,0.12);
+      background: rgba(0,0,0,0.05);
+    }
+    body.dark .bar{
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+    }
+    .bar > div{
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(135deg, #2f80ed, #00c6ff);
+    }
+    body.pastel .bar > div{
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    }
+
+    .tabs{
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      border-bottom: 2px solid rgba(255,255,255,0.2);
+      flex-shrink: 0;
+    }
+    body.pastel .tabs{ border-bottom-color: rgba(0,0,0,0.1); }
+
+    .tab-btn{
+      padding: 7px 10px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    body.pastel .tab-btn{
+      color: #333;
+      border-color: rgba(0,0,0,0.1);
+      background: rgba(0,0,0,0.05);
+    }
+    .tab-btn:hover{ border-color: #00c6ff; background: rgba(0,198,255,0.15); }
+    .tab-btn.active{
+      border-color: #00c6ff;
+      background: rgba(0,198,255,0.4);
+      box-shadow: 0 0 15px rgba(0,198,255,0.35);
+    }
+
+    .game{
+      display: none;
+      flex: 1;
+      animation: slideIn 0.35s ease;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+    .game.active{ display: flex; flex-direction: column; }
+
+    @keyframes slideIn{
+      from{ opacity: 0; transform: translateY(10px); }
+      to{ opacity: 1; transform: translateY(0); }
+    }
+
+    .game-title{
+      color: #00c6ff;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 15px;
+      flex-shrink: 0;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+    body.pastel .game-title{ color: #ff6b6b; }
+
+    .stats{
+      text-align: center;
+      margin: 8px 0;
+      font-size: 12px;
+      flex-shrink: 0;
+      opacity: 0.95;
+      line-height: 1.4;
+      font-weight: 800;
+    }
+
+    .game-content{
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      overflow-y: auto;
+    }
+
+    canvas{
+      border: 2px solid rgba(0,198,255,0.5);
+      border-radius: 10px;
+      background: white;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    #drawCanvas{
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      max-height: 70vh;
+      flex: 1;
+    }
+    #colorCanvas{
+      max-width: 100%;
+      height: auto;
+      max-height: 50vh;
+    }
+
+    .palette{
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 8px;
+      flex-shrink: 0;
+    }
+
+    .color-btn{
+      width: 28px;
+      height: 28px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .color-btn:hover{ transform: scale(1.12); border-color: #00c6ff; }
+    .color-btn.selected{
+      border: 3px solid #00c6ff;
+      box-shadow: 0 0 10px rgba(0,198,255,0.7);
+    }
+
+    .button-group{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: 8px;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .btn{
+      padding: 10px 8px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2f80ed, #00c6ff);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      user-select: none;
+    }
+    body.pastel .btn{ background: linear-gradient(135deg, #ff9a9e, #fad0c4); }
+    .btn:hover{ transform: translateY(-2px); }
+    .btn:active{ transform: scale(0.98); }
+    .btn:disabled{ opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    input[type="file"]{ display: none; }
+
+    .file-input-btn{
+      padding: 10px 8px;
+      border: 2px dashed rgba(0,198,255,0.5);
+      border-radius: 10px;
+      background: transparent;
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .file-input-btn:hover{ border-color: #00c6ff; background: rgba(0,198,255,0.1); }
+
+    .grid-container{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+      gap: 6px;
+      padding: 8px;
+      width: 100%;
+      max-width: 350px;
+    }
+
+    .card{
+      padding: 10px;
+      border: 2px solid rgba(0,198,255,0.3);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.12);
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      font-weight: 900;
+      font-size: 12px;
+      user-select: none;
+    }
+    body.pastel .card{
+      background: rgba(0,0,0,0.04);
+      border-color: rgba(255,107,107,0.30);
+      color: #333;
+    }
+    body.dark .card{
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(0,198,255,0.22);
+      color: #fff;
+    }
+    .card:hover{
+      transform: scale(1.04);
+      border-color: #00c6ff;
+      box-shadow: 0 0 10px rgba(0,198,255,0.35);
+    }
+    .card.selected{ background: rgba(0,198,255,0.3); border-color: #00c6ff; }
+    .card.mt{ opacity: 0.55; cursor: not-allowed; }
+    .card.sel{ background: rgba(0,198,255,0.6); }
+
+    input[type="text"], input[type="number"], textarea{
+      border: 2px solid rgba(0,198,255,0.3);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 12px;
+      padding: 10px;
+      font-family: inherit;
+      font-weight: 700;
+      outline: none;
+    }
+    body.pastel input, body.pastel textarea{
+      color: #333;
+      background: rgba(0,0,0,0.05);
+      border-color: rgba(255,107,107,0.3);
+    }
+    body.dark input, body.dark textarea{
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      border-color: rgba(0,198,255,0.22);
+    }
+    input::placeholder, textarea::placeholder{ color: rgba(255,255,255,0.55); }
+
+    .stress-ball{
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+      font-size: 40px;
+      box-shadow: 0 0 30px rgba(255,107,107,0.6), inset -2px -2px 5px rgba(0,0,0,0.3);
+      transition: all 0.1s ease;
+      user-select: none;
+    }
+    .stress-ball:hover{ transform: scale(1.05); }
+    .stress-ball:active{ transform: scale(0.95); }
+
+    .word-display{
+      background: rgba(0,0,0,0.2);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 16px;
+      letter-spacing: 3px;
+      text-align: center;
+      font-weight: 900;
+      width: 100%;
+      max-width: 320px;
+    }
+    body.pastel .word-display{ background: rgba(0,0,0,0.05); color: #333; }
+
+    .info{
+      background: rgba(0,0,0,0.2);
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      line-height: 1.5;
+      text-align: center;
+      width: 100%;
+      max-width: 380px;
+      font-weight: 800;
+    }
+    body.pastel .info{ background: rgba(0,0,0,0.05); color: #333; }
+
+    .trivia-options{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      width: 100%;
+      max-width: 350px;
+    }
+
+    .trivia-btn{
+      padding: 10px;
+      border: 2px solid rgba(0,198,255,0.3);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.1);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+      user-select: none;
+    }
+    body.pastel .trivia-btn{
+      background: rgba(0,0,0,0.03);
+      color: #333;
+      border-color: rgba(255,107,107,0.3);
+    }
+    body.dark .trivia-btn{
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      border-color: rgba(0,198,255,0.22);
+    }
+    .trivia-btn:hover{
+      border-color: #00c6ff;
+      background: rgba(0,198,255,0.15);
+      transform: translateX(4px);
+    }
+    .trivia-btn.correct{ border-color: #4caf50; background: rgba(76,175,80,0.3); }
+    .trivia-btn.incorrect{ border-color: #f44336; background: rgba(244,67,54,0.3); }
+
+    .word-options{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
+      width: 100%;
+      max-width: 420px;
+      margin-top: 10px;
+    }
+
+    .word-option-btn{
+      padding: 10px;
+      border: 2px solid rgba(0,198,255,0.3);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.1);
+      color: white;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: default;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    body.pastel .word-option-btn{
+      background: rgba(0,0,0,0.03);
+      color: #333;
+      border-color: rgba(255,107,107,0.3);
+    }
+    body.dark .word-option-btn{
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      border-color: rgba(0,198,255,0.22);
+    }
+    .word-option-btn.found{ border-color: #4caf50; background: rgba(76,175,80,0.3); }
+
+    .progress-text{
+      font-size: 12px;
+      color: #4caf50;
+      text-align: center;
+      min-height: 20px;
+      font-weight: 800;
+    }
+
+    .brush-options{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(55px, 1fr));
+      gap: 6px;
+      padding: 8px;
+      width: 100%;
+      max-width: 320px;
+      margin: 8px 0;
+      flex-shrink: 0;
+    }
+
+    .brush-btn{
+      padding: 8px;
+      border: 2px solid rgba(0,198,255,0.3);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.1);
+      color: white;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+      user-select: none;
+    }
+    body.pastel .brush-btn{
+      background: rgba(0,0,0,0.03);
+      color: #333;
+      border-color: rgba(255,107,107,0.3);
+    }
+    body.dark .brush-btn{
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      border-color: rgba(0,198,255,0.22);
+    }
+    .brush-btn:hover{ border-color: #00c6ff; background: rgba(0,198,255,0.15); transform: scale(1.03); }
+    .brush-btn.active{ border-color: #00c6ff; background: rgba(0,198,255,0.4); box-shadow: 0 0 10px rgba(0,198,255,0.35); }
+
+    .brush-preview{
+      width: 100%;
+      height: 30px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 5px 0;
+    }
+    body.dark .brush-preview{ background: rgba(255,255,255,0.06); }
+    .brush-circle{ background: #00c6ff; border-radius: 50%; }
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      max-width: 92vw;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.68);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 2000;
+      text-align: center;
+    }
+    .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+    ::-webkit-scrollbar{ width: 6px; }
+    ::-webkit-scrollbar-track{ background: rgba(255,255,255,0.1); }
+    ::-webkit-scrollbar-thumb{ background: rgba(0,198,255,0.5); border-radius: 3px; }
+
+    /* Bubble + Snake + Mandala */
+    .bubble-grid{
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 8px;
+      width: 100%;
+      max-width: 420px;
+      padding: 10px;
+    }
+    .bubble{
+      aspect-ratio: 1/1;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(0,198,255,0.25));
+      border: 2px solid rgba(0,198,255,0.35);
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+      user-select: none;
+    }
+    body.pastel .bubble{
+      border-color: rgba(255,107,107,0.35);
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,107,107,0.18));
+    }
+    body.dark .bubble{
+      border-color: rgba(0,198,255,0.22);
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), rgba(0,198,255,0.10));
+    }
+    .bubble:active{ transform: scale(0.92); }
+    .bubble.popped{
+      opacity: 0.15;
+      transform: scale(0.80);
+      cursor: default;
+    }
+
+    #snakeCanvas, #mandalaCanvas{
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+      cursor: default;
+    }
+
+    /* Achievements UI */
+    .ach-grid{
+      width: 100%;
+      max-width: 920px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      padding: 6px;
+    }
+    .badge{
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(0,0,0,0.14);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    body.pastel .badge{
+      border-color: rgba(0,0,0,0.10);
+      background: rgba(255,255,255,0.55);
+    }
+    body.dark .badge{
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+    }
+    .badge .icon{
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,198,255,0.18);
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    body.pastel .badge .icon{ background: rgba(255,107,107,0.16); }
+    body.dark .badge .icon{ background: rgba(0,198,255,0.10); }
+    .badge .title{
+      font-weight: 900;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+    .badge .desc{
+      font-weight: 800;
+      font-size: 11px;
+      opacity: 0.92;
+      line-height: 1.35;
+    }
+    .badge.locked{ opacity: 0.60; filter: grayscale(0.25); }
+
+    @media (max-width: 600px){
+      .header h1{ font-size: 18px; }
+      .tabs{ gap: 4px; }
+      .tab-btn{ padding: 6px 8px; font-size: 10px; }
+      #drawCanvas{ max-height: 60vh; }
+      #colorCanvas{ max-height: 45vh; }
+      .sound-btn{ right: 96px; }
+      .bar{ width: 190px; }
+
+      .bg-control{ top: 54px; right: 10px; }
+      .bg-control select{ max-width: 170px; }
+    }
+  </style>
+</head>
+
+<body class="glass">
+  <button class="dark-btn" onclick="toggleDark()">🌙 Dark: Off</button>
+  <button class="theme-btn glass" onclick="toggleTheme()">🎨 Pastel</button>
+  <button class="sound-btn" onclick="toggleSound()">🔊 Sound: On</button>
+
+  <!-- ===== Added: Background selector ===== -->
+  <div class="bg-control">
+    <select id="bgSelect" aria-label="Select background"></select>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1>🎮 Brain Games & Creative Tools</h1>
+      <p>Play, create, and relax</p>
+
+      <div class="level-hud">
+        <div class="chip">Level: <span id="hudLevel">1</span></div>
+        <div class="chip">XP: <span id="hudXP">0</span></div>
+        <div class="bar" aria-label="XP progress">
+          <div id="hudXPBar"></div>
+        </div>
+        <div class="chip">Badges: <span id="hudBadges">0</span></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showGame('memory', this)">🧠 Memory</button>
+      <button class="tab-btn" onclick="showGame('stress', this)">🎯 Stress</button>
+      <button class="tab-btn" onclick="showGame('trivia', this)">❓ Trivia</button>
+      <button class="tab-btn" onclick="showGame('pattern', this)">🔷 Pattern</button>
+      <button class="tab-btn" onclick="showGame('scrabble', this)">📝 Word</button>
+      <button class="tab-btn" onclick="showGame('draw', this)">🎨 Draw</button>
+      <button class="tab-btn" onclick="showGame('color', this)">🖌️ Color</button>
+
+      <button class="tab-btn" onclick="showGame('picker', this)">🧭 Picker</button>
+      <button class="tab-btn" onclick="showGame('bubble', this)">🫧 Bubble</button>
+      <button class="tab-btn" onclick="showGame('snake', this)">🐍 Snake</button>
+      <button class="tab-btn" onclick="showGame('mandala', this)">🪷 Mandala</button>
+
+      <button class="tab-btn" onclick="showGame('achievements', this)">🏅 Badges</button>
+    </div>
+
+    <!-- MEMORY -->
+    <div id="memory" class="game active">
+      <div class="game-title">🧠 Match the Pairs</div>
+      <div class="game-content">
+        <div class="grid-container" id="memoryGrid"></div>
+        <div class="stats">Moves: <strong id="memoryMoves">0</strong> | Matched: <strong id="memoryMatched">0/8</strong></div>
+        <div class="button-group">
+          <button class="btn" onclick="initMemory()">Start</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STRESS -->
+    <div id="stress" class="game">
+      <div class="game-title">🎯 Tap the Stress Ball</div>
+      <div class="game-content">
+        <div class="stress-ball" id="stressBall" onclick="tapStress()"><span id="stressBallNum">0</span></div>
+        <div class="stats">Taps: <strong id="stressTaps">0</strong> | Time: <strong id="stressTime">10</strong>s</div>
+        <div class="button-group">
+          <button class="btn" onclick="initStress()" id="stressBtn">Start Challenge</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRIVIA -->
+    <div id="trivia" class="game">
+      <div class="game-title">❓ Quick Trivia</div>
+      <div class="game-content">
+        <div class="info" id="triviaQ">Click "Start Quiz" to begin</div>
+        <div class="trivia-options" id="triviaOpts"></div>
+
+        <div class="stats" id="triviaStats" style="display:none;">
+          Level: <strong id="triviaLevel">-</strong> |
+          Score: <strong id="triviaScore">0</strong>/<strong id="triviaTotal">0</strong>
+        </div>
+
+        <div class="button-group">
+          <button class="btn" onclick="initTrivia()" id="triviaBtn">Start Quiz</button>
+          <button class="btn" onclick="loadOnlineTrivia()">Online Questions</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PATTERN -->
+    <div id="pattern" class="game">
+      <div class="game-title">🔷 Pattern Puzzle</div>
+      <div class="game-content">
+        <div class="word-display" id="patternD">?</div>
+        <div class="grid-container" id="patternC" style="max-width: 250px;"></div>
+        <div class="stats">Level: <strong id="patternL">1</strong> | Correct: <strong id="patternR">0</strong></div>
+        <div class="button-group">
+          <button class="btn" onclick="initPattern()">Start</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORD -->
+    <div id="scrabble" class="game">
+      <div class="game-title">📝 Word Finder (Levels)</div>
+      <div class="game-content">
+        <div class="info" id="scrabbleInstruction">Find the target number of words to clear the puzzle.</div>
+
+        <div class="stats">
+          <span>Level: <strong id="scrabbleLevel">-</strong></span> |
+          <span>Puzzle: <strong id="scrabblePuzzle">-</strong></span> |
+          <span>Goal: <strong id="scrabbleGoal">-</strong></span>
+        </div>
+
+        <div class="word-display" id="scrabbleW">READY</div>
+
+        <input
+          type="text"
+          placeholder="Type a word and press Enter"
+          id="scrabbleIn"
+          onkeypress="checkWord(event)"
+          style="width: 100%; max-width: 320px;"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+        />
+
+        <div class="progress-text" id="progressText"></div>
+        <div id="foundList" style="color:#4caf50;font-size:12px;min-height:20px;text-align:center;width:100%;max-width:380px;font-weight:800;"></div>
+        <div class="word-options" id="wordAnswers"></div>
+
+        <div class="stats">
+          Score: <strong id="scrabbleS">0</strong> | Total Words Found: <strong id="scrabbleC">0</strong>
+        </div>
+
+        <div class="button-group">
+          <button class="btn" onclick="nextWord()" id="nextBtn">Next</button>
+          <button class="btn" onclick="initScrabble()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DRAW -->
+    <div id="draw" class="game">
+      <div class="game-title">🎨 Free Drawing</div>
+      <div class="game-content">
+        <div style="width: 100%; max-width: 420px;">
+          <div style="font-size: 12px; text-align: center; margin-bottom: 8px; font-weight: 900;">✏️ Select Brush Size</div>
+          <div class="brush-options" id="brushSizeOptions"></div>
+          <div class="brush-preview"><div class="brush-circle" id="brushPreview" style="width: 6px; height: 6px;"></div></div>
+        </div>
+
+        <canvas id="drawCanvas"></canvas>
+        <div class="palette" id="drawPalette"></div>
+
+        <div class="button-group">
+          <button class="btn" onclick="clearDraw()">Clear</button>
+          <button class="btn" onclick="downloadDraw()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLOR -->
+    <div id="color" class="game">
+      <div class="game-title">🖌️ Coloring Pages</div>
+      <div class="game-content">
+        <div class="button-group">
+          <button class="btn" onclick="coloringTemplate()">Template</button>
+          <button class="btn" onclick="coloringBlank()">Blank</button>
+          <label class="file-input-btn">
+            Upload Image
+            <input type="file" onchange="loadColorImage(event)" accept="image/*" />
+          </label>
+        </div>
+
+        <div style="width: 100%; max-width: 420px;">
+          <div style="font-size: 12px; text-align: center; margin: 8px 0; font-weight: 900;">✏️ Select Brush Size</div>
+          <div class="brush-options" id="brushColorOptions"></div>
+        </div>
+
+        <canvas id="colorCanvas"></canvas>
+        <div class="palette" id="colorPalette"></div>
+
+        <div class="button-group">
+          <button class="btn" onclick="clearColor()">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PICKER -->
+    <div id="picker" class="game">
+      <div class="game-title">🧭 Mood-based Game Picker</div>
+      <div class="game-content">
+        <div class="info">Choose your stress level and get a quick suggestion.</div>
+
+        <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:10px;">
+          <div class="stats">Stress Level: <strong id="pickerStressLabel">5</strong>/10</div>
+          <input id="pickerStress" type="range" min="0" max="10" value="5" oninput="pickerUpdate(this.value)" />
+          <div class="info" id="pickerSuggestion">Suggestion will appear here.</div>
+        </div>
+
+        <div class="button-group" style="max-width:420px;">
+          <button class="btn" onclick="pickerGo()">Open Suggested</button>
+          <button class="btn" onclick="pickerRandom()">Random</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUBBLE -->
+    <div id="bubble" class="game">
+      <div class="game-title">🫧 Bubble Wrap Pop</div>
+      <div class="game-content">
+        <div class="info">Tap bubbles to pop. No timer, no pressure.</div>
+
+        <div id="bubbleGrid" class="bubble-grid"></div>
+
+        <div class="stats">
+          Pops: <strong id="bubblePops">0</strong> |
+          Left: <strong id="bubbleLeft">0</strong>
+        </div>
+
+        <div class="button-group" style="max-width:420px;">
+          <button class="btn" onclick="initBubble(true)">Start / Restart</button>
+          <button class="btn" onclick="bubbleRefill()">Refill</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SNAKE -->
+    <div id="snake" class="game">
+      <div class="game-title">🐍 Snake</div>
+      <div class="game-content">
+        <div class="info">Arrow keys on PC. Swipe on mobile. Press P to pause.</div>
+
+        <canvas id="snakeCanvas" width="360" height="360"></canvas>
+
+        <div class="stats">
+          Score: <strong id="snakeScore">0</strong> |
+          Best: <strong id="snakeBest">0</strong>
+        </div>
+
+        <div class="button-group" style="max-width:420px;">
+          <button class="btn" onclick="startSnake()">Start</button>
+          <button class="btn" onclick="pauseSnake()">Pause</button>
+          <button class="btn" onclick="resetSnakeBest()">Reset Best</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANDALA -->
+    <div id="mandala" class="game">
+      <div class="game-title">🪷 Mandala Generator</div>
+      <div class="game-content">
+        <div class="info">Draw once — it mirrors into a mandala.</div>
+
+        <div style="width:100%;max-width:420px;">
+          <div class="stats">
+            Symmetry:
+            <select id="mandalaSym" onchange="mandalaSetSym()">
+              <option value="6">6</option>
+              <option value="8" selected>8</option>
+              <option value="12">12</option>
+              <option value="16">16</option>
+            </select>
+            Brush:
+            <select id="mandalaSize" onchange="mandalaSetSize()">
+              <option value="2">2px</option>
+              <option value="4" selected>4px</option>
+              <option value="6">6px</option>
+              <option value="8">8px</option>
+            </select>
+          </div>
+
+          <div class="palette" id="mandalaPalette"></div>
+        </div>
+
+        <canvas id="mandalaCanvas" width="360" height="360"></canvas>
+
+        <div class="button-group" style="max-width:420px;">
+          <button class="btn" onclick="mandalaClear()">Clear</button>
+          <button class="btn" onclick="mandalaSave()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div id="achievements" class="game">
+      <div class="game-title">🏅 Badges & Achievements</div>
+      <div class="game-content">
+        <div class="info">
+          Unlock badges by playing. Badges are saved in this browser (localStorage).
+        </div>
+
+        <div class="stats">
+          Unlocked: <strong id="achUnlocked">0</strong>/<strong id="achTotal">0</strong>
+        </div>
+
+        <div class="ach-grid" id="achGrid"></div>
+
+        <div class="button-group" style="max-width:520px;">
+          <button class="btn" onclick="toast('Play more games to unlock badges!')">Tip</button>
+          <button class="btn" onclick="resetProgress()">Reset Progress</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ===== Added: Background images dropdown =====
+    const BG_KEY = "gp_bg_v1";
+    const bgOptions = [
+      { name: "Theme default", value: "" },
+
+      // Your 4 backgrounds
+      { name: "BG 1 (Image)", value: 'url("https://image2url.com/images/1765535429111-dbb6e02c-4e88-4428-9a33-2ed8342cbea7.jpg")' },
+      { name: "BG 2 (Image)", value: 'url("https://image2url.com/images/1765535471464-a868561c-9b00-4b8e-981d-21259bdcc019.jpg")' },
+      { name: "BG 3 (Image)", value: 'url("https://image2url.com/images/1765535496527-fa01b497-9cb1-488e-9857-aa3c4e96d7b2.jpg")' },
+      { name: "BG 4 (Image)", value: 'url("https://image2url.com/images/1765535519824-fd55527b-0e36-4097-8a6a-9d462f1dbeb3.jpg")' },
+
+      // Extra pastel gradients (optional)
+      { name: "Pastel Peach (Gradient)", value: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)" },
+      { name: "Pastel Sky (Gradient)", value: "linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)" },
+      { name: "Pastel Pink (Gradient)", value: "linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)" }
+    ];
+
+    function setBgIndex(i){
+      const idx = Math.max(0, Math.min(bgOptions.length - 1, i|0));
+      const v = bgOptions[idx].value;
+
+      // Only override background-image; if empty, CSS theme backgrounds take over.
+      if (!v) document.body.style.backgroundImage = "";
+      else document.body.style.backgroundImage = v;
+
+      try { localStorage.setItem(BG_KEY, String(idx)); } catch(e){}
+    }
+
+    function initBgDropdown(){
+      const sel = document.getElementById("bgSelect");
+      if (!sel) return;
+
+      sel.innerHTML = bgOptions.map((o, i) => `<option value="${i}">${o.name}</option>`).join("");
+
+      let saved = 0;
+      try { saved = parseInt(localStorage.getItem(BG_KEY) || "0", 10); } catch(e){ saved = 0; }
+      if (isNaN(saved)) saved = 0;
+
+      sel.value = String(saved);
+      setBgIndex(saved);
+
+      sel.addEventListener("change", () => setBgIndex(parseInt(sel.value, 10)));
+    }
+
+    // --------------------------
+    // Toast
+    // --------------------------
+    let toastTimer = null;
+    function toast(msg){
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 1200);
+    }
+
+    // --------------------------
+    // Sound (WebAudio SFX)
+    // --------------------------
+    let soundOn = true;
+    let audioCtx = null;
+
+    function ensureAudio(){
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+    document.addEventListener('pointerdown', ensureAudio, { once: true });
+
+    function toggleSound(){
+      soundOn = !soundOn;
+      const b = document.querySelector('.sound-btn');
+      if (b) b.textContent = soundOn ? '🔊 Sound: On' : '🔇 Sound: Off';
+      toast(soundOn ? 'Sound enabled' : 'Sound muted');
+      try { localStorage.setItem('gp_sound', soundOn ? '1' : '0'); } catch(e){}
+    }
+
+    function sfx(kind='click'){
+      if (!soundOn) return;
+      ensureAudio();
+      if (!audioCtx) return;
+
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+
+      const now = audioCtx.currentTime;
+      const map = {
+        click:   { f: 520, d: 0.05, t: 'sine' },
+        correct: { f: 740, d: 0.10, t: 'triangle' },
+        wrong:   { f: 180, d: 0.12, t: 'sawtooth' },
+        win:     { f: 880, d: 0.18, t: 'triangle' }
+      };
+      const p = map[kind] || map.click;
+
+      o.type = p.t;
+      o.frequency.setValueAtTime(p.f, now);
+
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.15, now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + p.d);
+
+      o.connect(g);
+      g.connect(audioCtx.destination);
+
+      o.start(now);
+      o.stop(now + p.d + 0.02);
+    }
+
+    // --------------------------
+    // Theme + Tabs
+    // --------------------------
+    let currentGame = 'memory';
+
+    function toggleTheme(){
+      document.body.classList.toggle('pastel');
+      document.body.classList.toggle('glass');
+      const tb = document.querySelector('.theme-btn');
+      tb.classList.toggle('glass');
+      tb.classList.toggle('pastel');
+      tb.textContent = document.body.classList.contains('pastel') ? '🔷 Glass' : '🎨 Pastel';
+      sfx('click');
+      try { localStorage.setItem('gp_theme', document.body.classList.contains('pastel') ? 'pastel' : 'glass'); } catch(e){}
+    }
+
+    function toggleDark(){
+      document.body.classList.toggle('dark');
+      const on = document.body.classList.contains('dark');
+      const b = document.querySelector('.dark-btn');
+      if (b) b.textContent = on ? '☀️ Dark: On' : '🌙 Dark: Off';
+      sfx('click');
+      try { localStorage.setItem('gp_dark', on ? '1' : '0'); } catch(e){}
+    }
+
+    function showGame(g, btn){
+      sfx('click');
+      document.querySelectorAll('.game').forEach(x => x.classList.remove('active'));
+      document.getElementById(g).classList.add('active');
+
+      document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      currentGame = g;
+
+      if (currentGame === 'draw') initDraw();
+      if (currentGame === 'color') initColor();
+
+      if (currentGame === 'bubble') initBubble(false);
+      if (currentGame === 'snake') renderSnakeBest();
+      if (currentGame === 'mandala') initMandala();
+      if (currentGame === 'picker') pickerUpdate(document.getElementById('pickerStress')?.value || 5);
+      if (currentGame === 'achievements') renderAchievements();
+    }
+
+    // --------------------------
+    // Shared state
+    // --------------------------
+    const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#FFA500', '#800080', '#FFC0CB', '#00FFFF'];
+    let currentColor = '#000000';
+    let brushSize = 3;
+    const brushSizes = [2, 3, 5, 8, 12, 16, 20];
+
+    // =========================================================
+    // Leveling + Achievements
+    // =========================================================
+    const GP = {
+      xpKey: 'gp_xp_v1',
+      statsKey: 'gp_stats_v1',
+      achKey: 'gp_ach_v1'
+    };
+
+    function getXP(){ return parseInt(localStorage.getItem(GP.xpKey) || '0', 10); }
+    function setXP(xp){ localStorage.setItem(GP.xpKey, String(Math.max(0, xp|0))); }
+
+    function getStats(){
+      try{ return JSON.parse(localStorage.getItem(GP.statsKey) || '{}'); }
+      catch(e){ return {}; }
+    }
+    function setStats(s){ localStorage.setItem(GP.statsKey, JSON.stringify(s || {})); }
+    function incStat(k, n=1){
+      const s = getStats();
+      s[k] = (s[k] || 0) + n;
+      setStats(s);
+      return s[k];
+    }
+    function setStatMax(k, v){
+      const s = getStats();
+      s[k] = Math.max(s[k] || 0, v);
+      setStats(s);
+      return s[k];
+    }
+
+    function levelFromXP(xp){
+      let level = 1;
+      let need = 100;
+      let rem = xp;
+      while(rem >= need){
+        rem -= need;
+        level++;
+        need = 100 * level;
+      }
+      return { level, rem, need };
+    }
+
+    function addXP(amount, reason=''){
+      const before = getXP();
+      const a = Math.max(0, amount|0);
+      if (!a) return;
+
+      const beforeL = levelFromXP(before).level;
+      const after = before + a;
+      setXP(after);
+
+      const afterL = levelFromXP(after).level;
+      updateHUD();
+
+      if (afterL > beforeL){
+        toast(`Level Up! 🎉 You reached Level ${afterL}`);
+        sfx('win');
+        evaluateAchievements();
+      }
+    }
+
+    function getAchUnlocked(){
+      try{ return JSON.parse(localStorage.getItem(GP.achKey) || '{}'); }
+      catch(e){ return {}; }
+    }
+    function setAchUnlocked(obj){ localStorage.setItem(GP.achKey, JSON.stringify(obj || {})); }
+
+    const ACH = [
+      { id:'first_xp', icon:'✨', title:'First Steps', desc:'Earn any XP (play something).', check: (s)=> (getXP() >= 1), xp: 10 },
+      { id:'memory_win_1', icon:'🧠', title:'Pair Finder', desc:'Win Memory 1 time.', check: (s)=> (s.memoryWins || 0) >= 1, xp: 25 },
+      { id:'stress_finish_3', icon:'🎯', title:'Tapper', desc:'Finish Stress Ball 3 times.', check: (s)=> (s.stressRuns || 0) >= 3, xp: 20 },
+      { id:'trivia_perfect', icon:'❓', title:'Perfect Quiz', desc:'Score full marks in Trivia (any level).', check: (s)=> (s.triviaPerfect || 0) >= 1, xp: 35 },
+      { id:'pattern_master', icon:'🔷', title:'Pattern Master', desc:'Get 5/5 correct in Pattern once.', check: (s)=> (s.patternPerfect || 0) >= 1, xp: 35 },
+      { id:'word_level_2', icon:'📝', title:'Word Climber', desc:'Reach Word Level 2.', check: (s)=> (s.wordMaxLevel || 0) >= 2, xp: 30 },
+      { id:'bubble_50', icon:'🫧', title:'Pop Pop', desc:'Pop 50 bubbles total.', check: (s)=> (s.bubbleTotal || 0) >= 50, xp: 20 },
+      { id:'bubble_100', icon:'💥', title:'Bubble Clear', desc:'Pop 100 bubbles total.', check: (s)=> (s.bubbleTotal || 0) >= 100, xp: 30 },
+      { id:'snake_10', icon:'🐍', title:'Snake Snack', desc:'Get Snake best score ≥ 10.', check: (s)=> (s.snakeBest || 0) >= 10, xp: 40 },
+      { id:'mandala_save', icon:'🪷', title:'Mandala Artist', desc:'Save 1 mandala.', check: (s)=> (s.mandalaSaves || 0) >= 1, xp: 25 },
+      { id:'art_saver', icon:'🎨', title:'Art Saver', desc:'Save drawings/mandalas 3 times.', check: (s)=> ((s.drawSaves || 0) + (s.mandalaSaves || 0)) >= 3, xp: 30 },
+      { id:'level_5', icon:'🏆', title:'Level 5', desc:'Reach Level 5.', check: (s)=> (levelFromXP(getXP()).level >= 5), xp: 50 },
+    ];
+
+    function evaluateAchievements(){
+      const s = getStats();
+      const unlocked = getAchUnlocked();
+      let changed = false;
+
+      ACH.forEach(a => {
+        if (unlocked[a.id]) return;
+        const ok = !!a.check(s);
+        if (ok){
+          unlocked[a.id] = { at: Date.now() };
+          changed = true;
+          toast(`Badge unlocked: ${a.title}`);
+          sfx('win');
+          addXP(a.xp || 0, 'badge');
+        }
+      });
+
+      if (changed) setAchUnlocked(unlocked);
+      updateHUD();
+      if (currentGame === 'achievements') renderAchievements();
+    }
+
+    function renderAchievements(){
+      const grid = document.getElementById('achGrid');
+      if (!grid) return;
+
+      const unlocked = getAchUnlocked();
+      grid.innerHTML = '';
+
+      let count = 0;
+      ACH.forEach(a => {
+        const isOn = !!unlocked[a.id];
+        if (isOn) count++;
+
+        const card = document.createElement('div');
+        card.className = 'badge' + (isOn ? '' : ' locked');
+
+        const icon = document.createElement('div');
+        icon.className = 'icon';
+        icon.textContent = a.icon;
+
+        const wrap = document.createElement('div');
+        const t = document.createElement('div');
+        t.className = 'title';
+        t.textContent = a.title + (isOn ? ' ✅' : ' 🔒');
+
+        const d = document.createElement('div');
+        d.className = 'desc';
+        d.textContent = a.desc + ` (+${a.xp} XP)`;
+
+        wrap.appendChild(t);
+        wrap.appendChild(d);
+
+        card.appendChild(icon);
+        card.appendChild(wrap);
+        grid.appendChild(card);
+      });
+
+      const u = document.getElementById('achUnlocked');
+      const tot = document.getElementById('achTotal');
+      if (u) u.textContent = String(count);
+      if (tot) tot.textContent = String(ACH.length);
+    }
+
+    function updateHUD(){
+      const xp = getXP();
+      const unlocked = getAchUnlocked();
+
+      const lv = levelFromXP(xp);
+      const badgeCount = Object.keys(unlocked || {}).length;
+
+      const eLv = document.getElementById('hudLevel');
+      const eXP = document.getElementById('hudXP');
+      const eBar = document.getElementById('hudXPBar');
+      const eBadges = document.getElementById('hudBadges');
+
+      if (eLv) eLv.textContent = String(lv.level);
+      if (eXP) eXP.textContent = `${xp} (Next: ${lv.need - lv.rem})`;
+      if (eBadges) eBadges.textContent = `${badgeCount}/${ACH.length}`;
+      if (eBar){
+        const pct = Math.max(0, Math.min(100, Math.round((lv.rem / lv.need) * 100)));
+        eBar.style.width = pct + '%';
+      }
+    }
+
+    function resetProgress(){
+      if (!confirm('Reset XP + badges + stats? This only affects this browser.')) return;
+      localStorage.removeItem(GP.xpKey);
+      localStorage.removeItem(GP.statsKey);
+      localStorage.removeItem(GP.achKey);
+      toast('Progress reset');
+      updateHUD();
+      renderAchievements();
+    }
+
+    // --------------------------
+    // Memory
+    // --------------------------
+    const memEmojis = ['🌟', '💫', '✨', '🎆', '🎇', '🌈', '⭐', '🌠'];
+    let memMoves = 0, memMatched = 0, memActive = false, memFirst = null, memSec = null;
+
+    function initMemory(){
+      memActive = true;
+      memMoves = 0;
+      memMatched = 0;
+      memFirst = null;
+      memSec = null;
+      document.getElementById('memoryMoves').textContent = '0';
+      document.getElementById('memoryMatched').textContent = '0/8';
+
+      const grid = [...memEmojis, ...memEmojis].sort(() => Math.random() - 0.5);
+      const container = document.getElementById('memoryGrid');
+      container.innerHTML = '';
+
+      grid.forEach(e => {
+        const c = document.createElement('div');
+        c.className = 'card';
+        c.dataset.e = e;
+        c.textContent = '?';
+        c.onclick = () => flipMem(c);
+        container.appendChild(c);
+      });
+
+      toast('Match all pairs!');
+      sfx('click');
+      addXP(2, 'memory start');
+      evaluateAchievements();
+    }
+
+    function flipMem(c){
+      if (!memActive || c.classList.contains('sel') || c.classList.contains('mt')) return;
+
+      sfx('click');
+      c.classList.add('sel');
+      c.textContent = c.dataset.e;
+
+      if (!memFirst){
+        memFirst = c;
+        return;
+      }
+
+      if (!memSec){
+        memSec = c;
+        memMoves++;
+        document.getElementById('memoryMoves').textContent = memMoves;
+
+        if (memFirst.dataset.e === memSec.dataset.e){
+          sfx('correct');
+          memFirst.classList.add('mt');
+          memSec.classList.add('mt');
+          memMatched++;
+          document.getElementById('memoryMatched').textContent = memMatched + '/8';
+          toast('Matched!');
+
+          memFirst = null;
+          memSec = null;
+
+          if (memMatched === 8){
+            memActive = false;
+            sfx('win');
+            setTimeout(() => toast('You won! Moves: ' + memMoves), 250);
+
+            incStat('memoryWins', 1);
+            addXP(25, 'memory win');
+            evaluateAchievements();
+          }
+        } else {
+          sfx('wrong');
+          setTimeout(() => {
+            if (!memFirst || !memSec) return;
+            memFirst.classList.remove('sel');
+            memFirst.textContent = '?';
+            memSec.classList.remove('sel');
+            memSec.textContent = '?';
+            memFirst = null;
+            memSec = null;
+          }, 750);
+        }
+      }
+    }
+
+    // --------------------------
+    // Stress Ball
+    // --------------------------
+    let stressTaps = 0, stressTime = 10, stressActive = false, stressInterval = null;
+
+    function tapStress(){
+      if (!stressActive) return;
+
+      sfx('click');
+      stressTaps++;
+      document.getElementById('stressTaps').textContent = stressTaps;
+      document.getElementById('stressBallNum').textContent = stressTaps;
+
+      const ball = document.getElementById('stressBall');
+      ball.style.transform = 'scale(0.9)';
+      setTimeout(() => { ball.style.transform = 'scale(1)'; }, 90);
+    }
+
+    function initStress(){
+      if (stressActive) return;
+
+      sfx('click');
+      stressActive = true;
+      stressTaps = 0;
+      stressTime = 10;
+
+      document.getElementById('stressTaps').textContent = '0';
+      document.getElementById('stressBallNum').textContent = '0';
+      document.getElementById('stressTime').textContent = '10';
+
+      const btn = document.getElementById('stressBtn');
+      btn.disabled = true;
+      btn.textContent = 'Running...';
+
+      toast('Go! Tap fast');
+      addXP(2, 'stress start');
+
+      if (stressInterval) clearInterval(stressInterval);
+      stressInterval = setInterval(() => {
+        stressTime--;
+        document.getElementById('stressTime').textContent = stressTime;
+
+        if (stressTime <= 0){
+          clearInterval(stressInterval);
+          stressActive = false;
+          btn.disabled = false;
+          btn.textContent = 'Start Challenge';
+          sfx('win');
+          toast('Done! Taps: ' + stressTaps);
+
+          incStat('stressRuns', 1);
+          setStatMax('stressBest', Math.max(getStats().stressBest || 0, stressTaps));
+          addXP(10, 'stress finish');
+          evaluateAchievements();
+        }
+      }, 1000);
+    }
+
+    // --------------------------
+    // Trivia (LEVELS + Online API)
+    // --------------------------
+    const triviaLevels = [
+      {
+        name: 'Level 1 (Easy)',
+        questions: [
+          { q: 'Which gas do humans need to breathe to stay alive?', o: ['Carbon dioxide', 'Oxygen', 'Helium', 'Hydrogen'], a: 1 },
+          { q: 'Which planet is known as the Red Planet?', o: ['Mars', 'Jupiter', 'Venus', 'Mercury'], a: 0 },
+          { q: 'Which ocean is the largest by area?', o: ['Atlantic', 'Indian', 'Pacific', 'Arctic'], a: 2 },
+          { q: 'How many continents are there on Earth (commonly counted)?', o: ['5', '6', '7', '8'], a: 2 },
+          { q: 'What is the chemical formula of water?', o: ['H2O', 'CO2', 'NaCl', 'O2'], a: 0 }
+        ]
+      },
+      {
+        name: 'Level 2 (Medium)',
+        questions: [
+          { q: 'Which process lets plants make food using sunlight?', o: ['Respiration', 'Photosynthesis', 'Fermentation', 'Evaporation'], a: 1 },
+          { q: 'Which country is the largest coffee producer in the world?', o: ['India', 'Ethiopia', 'Brazil', 'Spain'], a: 2 },
+          { q: 'What is the largest island in the world?', o: ['Madagascar', 'Greenland', 'Borneo', 'Iceland'], a: 1 },
+          { q: 'What is the name of the layer that blocks much of the Sun’s UV radiation?', o: ['Troposphere', 'Ozone layer', 'Ionosphere', 'Core'], a: 1 },
+          { q: 'Which river is widely taught as the longest in Africa?', o: ['Congo', 'Niger', 'Zambezi', 'Nile'], a: 3 }
+        ]
+      },
+      {
+        name: 'Level 3 (Challenge)',
+        questions: [
+          { q: 'Which instrument is used to detect/measure radiation?', o: ['Barometer', 'Geiger counter', 'Thermometer', 'Altimeter'], a: 1 },
+          { q: 'What is the center of an atom called?', o: ['Nucleus', 'Orbit', 'Shell', 'Cell'], a: 0 },
+          { q: 'Which desert is commonly cited as the largest desert on Earth (overall)?', o: ['Sahara', 'Gobi', 'Antarctica', 'Kalahari'], a: 2 },
+          { q: 'Which U.S. state is home to Yellowstone National Park?', o: ['California', 'Wyoming', 'Texas', 'Florida'], a: 1 },
+          { q: 'What is the tallest mountain above sea level?', o: ['K2', 'Mount Kilimanjaro', 'Mount Everest', 'Denali'], a: 2 }
+        ]
+      }
+    ];
+
+    let trivLevel = 0;
+    let trivIdx = 0;
+    let trivScore = 0;
+    let triviaOnlineSet = null;
+
+    function getUnlockedTriviaLevel(){
+      const s = getStats();
+      const lv = parseInt(s.triviaUnlockedLevel || 1, 10);
+      return Math.max(1, Math.min(triviaLevels.length, lv));
+    }
+
+    function setUnlockedTriviaLevel(lv1Based){
+      const s = getStats();
+      const cur = parseInt(s.triviaUnlockedLevel || 1, 10);
+      s.triviaUnlockedLevel = Math.max(cur, lv1Based);
+      setStats(s);
+    }
+
+    function initTrivia(){
+      sfx('click');
+      const startIndex = getUnlockedTriviaLevel() - 1; // start from highest unlocked
+      startTriviaLevel(startIndex);
+    }
+
+    function startTriviaLevel(levelIndex){
+      trivLevel = Math.max(0, Math.min(triviaLevels.length - 1, levelIndex));
+      trivIdx = 0;
+      trivScore = 0;
+
+      const set = triviaLevels[trivLevel];
+
+      const qEl = document.getElementById('triviaQ');
+      const opts = document.getElementById('triviaOpts');
+      const stats = document.getElementById('triviaStats');
+      const btn = document.getElementById('triviaBtn');
+
+      if (qEl) qEl.textContent = 'Get ready...';
+      if (opts) opts.innerHTML = '';
+
+      if (stats) stats.style.display = 'block';
+      document.getElementById('triviaLevel').textContent = set.name;
+      document.getElementById('triviaScore').textContent = '0';
+      document.getElementById('triviaTotal').textContent = String(set.questions.length);
+
+      if (btn){
+        btn.style.display = 'none';
+        btn.onclick = initTrivia;
+        btn.textContent = 'Start Quiz';
+      }
+
+      toast(`Trivia: ${set.name}`);
+      addXP(2, 'trivia start');
+      showTriv();
+    }
+
+    function shuffleArray(arr){
+      for (let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    async function loadOnlineTrivia(){
+      sfx('click');
+      toast('Fetching questions...');
+      try{
+        const res = await fetch('https://opentdb.com/api.php?amount=5&type=multiple&encode=url3986');
+        const data = await res.json();
+        if (!data.results || !data.results.length) throw new Error('No questions');
+
+        const mapped = data.results.map(item => {
+          const question = decodeURIComponent(item.question);
+          const correct = decodeURIComponent(item.correct_answer);
+          const incorrects = item.incorrect_answers.map(x => decodeURIComponent(x));
+          const options = shuffleArray([correct, ...incorrects]);
+          const correctIndex = options.indexOf(correct);
+          return { q: question, o: options, a: correctIndex };
+        });
+
+        triviaOnlineSet = { name: 'Online (Random)', questions: mapped };
+        toast('Online questions loaded');
+        addXP(3, 'trivia api');
+        startOnlineTrivia();
+      } catch(err){
+        console.error(err);
+        toast('Could not load online questions');
+      }
+    }
+
+    function startOnlineTrivia(){
+      if (!triviaOnlineSet || !triviaOnlineSet.questions.length){
+        toast('No online questions yet');
+        return;
+      }
+      trivLevel = -1; // mark as online
+      trivIdx = 0;
+      trivScore = 0;
+
+      const set = triviaOnlineSet;
+
+      const qEl = document.getElementById('triviaQ');
+      const opts = document.getElementById('triviaOpts');
+      const stats = document.getElementById('triviaStats');
+      const btn = document.getElementById('triviaBtn');
+
+      if (qEl) qEl.textContent = 'Get ready...';
+      if (opts) opts.innerHTML = '';
+
+      if (stats) stats.style.display = 'block';
+      document.getElementById('triviaLevel').textContent = set.name;
+      document.getElementById('triviaScore').textContent = '0';
+      document.getElementById('triviaTotal').textContent = String(set.questions.length);
+
+      if (btn){
+        btn.style.display = 'none';
+        btn.onclick = initTrivia;
+        btn.textContent = 'Start Quiz';
+      }
+
+      toast('Trivia: Online set');
+      addXP(2, 'trivia start online');
+      showTriv();
+    }
+
+    function showTriv(){
+      const isOnline = (trivLevel === -1 && triviaOnlineSet);
+      const set = isOnline ? triviaOnlineSet : triviaLevels[trivLevel];
+      const opts = document.getElementById('triviaOpts');
+      const qEl = document.getElementById('triviaQ');
+      const btn = document.getElementById('triviaBtn');
+
+      if (trivIdx >= set.questions.length){
+        if (opts) opts.innerHTML = '';
+
+        const total = set.questions.length;
+        if (qEl) qEl.textContent = isOnline
+          ? `Online set finished!`
+          : `Completed ${set.name}!`;
+
+        if (!isOnline){
+          incStat('triviaRuns', 1);
+          setStatMax('triviaMaxLevel', Math.max(getStats().triviaMaxLevel || 1, trivLevel + 1));
+          addXP(12, 'trivia level finish');
+
+          if (trivScore === total){
+            incStat('triviaPerfect', 1);
+            addXP(18, 'perfect');
+            toast('Perfect score! ✅');
+          } else {
+            toast(`Level score: ${trivScore}/${total}`);
+          }
+
+          if (trivLevel + 1 < triviaLevels.length){
+            setUnlockedTriviaLevel(trivLevel + 2);
+            if (btn){
+              btn.style.display = 'block';
+              btn.textContent = 'Next Level';
+              btn.onclick = () => startTriviaLevel(trivLevel + 1);
+            }
+          } else {
+            if (btn){
+              btn.style.display = 'block';
+              btn.textContent = 'Restart Trivia';
+              btn.onclick = () => startTriviaLevel(0);
+            }
+            toast('All trivia levels completed! 🎉');
+            sfx('win');
+          }
+        } else {
+          addXP(10, 'trivia online finish');
+          toast(`Online score: ${trivScore}/${total}`);
+          if (btn){
+            btn.style.display = 'block';
+            btn.textContent = 'Online Again';
+            btn.onclick = () => startOnlineTrivia();
+          }
+        }
+
+        document.getElementById('triviaScore').textContent = String(trivScore);
+        document.getElementById('triviaTotal').textContent = String(total);
+
+        evaluateAchievements();
+        return;
+      }
+
+      const q = set.questions[trivIdx];
+      if (qEl) qEl.textContent = q.q;
+      if (!opts) return;
+
+      opts.innerHTML = '';
+      q.o.forEach((opt, i) => {
+        const b = document.createElement('button');
+        b.className = 'trivia-btn';
+        b.textContent = opt;
+
+        b.onclick = () => {
+          opts.querySelectorAll('button').forEach(btn => btn.onclick = null);
+
+          if (i === q.a){
+            trivScore++;
+            document.getElementById('triviaScore').textContent = String(trivScore);
+            b.classList.add('correct');
+            sfx('correct');
+            toast('Correct!');
+            addXP(2, 'trivia correct');
+          } else {
+            b.classList.add('incorrect');
+            if (opts.children[q.a]) opts.children[q.a].classList.add('correct');
+            sfx('wrong');
+            toast('Wrong!');
+          }
+
+          setTimeout(() => {
+            trivIdx++;
+            showTriv();
+          }, 650);
+        };
+
+        opts.appendChild(b);
+      });
+    }
+
+    // --------------------------
+    // Pattern Puzzle (more levels)
+    // --------------------------
+    const pats = [
+      { d: '🔷 🔶 🔷 🔶 ?', o: ['🔷', '🔶', '🔺', '⭐'], a: 0 },
+      { d: '⭐ 💫 ⭐ 💫 ?', o: ['⭐', '💫', '🌟', '✨'], a: 0 },
+      { d: '🟢 🟡 🟢 🟡 ?', o: ['🟢', '🟡', '🔴', '🟣'], a: 0 },
+      { d: '🔴 🔵 🔴 🔵 ?', o: ['🔴', '🔵', '🟢', '🟡'], a: 1 },
+      { d: '1 2 3 1 ?', o: ['1', '2', '3', '4'], a: 1 },
+
+      // extra levels
+      { d: '2 4 6 8 ?', o: ['9', '10', '12', '6'], a: 1 },
+      { d: 'A B A B ?', o: ['A', 'B', 'C', 'D'], a: 0 },
+      { d: '🔺 🔺 🔷 🔺 🔺 🔷 ?', o: ['🔺', '🔷', '⭐', '🔶'], a: 0 },
+      { d: '3 6 9 12 ?', o: ['15', '18', '13', '6'], a: 0 },
+      { d: '🌞 🌙 🌞 🌙 🌞 ?', o: ['🌞', '🌙', '⭐', '☁️'], a: 1 }
+    ];
+    let patIdx = 0, patCor = 0;
+
+    function initPattern(){
+      sfx('click');
+      patIdx = 0;
+      patCor = 0;
+      document.getElementById('patternL').textContent = '1';
+      document.getElementById('patternR').textContent = '0';
+      toast('Pick the next item');
+      addXP(2, 'pattern start');
+      showPat();
+    }
+
+    function showPat(){
+      if (patIdx >= pats.length){
+        sfx('win');
+        toast('Finished! ' + patCor + '/' + pats.length + ' correct');
+
+        incStat('patternRuns', 1);
+        addXP(12, 'pattern finish');
+        if (patCor >= 5){
+          incStat('patternPerfect', 1);
+          addXP(18, 'pattern streak');
+        }
+        evaluateAchievements();
+        return;
+      }
+
+      const p = pats[patIdx];
+      document.getElementById('patternD').textContent = p.d;
+
+      const ch = document.getElementById('patternC');
+      ch.innerHTML = '';
+
+      p.o.forEach((o, i) => {
+        const b = document.createElement('div');
+        b.className = 'card';
+        b.textContent = o;
+
+        b.onclick = () => {
+          if (i === p.a){
+            patCor++;
+            sfx('correct');
+            toast('Correct!');
+          } else {
+            sfx('wrong');
+            toast('Wrong!');
+          }
+
+          patIdx++;
+          document.getElementById('patternL').textContent = String(patIdx + 1);
+          document.getElementById('patternR').textContent = String(patCor);
+          showPat();
+        };
+
+        ch.appendChild(b);
+      });
+    }
+
+    // --------------------------
+    // Word Finder (Levels)
+    // --------------------------
+    const scrabbleLevels = [
+      {
+        name: 'Level 1 (Easy)',
+        goal: 4,
+        puzzles: [
+          { word: 'CARE', answers: ['CARE','RACE','ACRE','CAR','ARE','EAR'] },
+          { word: 'NOTE', answers: ['NOTE','TONE','ONE','TON','NOT','NET'] },
+          { word: 'SALT', answers: ['SALT','LAST','SAT','LAT','ALT'] }
+        ]
+      },
+      {
+        name: 'Level 2 (Medium)',
+        goal: 5,
+        puzzles: [
+          { word: 'LISTEN', answers: ['LISTEN','LIST','LITE','SITE','LINE','LENT','TEN','LET','TIN'] },
+          { word: 'GARDEN', answers: ['GARDEN','GRADE','GEAR','DEAR','READ','DRAG','DEN','END','RANGE'] }
+        ]
+      },
+      {
+        name: 'Level 3 (Hard)',
+        goal: 6,
+        puzzles: [
+          { word: 'FRIEND', answers: ['FRIEND','FINED','FIND','FIRE','RIDE','RIND','END','RED','IN'] },
+          { word: 'PLAYER', answers: ['PLAYER','PLAY','PEAR','PALE','LEAP','REAL','YEAR','LAYER','REAP'] }
+        ]
+      }
+    ];
+
+    let scrLevel = 0;
+    let scrPuzzle = 0;
+    let scrFound = [];
+    let totalScore = 0;
+    let totalWordsFound = 0;
+
+    function initScrabble(){
+      sfx('click');
+      scrLevel = 0;
+      scrPuzzle = 0;
+      scrFound = [];
+      totalScore = 0;
+      totalWordsFound = 0;
+
+      document.getElementById('scrabbleS').textContent = '0';
+      document.getElementById('scrabbleC').textContent = '0';
+      updateScrHeader();
+      startScrPuzzle();
+      toast('Word Levels started');
+      addXP(2, 'word start');
+      evaluateAchievements();
+    }
+
+    function updateScrHeader(){
+      const level = scrabbleLevels[scrLevel];
+      document.getElementById('scrabbleLevel').textContent = level.name;
+      document.getElementById('scrabblePuzzle').textContent = String(scrPuzzle + 1) + '/' + level.puzzles.length;
+      document.getElementById('scrabbleGoal').textContent = String(level.goal);
+
+      setStatMax('wordMaxLevel', Math.max(getStats().wordMaxLevel || 1, scrLevel + 1));
+      evaluateAchievements();
+    }
+
+    function startScrPuzzle(){
+      const level = scrabbleLevels[scrLevel];
+      const p = level.puzzles[scrPuzzle];
+
+      scrFound = [];
+
+      document.getElementById('scrabbleW').textContent = p.word;
+      document.getElementById('scrabbleIn').value = '';
+      document.getElementById('scrabbleIn').focus();
+
+      document.getElementById('progressText').textContent = `Find ${level.goal} words from "${p.word}"`;
+      document.getElementById('foundList').textContent = '';
+
+      renderScrAnswerSlots();
+      updateScrHeader();
+    }
+
+    function renderScrAnswerSlots(){
+      const level = scrabbleLevels[scrLevel];
+      const p = level.puzzles[scrPuzzle];
+      const answersContainer = document.getElementById('wordAnswers');
+      answersContainer.innerHTML = '';
+
+      p.answers.forEach(ans => {
+        const btn = document.createElement('div');
+        btn.className = 'word-option-btn';
+        const got = scrFound.includes(ans);
+        btn.textContent = got ? ans : (ans.length + ' letters');
+        if (got) btn.classList.add('found');
+        answersContainer.appendChild(btn);
+      });
+    }
+
+    function checkWord(e){
+      if (e.key !== 'Enter') return;
+
+      const input = document.getElementById('scrabbleIn');
+      const w = input.value.toUpperCase().trim();
+      input.value = '';
+      if (!w) return;
+
+      const level = scrabbleLevels[scrLevel];
+      const p = level.puzzles[scrPuzzle];
+
+      sfx('click');
+
+      if (!p.answers.includes(w)){
+        sfx('wrong');
+        toast('Not valid for this word');
+        return;
+      }
+
+      if (scrFound.includes(w)){
+        sfx('wrong');
+        toast('Already found');
+        return;
+      }
+
+      scrFound.push(w);
+      const pts = w.length * 10;
+      totalScore += pts;
+      totalWordsFound++;
+
+      document.getElementById('scrabbleS').textContent = String(totalScore);
+      document.getElementById('scrabbleC').textContent = String(totalWordsFound);
+
+      document.getElementById('foundList').textContent = 'Found: ' + scrFound.join(', ');
+      renderScrAnswerSlots();
+
+      sfx('correct');
+      toast('+' + pts + ' points');
+      addXP(3, 'word found');
+
+      if (scrFound.length >= level.goal){
+        sfx('win');
+        toast('Goal reached! Next...');
+        addXP(10, 'puzzle clear');
+        setTimeout(() => nextWord(), 650);
+      }
+      evaluateAchievements();
+    }
+
+    function nextWord(){
+      sfx('click');
+
+      const level = scrabbleLevels[scrLevel];
+      scrPuzzle++;
+
+      if (scrPuzzle >= level.puzzles.length){
+        scrLevel++;
+        scrPuzzle = 0;
+
+        if (scrLevel >= scrabbleLevels.length){
+          sfx('win');
+          toast('All levels complete! Score: ' + totalScore);
+          addXP(40, 'all word levels');
+          incStat('wordComplete', 1);
+          evaluateAchievements();
+          return;
+        }
+      }
+
+      updateScrHeader();
+      startScrPuzzle();
+    }
+
+    // --------------------------
+    // Brush UI
+    // --------------------------
+    function initBrushSizes(){
+      const drawOpts = document.getElementById('brushSizeOptions');
+      drawOpts.innerHTML = '';
+      brushSizes.forEach(size => {
+        const btn = document.createElement('button');
+        btn.className = 'brush-btn' + (size === brushSize ? ' active' : '');
+        btn.textContent = size + 'px';
+        btn.onclick = () => {
+          sfx('click');
+          drawOpts.querySelectorAll('.brush-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          brushSize = size;
+          updateBrushPreview();
+        };
+        drawOpts.appendChild(btn);
+      });
+
+      const colorOpts = document.getElementById('brushColorOptions');
+      colorOpts.innerHTML = '';
+      brushSizes.forEach(size => {
+        const btn = document.createElement('button');
+        btn.className = 'brush-btn' + (size === brushSize ? ' active' : '');
+        btn.textContent = size + 'px';
+        btn.onclick = () => {
+          sfx('click');
+          colorOpts.querySelectorAll('.brush-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          brushSize = size;
+          updateBrushPreview();
+        };
+        colorOpts.appendChild(btn);
+      });
+    }
+
+    function updateBrushPreview(){
+      const preview = document.getElementById('brushPreview');
+      preview.style.width = brushSize + 'px';
+      preview.style.height = brushSize + 'px';
+    }
+
+    // --------------------------
+    // Drawing
+    // --------------------------
+    let drawCtx = null, drawActive = false, lastX = 0, lastY = 0;
+
+    function initDraw(){
+      const c = document.getElementById('drawCanvas');
+      const container = c.parentElement;
+
+      c.width = container.offsetWidth - 20;
+      c.height = Math.min(container.offsetHeight - 200, window.innerHeight * 0.7);
+
+      drawCtx = c.getContext('2d');
+      drawCtx.fillStyle = 'white';
+      drawCtx.fillRect(0, 0, c.width, c.height);
+
+      const pal = document.getElementById('drawPalette');
+      pal.innerHTML = '';
+      colors.forEach(col => {
+        const b = document.createElement('div');
+        b.className = 'color-btn' + (col === currentColor ? ' selected' : '');
+        b.style.background = col;
+        b.onclick = () => {
+          sfx('click');
+          pal.querySelectorAll('.color-btn').forEach(cb => cb.classList.remove('selected'));
+          b.classList.add('selected');
+          currentColor = col;
+        };
+        pal.appendChild(b);
+      });
+
+      c.onpointerdown = (e) => {
+        drawActive = true;
+        const r = c.getBoundingClientRect();
+        lastX = e.clientX - r.left;
+        lastY = e.clientY - r.top;
+      };
+
+      c.onpointermove = (e) => {
+        if (!drawActive) return;
+        const r = c.getBoundingClientRect();
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+
+        drawCtx.strokeStyle = currentColor;
+        drawCtx.lineWidth = brushSize;
+        drawCtx.lineCap = 'round';
+        drawCtx.lineJoin = 'round';
+        drawCtx.beginPath();
+        drawCtx.moveTo(lastX, lastY);
+        drawCtx.lineTo(x, y);
+        drawCtx.stroke();
+
+        lastX = x; lastY = y;
+      };
+
+      c.onpointerup = () => { drawActive = false; };
+      c.onpointerleave = () => { drawActive = false; };
+    }
+
+    function clearDraw(){
+      sfx('click');
+      const c = document.getElementById('drawCanvas');
+      if (!drawCtx) return;
+      drawCtx.fillStyle = 'white';
+      drawCtx.fillRect(0, 0, c.width, c.height);
+      toast('Cleared');
+    }
+
+    function downloadDraw(){
+      sfx('click');
+      const c = document.getElementById('drawCanvas');
+      const l = document.createElement('a');
+      l.href = c.toDataURL();
+      l.download = 'drawing.png';
+      l.click();
+      toast('Saved');
+
+      incStat('drawSaves', 1);
+      addXP(10, 'saved art');
+      evaluateAchievements();
+    }
+
+    // --------------------------
+    // Coloring
+    // --------------------------
+    let colorCtx = null, colorActive = false, lastColorX = 0, lastColorY = 0;
+
+    function initColor(){
+      const c = document.getElementById('colorCanvas');
+      const container = c.parentElement;
+
+      c.width = container.offsetWidth - 20;
+      c.height = Math.min(container.offsetHeight - 250, window.innerHeight * 0.5);
+
+      colorCtx = c.getContext('2d');
+      colorCtx.fillStyle = 'white';
+      colorCtx.fillRect(0, 0, c.width, c.height);
+
+      const pal = document.getElementById('colorPalette');
+      pal.innerHTML = '';
+      colors.forEach(col => {
+        const b = document.createElement('div');
+        b.className = 'color-btn' + (col === currentColor ? ' selected' : '');
+        b.style.background = col;
+        b.onclick = () => {
+          sfx('click');
+          pal.querySelectorAll('.color-btn').forEach(cb => cb.classList.remove('selected'));
+          b.classList.add('selected');
+          currentColor = col;
+        };
+        pal.appendChild(b);
+      });
+
+      c.onpointerdown = (e) => {
+        colorActive = true;
+        const r = c.getBoundingClientRect();
+        lastColorX = e.clientX - r.left;
+        lastColorY = e.clientY - r.top;
+      };
+
+      c.onpointermove = (e) => {
+        if (!colorActive) return;
+        const r = c.getBoundingClientRect();
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+
+        colorCtx.strokeStyle = currentColor;
+        colorCtx.lineWidth = brushSize;
+        colorCtx.lineCap = 'round';
+        colorCtx.lineJoin = 'round';
+        colorCtx.beginPath();
+        colorCtx.moveTo(lastColorX, lastColorY);
+        colorCtx.lineTo(x, y);
+        colorCtx.stroke();
+
+        lastColorX = x; lastColorY = y;
+      };
+
+      c.onpointerup = () => { colorActive = false; };
+      c.onpointerleave = () => { colorActive = false; };
+    }
+
+    function coloringTemplate(){
+      sfx('click');
+      initColor();
+      const c = document.getElementById('colorCanvas');
+
+      colorCtx.fillStyle = 'white';
+      colorCtx.fillRect(0, 0, c.width, c.height);
+
+      colorCtx.strokeStyle = '#ddd';
+      colorCtx.lineWidth = 2;
+      colorCtx.fillStyle = 'rgba(100,150,255,0.05)';
+
+      const cellWidth = c.width / 4;
+      const cellHeight = c.height / 3;
+
+      for (let i = 0; i < 4; i++){
+        for (let j = 0; j < 3; j++){
+          colorCtx.fillRect(i * cellWidth, j * cellHeight, cellWidth - 2, cellHeight - 2);
+          colorCtx.strokeRect(i * cellWidth, j * cellHeight, cellWidth - 2, cellHeight - 2);
+        }
+      }
+
+      toast('Template loaded');
+      addXP(1, 'color template');
+      evaluateAchievements();
+    }
+
+    function coloringBlank(){
+      sfx('click');
+      initColor();
+      toast('Blank page');
+      addXP(1, 'color blank');
+      evaluateAchievements();
+    }
+
+    function loadColorImage(e){
+      sfx('click');
+      initColor();
+      const f = e.target.files[0];
+      if (!f) return;
+
+      const r = new FileReader();
+      r.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => {
+          const c = document.getElementById('colorCanvas');
+          colorCtx.drawImage(img, 0, 0, c.width, c.height);
+          toast('Image loaded');
+          addXP(2, 'image loaded');
+          evaluateAchievements();
+        };
+        img.src = evt.target.result;
+      };
+      r.readAsDataURL(f);
+      e.target.value = '';
+    }
+
+    function clearColor(){
+      sfx('click');
+      const c = document.getElementById('colorCanvas');
+      if (!colorCtx) return;
+      colorCtx.fillStyle = 'white';
+      colorCtx.fillRect(0, 0, c.width, c.height);
+      toast('Cleared');
+    }
+
+    // --------------------------
+    // Picker
+    // --------------------------
+    let pickerChosen = "bubble";
+    function pickerUpdate(val){
+      const n = parseInt(val, 10);
+      const label = document.getElementById("pickerStressLabel");
+      const sug = document.getElementById("pickerSuggestion");
+      if (label) label.textContent = String(n);
+
+      if (n >= 8){
+        pickerChosen = "mandala";
+        if (sug) sug.textContent = "High stress → Mandala (slow focus) or Bubble Wrap (mindless relief).";
+      } else if (n >= 5){
+        pickerChosen = "bubble";
+        if (sug) sug.textContent = "Medium stress → Bubble Wrap (light dopamine, zero pressure).";
+      } else if (n >= 3){
+        pickerChosen = "snake";
+        if (sug) sug.textContent = "Low-medium stress → Snake (engaging short challenge).";
+      } else {
+        pickerChosen = "trivia";
+        if (sug) sug.textContent = "Very low stress → Trivia/Word (keep brain active).";
+      }
+      addXP(1, 'picker used');
+      evaluateAchievements();
+    }
+
+    function pickerGo(){
+      const id = pickerChosen || "bubble";
+      const btn = Array.from(document.querySelectorAll(".tab-btn"))
+        .find(b => (b.getAttribute("onclick") || "").includes(`'${id}'`));
+      showGame(id, btn || null);
+    }
+
+    function pickerRandom(){
+      const pool = ["bubble","snake","mandala","memory","trivia","pattern","scrabble","draw","color","achievements"];
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      const btn = Array.from(document.querySelectorAll(".tab-btn"))
+        .find(b => (b.getAttribute("onclick") || "").includes(`'${pick}'`));
+      showGame(pick, btn || null);
+    }
+
+    // --------------------------
+    // Bubble
+    // --------------------------
+    let bubblePops = 0;
+
+    function initBubble(force=false){
+      const grid = document.getElementById("bubbleGrid");
+      if (!grid) return;
+
+      if (!force && grid.childElementCount > 0){
+        updateBubbleStats();
+        return;
+      }
+
+      bubblePops = 0;
+      grid.innerHTML = "";
+      const total = 100;
+      for (let i=0;i<total;i++){
+        const b = document.createElement("div");
+        b.className = "bubble";
+        b.dataset.popped = "0";
+        b.onclick = () => popBubble(b);
+        grid.appendChild(b);
+      }
+      updateBubbleStats();
+      toast("Bubble wrap ready");
+      addXP(2, 'bubble start');
+      evaluateAchievements();
+    }
+
+    function updateBubbleStats(){
+      const grid = document.getElementById("bubbleGrid");
+      const popsEl = document.getElementById("bubblePops");
+      const leftEl = document.getElementById("bubbleLeft");
+      const left = grid ? Array.from(grid.children).filter(x => x.dataset.popped !== "1").length : 0;
+      if (popsEl) popsEl.textContent = String(bubblePops);
+      if (leftEl) leftEl.textContent = String(left);
+    }
+
+    function popBubble(b){
+      if (!b || b.dataset.popped === "1") return;
+      b.dataset.popped = "1";
+      b.classList.add("popped");
+      bubblePops++;
+      updateBubbleStats();
+      sfx("click");
+
+      incStat('bubbleTotal', 1);
+
+      if (bubblePops % 10 === 0){
+        addXP(3, 'bubble pops');
+        toast(`Nice… ${bubblePops} pops`);
+        evaluateAchievements();
+      }
+
+      const grid = document.getElementById("bubbleGrid");
+      const left = grid ? Array.from(grid.children).filter(x => x.dataset.popped !== "1").length : 0;
+      if (left === 0){
+        addXP(15, 'bubble clear');
+        incStat('bubbleClears', 1);
+        toast('All bubbles popped! ✅');
+        sfx('win');
+        evaluateAchievements();
+      }
+    }
+
+    function bubbleRefill(){
+      const grid = document.getElementById("bubbleGrid");
+      if (!grid) return;
+      bubblePops = 0;
+      Array.from(grid.children).forEach(b => {
+        b.dataset.popped = "0";
+        b.classList.remove("popped");
+      });
+      updateBubbleStats();
+      toast("Refilled");
+      sfx("click");
+    }
+
+    // --------------------------
+    // Snake
+    // --------------------------
+    const SNAKE_BEST_KEY = "snake_best_v1";
+    let snakeCtx = null;
+    let snakeTimer = null;
+    let snakePaused = false;
+
+    let snake = [];
+    let snakeDir = {x: 1, y: 0};
+    let snakeNextDir = {x: 1, y: 0};
+    let snakeFood = {x: 5, y: 5};
+    let snakeScore = 0;
+
+    const snakeGrid = 18;
+    let snakeCell = 20;
+
+    function renderSnakeBest(){
+      const best = parseInt(localStorage.getItem(SNAKE_BEST_KEY) || "0", 10);
+      const el = document.getElementById("snakeBest");
+      if (el) el.textContent = String(best);
+      setStatMax('snakeBest', best);
+      evaluateAchievements();
+    }
+
+    function resetSnakeBest(){
+      localStorage.setItem(SNAKE_BEST_KEY, "0");
+      renderSnakeBest();
+      toast("Snake best reset");
+      sfx("click");
+    }
+
+    function startSnake(){
+      const c = document.getElementById("snakeCanvas");
+      if (!c) return;
+
+      const size = Math.min(420, c.parentElement?.offsetWidth || 360);
+      c.width = size;
+      c.height = size;
+      snakeCell = Math.floor(size / snakeGrid);
+
+      snakeCtx = c.getContext("2d");
+
+      snake = [{x: 8, y: 9},{x: 7, y: 9},{x: 6, y: 9}];
+      snakeDir = {x: 1, y: 0};
+      snakeNextDir = {x: 1, y: 0};
+      snakeScore = 0;
+      snakePaused = false;
+
+      placeFood();
+
+      document.getElementById("snakeScore").textContent = "0";
+      renderSnakeBest();
+
+      document.onkeydown = (e) => {
+        if (e.key === "ArrowUp")    setSnakeDir(0, -1);
+        if (e.key === "ArrowDown")  setSnakeDir(0, 1);
+        if (e.key === "ArrowLeft")  setSnakeDir(-1, 0);
+        if (e.key === "ArrowRight") setSnakeDir(1, 0);
+        if (e.key.toLowerCase() === "p") pauseSnake();
+      };
+
+      let sx=0, sy=0;
+      c.onpointerdown = (e) => { sx = e.clientX; sy = e.clientY; };
+      c.onpointerup = (e) => {
+        const dx = e.clientX - sx;
+        const dy = e.clientY - sy;
+        if (Math.abs(dx) > Math.abs(dy)){
+          if (dx > 20) setSnakeDir(1,0);
+          else if (dx < -20) setSnakeDir(-1,0);
+        } else {
+          if (dy > 20) setSnakeDir(0,1);
+          else if (dy < -20) setSnakeDir(0,-1);
+        }
+      };
+
+      clearInterval(snakeTimer);
+      snakeTimer = setInterval(tickSnake, 110);
+      toast("Snake started");
+      sfx("click");
+      addXP(2, 'snake start');
+      incStat('snakeRuns', 1);
+      evaluateAchievements();
+    }
+
+    function pauseSnake(){
+      snakePaused = !snakePaused;
+      toast(snakePaused ? "Paused" : "Resume");
+      sfx("click");
+    }
+
+    function setSnakeDir(x, y){
+      if (x === -snakeDir.x && y === -snakeDir.y) return;
+      snakeNextDir = {x, y};
+    }
+
+    function placeFood(){
+      while(true){
+        const fx = Math.floor(Math.random() * snakeGrid);
+        const fy = Math.floor(Math.random() * snakeGrid);
+        const hit = snake.some(p => p.x === fx && p.y === fy);
+        if (!hit){ snakeFood = {x: fx, y: fy}; return; }
+      }
+    }
+
+    function tickSnake(){
+      if (!snakeCtx) return;
+      if (snakePaused) { drawSnake(); return; }
+
+      snakeDir = snakeNextDir;
+
+      const head = snake[0];
+      const nx = head.x + snakeDir.x;
+      const ny = head.y + snakeDir.y;
+
+      if (nx < 0 || ny < 0 || nx >= snakeGrid || ny >= snakeGrid){
+        return snakeGameOver();
+      }
+
+      if (snake.some((p, i) => i !== 0 && p.x === nx && p.y === ny)){
+        return snakeGameOver();
+      }
+
+      snake.unshift({x: nx, y: ny});
+
+      if (nx === snakeFood.x && ny === snakeFood.y){
+        snakeScore++;
+        document.getElementById("snakeScore").textContent = String(snakeScore);
+        sfx("correct");
+        addXP(2, 'snake food');
+        placeFood();
+      } else {
+        snake.pop();
+      }
+
+      drawSnake();
+    }
+
+    function snakeGameOver(){
+      clearInterval(snakeTimer);
+      snakeTimer = null;
+
+      const best = parseInt(localStorage.getItem(SNAKE_BEST_KEY) || "0", 10);
+      if (snakeScore > best) localStorage.setItem(SNAKE_BEST_KEY, String(snakeScore));
+      renderSnakeBest();
+
+      addXP(8, 'snake end');
+      sfx("win");
+      toast(`Game over! Score: ${snakeScore}`);
+      evaluateAchievements();
+    }
+
+    function drawSnake(){
+      const c = document.getElementById("snakeCanvas");
+      if (!c || !snakeCtx) return;
+
+      snakeCtx.clearRect(0,0,c.width,c.height);
+
+      snakeCtx.fillStyle = "rgba(255,255,255,0.95)";
+      snakeCtx.fillRect(0,0,c.width,c.height);
+
+      snakeCtx.fillStyle = "#ff6b6b";
+      snakeCtx.fillRect(snakeFood.x * snakeCell, snakeFood.y * snakeCell, snakeCell, snakeCell);
+
+      snake.forEach((p, i) => {
+        snakeCtx.fillStyle = i === 0 ? "#00c6ff" : "rgba(0,198,255,0.65)";
+        snakeCtx.fillRect(p.x * snakeCell, p.y * snakeCell, snakeCell, snakeCell);
+      });
+
+      if (snakePaused){
+        snakeCtx.fillStyle = "rgba(0,0,0,0.25)";
+        snakeCtx.fillRect(0,0,c.width,c.height);
+        snakeCtx.fillStyle = "#fff";
+        snakeCtx.font = "bold 18px Roboto";
+        snakeCtx.textAlign = "center";
+        snakeCtx.fillText("PAUSED", c.width/2, c.height/2);
+      }
+    }
+
+    // --------------------------
+    // Mandala
+    // --------------------------
+    let mandalaCtx = null;
+    let mandalaDown = false;
+    let mandalaLast = null;
+    let mandalaSym = 8;
+    let mandalaSize = 4;
+    let mandalaColor = "#00c6ff";
+
+    function initMandala(){
+      const c = document.getElementById("mandalaCanvas");
+      if (!c) return;
+
+      const size = Math.min(420, c.parentElement?.offsetWidth || 360);
+      c.width = size;
+      c.height = size;
+
+      mandalaCtx = c.getContext("2d");
+      mandalaClear();
+
+      const pal = document.getElementById("mandalaPalette");
+      if (pal && pal.childElementCount === 0){
+        const palColors = ["#00c6ff","#ff6b6b","#4caf50","#ffb300","#9c27b0","#000000","#ffffff"];
+        palColors.forEach(col => {
+          const b = document.createElement("div");
+          b.className = "color-btn" + (col === mandalaColor ? " selected" : "");
+          b.style.background = col;
+          b.onclick = () => {
+            pal.querySelectorAll(".color-btn").forEach(x => x.classList.remove("selected"));
+            b.classList.add("selected");
+            mandalaColor = col;
+            toast("Mandala color set");
+            sfx("click");
+          };
+          pal.appendChild(b);
+        });
+      }
+
+      c.onpointerdown = (e) => {
+        mandalaDown = true;
+        mandalaLast = getCanvasPos(c, e);
+        c.setPointerCapture(e.pointerId);
+        sfx("click");
+      };
+      c.onpointermove = (e) => {
+        if (!mandalaDown) return;
+        const p = getCanvasPos(c, e);
+        drawMandalaLine(mandalaLast, p);
+        mandalaLast = p;
+      };
+      c.onpointerup = () => { mandalaDown = false; mandalaLast = null; };
+      c.onpointercancel = () => { mandalaDown = false; mandalaLast = null; };
+
+      mandalaSetSym();
+      mandalaSetSize();
+      addXP(2, 'mandala start');
+      evaluateAchievements();
+    }
+
+    function mandalaSetSym(){
+      const sel = document.getElementById("mandalaSym");
+      if (!sel) return;
+      mandalaSym = parseInt(sel.value, 10) || 8;
+      sfx("click");
+    }
+
+    function mandalaSetSize(){
+      const sel = document.getElementById("mandalaSize");
+      if (!sel) return;
+      mandalaSize = parseInt(sel.value, 10) || 4;
+      sfx("click");
+    }
+
+    function mandalaClear(){
+      const c = document.getElementById("mandalaCanvas");
+      if (!c || !mandalaCtx) return;
+
+      mandalaCtx.fillStyle = "#ffffff";
+      mandalaCtx.fillRect(0,0,c.width,c.height);
+
+      mandalaCtx.strokeStyle = "rgba(0,0,0,0.08)";
+      mandalaCtx.lineWidth = 2;
+      mandalaCtx.beginPath();
+      mandalaCtx.arc(c.width/2, c.height/2, c.width*0.18, 0, Math.PI*2);
+      mandalaCtx.stroke();
+      mandalaCtx.beginPath();
+      mandalaCtx.arc(c.width/2, c.height/2, c.width*0.32, 0, Math.PI*2);
+      mandalaCtx.stroke();
+
+      toast("Mandala cleared");
+    }
+
+    function mandalaSave(){
+      const c = document.getElementById("mandalaCanvas");
+      if (!c) return;
+      const a = document.createElement("a");
+      a.href = c.toDataURL("image/png");
+      a.download = "mandala.png";
+      a.click();
+      toast("Mandala saved");
+      sfx("click");
+
+      incStat('mandalaSaves', 1);
+      addXP(15, 'mandala saved');
+      evaluateAchievements();
+    }
+
+    function getCanvasPos(canvas, e){
+      const r = canvas.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+
+    function rotatePoint(p, center, ang){
+      const s = Math.sin(ang), c = Math.cos(ang);
+      const x = p.x - center.x;
+      const y = p.y - center.y;
+      return { x: x*c - y*s + center.x, y: x*s + y*c + center.y };
+    }
+
+    function drawMandalaLine(a, b){
+      const c = document.getElementById("mandalaCanvas");
+      if (!c || !mandalaCtx || !a || !b) return;
+
+      const center = { x: c.width/2, y: c.height/2 };
+      const step = (Math.PI * 2) / mandalaSym;
+
+      mandalaCtx.lineWidth = mandalaSize;
+      mandalaCtx.lineCap = "round";
+      mandalaCtx.lineJoin = "round";
+      mandalaCtx.strokeStyle = mandalaColor;
+
+      for (let i=0;i<mandalaSym;i++){
+        const ang = step * i;
+
+        const a1 = rotatePoint(a, center, ang);
+        const b1 = rotatePoint(b, center, ang);
+        mandalaCtx.beginPath();
+        mandalaCtx.moveTo(a1.x, a1.y);
+        mandalaCtx.lineTo(b1.x, b1.y);
+        mandalaCtx.stroke();
+
+        const am = { x: (2*center.x - a.x), y: a.y };
+        const bm = { x: (2*center.x - b.x), y: b.y };
+        const a2 = rotatePoint(am, center, ang);
+        const b2 = rotatePoint(bm, center, ang);
+        mandalaCtx.beginPath();
+        mandalaCtx.moveTo(a2.x, a2.y);
+        mandalaCtx.lineTo(b2.x, b2.y);
+        mandalaCtx.stroke();
+      }
+    }
+
+    // --------------------------
+    // Init
+    // --------------------------
+    window.addEventListener('load', () => {
+      // Added: background dropdown init
+      initBgDropdown();
+
+      try{
+        const th = localStorage.getItem('gp_theme');
+        if (th === 'pastel' && !document.body.classList.contains('pastel')) toggleTheme();
+      }catch(e){}
+
+      try{
+        const dk = localStorage.getItem('gp_dark');
+        if (dk === '1' && !document.body.classList.contains('dark')) toggleDark();
+      }catch(e){}
+
+      try{
+        const so = localStorage.getItem('gp_sound');
+        if (so === '0') { soundOn = false; document.querySelector('.sound-btn').textContent = '🔇 Sound: Off'; }
+      }catch(e){}
+
+      initBrushSizes();
+      updateBrushPreview();
+
+      initMemory();
+      initScrabble();
+
+      initDraw();
+      initColor();
+
+      initBubble(true);
+      renderSnakeBest();
+      initMandala();
+      pickerUpdate(5);
+
+      updateHUD();
+      evaluateAchievements();
+    });
+
+    window.addEventListener('resize', () => {
+      if (currentGame === 'draw') initDraw();
+      if (currentGame === 'color') initColor();
+      if (currentGame === 'mandala') initMandala();
+    });
+  </script>
+</body>
+</html>

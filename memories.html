@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nostalgia TV | Infinite</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;500;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Palette */
+      --space-bg: #030512;
+      --accent: #00d4ff; /* Cyan */
+      --glow: #7000ff;   /* Neon Purple */
+      --glass: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text: #e0e6ed;
+    }
+
+    * { box-sizing: border-box; }
+    
+    body { 
+      margin: 0; font-family: 'Exo 2', sans-serif; 
+      background-color: var(--space-bg); color: var(--text);
+      min-height: 100vh; overflow-x: hidden;
+    }
+
+    /* --- PURE CSS STARS (No Images) --- */
+    .bg-animation {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1; overflow: hidden;
+      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+    }
+
+    /* 3 Layers of Stars moving at different speeds */
+    .star-layer {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      animation: starFloat linear infinite;
+    }
+    .s1 { width: 2px; height: 2px; background: transparent; box-shadow: 10vw 10vh #fff, 20vw 80vh #fff, 80vw 10vh #fff, 90vw 90vh #fff, 40vw 30vh #fff, 60vw 50vh #fff, 10vw 90vh #fff; animation-duration: 50s; opacity: 0.8; }
+    .s2 { width: 3px; height: 3px; background: transparent; box-shadow: 30vw 20vh #fff, 50vw 60vh #fff, 70vw 40vh #fff, 10vw 50vh #fff, 90vw 20vh #fff; animation-duration: 100s; opacity: 0.5; }
+    
+    /* Nebula Glow */
+    .nebula-glow {
+        position: absolute; width: 600px; height: 600px;
+        background: radial-gradient(circle, rgba(112,0,255,0.2) 0%, transparent 70%);
+        top: 50%; left: 50%; transform: translate(-50%, -50%);
+        filter: blur(80px); animation: pulse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes starFloat { from { transform: translateY(0); } to { transform: translateY(-100vh); } }
+    @keyframes pulse { 0% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); } }
+
+    /* --- UI --- */
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px; }
+
+    /* Floating Header */
+    nav {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 60px;
+      padding: 15px 30px; border-radius: 50px;
+      background: rgba(255,255,255,0.03); backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+    }
+    .logo { 
+        font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.8rem; letter-spacing: 2px;
+        text-transform: uppercase;
+        background: linear-gradient(90deg, #fff, var(--accent)); 
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+    }
+    .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; margin-left: 20px; transition: 0.3s; }
+    .nav-links a:hover { color: #fff; text-shadow: 0 0 10px #fff; }
+
+    /* Search */
+    .search-area { text-align: center; margin-bottom: 60px; position: relative; z-index: 2; }
+    input[type="search"] {
+        width: 100%; max-width: 500px; padding: 18px 30px;
+        background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+        border-radius: 100px; color: #fff; font-size: 1.1rem;
+        backdrop-filter: blur(10px); outline: none; transition: 0.3s;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    input[type="search"]:focus { 
+        border-color: var(--accent); box-shadow: 0 0 40px rgba(0, 212, 255, 0.2); 
+    }
+
+    /* Grid */
+    .grid { 
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+      gap: 30px; perspective: 1000px;
+    }
+
+    /* Cosmic Card */
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px; overflow: hidden;
+      text-decoration: none; color: #fff; position: relative;
+      transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .card:hover {
+      transform: translateY(-10px) scale(1.02);
+      border-color: rgba(255,255,255,0.3);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(0, 212, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      z-index: 10;
+    }
+
+    .thumb-wrap { position: relative; aspect-ratio: 16/9; overflow: hidden; }
+    .thumb { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; opacity: 0.8; }
+    .card:hover .thumb { transform: scale(1.1); opacity: 1; }
+
+    /* Play Button Overlay */
+    .play-overlay {
+        position: absolute; inset: 0; background: rgba(0,0,0,0.3);
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0; transition: 0.3s;
+    }
+    .card:hover .play-overlay { opacity: 1; }
+    .play-btn {
+        width: 50px; height: 50px; border-radius: 50%;
+        background: rgba(255,255,255,0.2); backdrop-filter: blur(5px);
+        border: 1px solid rgba(255,255,255,0.5);
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 0 20px rgba(255,255,255,0.3);
+    }
+
+    .info { padding: 20px; }
+    .title { font-size: 1.2rem; font-weight: 700; margin: 0 0 6px; letter-spacing: 0.5px; }
+    .tags { display: flex; gap: 8px; }
+    .tag { 
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.6);
+    }
+    .card:hover .tag { color: var(--accent); background: rgba(0, 212, 255, 0.1); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 20px);
+      background: #fff; color: #000; padding: 12px 30px; border-radius: 50px;
+      font-weight: 700; opacity: 0; transition: 0.3s; pointer-events: none;
+      box-shadow: 0 0 30px rgba(255,255,255,0.3);
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } .logo { font-size: 1.5rem; } }
+  </style>
+</head>
+<body>
+
+  <!-- Pure CSS Background -->
+  <div class="bg-animation">
+      <div class="star-layer s1"></div>
+      <div class="star-layer s2"></div>
+      <div class="nebula-glow"></div>
+  </div>
+
+  <div class="container">
+    <nav>
+      <div class="logo">NOSTALGIA_TV</div>
+      <div class="nav-links">
+        <a href="dashboard.html">Home</a>
+        <a href="memories.html">Collection</a>
+      </div>
+    </nav>
+
+    <div class="search-area">
+      <input id="searchInput" type="search" placeholder="Search archive (e.g. Ben 10, Courage)...">
+    </div>
+
+    <div class="grid" id="grid">
+      <!-- Cards will appear here -->
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Memory Saved</div>
+
+  <script>
+    const DB = [
+      { t: "Ben 10", c: "Action", i: "q_tDq8_yqQc", u: "https://www.youtube.com/results?search_query=ben+10+classic+hindi" },
+      { t: "Courage", c: "Horror", i: "0_0_0_0_0", u: "https://www.youtube.com/results?search_query=courage+the+cowardly+dog+hindi" },
+      { t: "Dragon Ball Z", c: "Anime", i: "aH1a0211a_I", u: "https://www.youtube.com/results?search_query=dragon+ball+z+hindi" },
+      { t: "Pokemon", c: "Anime", i: "6p7W8jA1z5I", u: "https://www.youtube.com/results?search_query=pokemon+season+1+hindi" },
+      { t: "Tom & Jerry", c: "Classic", i: "t0Q2otsqC4I", u: "https://www.youtube.com/results?search_query=tom+and+jerry+classic" },
+      { t: "Beyblade", c: "Anime", i: "1_1_1_1_1", u: "https://www.youtube.com/results?search_query=beyblade+classic+hindi" },
+      { t: "Power Rangers", c: "Action", i: "31_31_31_31", u: "https://www.youtube.com/results?search_query=power+rangers+spd+hindi" },
+      { t: "Mr. Bean", c: "Comedy", i: "8y2T2-4r4-k", u: "https://www.youtube.com/watch?v=8y2T2-4r4-k" },
+      { t: "Doraemon", c: "Anime", i: "lsJA3EifwFY", u: "https://www.youtube.com/results?search_query=doraemon+hindi" },
+      { t: "Shin Chan", c: "Comedy", i: "1_1_1_1_1", u: "https://www.youtube.com/results?search_query=shin+chan+hindi" },
+      { t: "Phineas & Ferb", c: "Disney", i: "lsJA3EifwFY", u: "https://www.youtube.com/results?search_query=phineas+and+ferb+hindi" },
+      { t: "Swat Kats", c: "Action", i: "q_tDq8_yqQc", u: "https://www.youtube.com/results?search_query=swat+kats+hindi" },
+      { t: "Ninja Hattori", c: "Nick", i: "q_tDq8_yqQc", u: "https://www.youtube.com/results?search_query=ninja+hattori+hindi" },
+      { t: "Kid vs Kat", c: "Jetix", i: "4_4_4_4_4", u: "https://www.youtube.com/results?search_query=kid+vs+kat+hindi" },
+      { t: "Oswald", c: "Calm", i: "t0Q2otsqC4I", u: "https://www.youtube.com/results?search_query=oswald+hindi" }
+    ];
+
+    const grid = document.getElementById('grid');
+
+    function render(q = "") {
+      grid.innerHTML = "";
+      DB.filter(x => x.t.toLowerCase().includes(q.toLowerCase())).forEach(item => {
+        const url = `https://img.youtube.com/vi/${item.i}/hqdefault.jpg`;
+        const div = document.createElement('a');
+        div.className = 'card';
+        div.href = item.u;
+        div.target = "_blank";
+        div.onclick = () => showToast(item.t);
+        div.innerHTML = `
+          <div class="thumb-wrap">
+            <img src="${url}" class="thumb" loading="lazy">
+            <div class="play-overlay"><div class="play-btn">▶</div></div>
+          </div>
+          <div class="info">
+            <h3 class="title">${item.t}</h3>
+            <div class="tags"><span class="tag">${item.c}</span></div>
+          </div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    function showToast(title) {
+        const t = document.getElementById('toast');
+        t.innerText = `Saved ${title}`;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+        
+        // Save logic
+        let mem = JSON.parse(localStorage.getItem('userMemories') || "[]");
+        if(!mem.find(x => x.title === title)) {
+            mem.unshift({ title, date: new Date().toLocaleDateString() });
+            localStorage.setItem('userMemories', JSON.stringify(mem));
+        }
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => render(e.target.value));
+    render();
+  </script>
+</body>
+</html>
