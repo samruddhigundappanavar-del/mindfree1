@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Begin Journey | Mind Sanctuary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      overflow: hidden;
+      color: #334155;
+    }
+
+    /* Light Splash Screen */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, #e0f2fe 0%, #fdfcff 60%, #e5e7eb 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .splash-logo {
+      text-align: center;
+      color: #0f172a;
+      animation: fadeIn 0.9s ease forwards;
+    }
+
+    /* Circle logo (splash + login) */
+    .splash-logo img,
+    .login-logo img {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;          /* circle */ /* [web:29][web:31][web:61] */
+      object-fit: cover;
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.25);
+      border: 4px solid rgba(255, 255, 255, 0.9);
+    }
+
+    .splash-logo h2 {
+      margin-top: 14px;
+      font-family: 'Playfair Display', serif;
+      letter-spacing: 1.5px;
+      font-size: 24px;
+    }
+
+    .splash-logo p {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    #enterBtn {
+      margin-top: 16px;
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: #111827;
+      color: #f9fafb;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.6px;
+      transition: 0.25s;
+    }
+
+    #enterBtn:hover {
+      background: #4f46e5;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25);
+    }
+
+    /* Abstract background blobs */
+    .blob {
+      position: absolute;
+      filter: blur(80px);
+      opacity: 0.6;
+      z-index: 0;
+      animation: float 20s infinite ease-in-out;
+    }
+    .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #e0c3fc; animation-delay: 0s; }
+    .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #8ec5fc; animation-delay: -5s; }
+    @keyframes float { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(30px, -30px); } }
+
+    /* Glassmorphism Card */
+    .card {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 32px;
+      padding: 40px 40px 48px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      z-index: 10;
+      transition: all 0.5s ease;
+    }
+
+    /* Small circular logo on login card */
+    .login-logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .login-logo img {
+      width: 80px;
+      height: 80px;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.25);
+      border-width: 3px;
+    }
+
+    /* Step Transition Logic */
+    .step { display: none; opacity: 0; transition: opacity 0.5s ease; }
+    .step.active { display: block; opacity: 1; animation: fadeIn 0.6s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      margin-bottom: 12px;
+      color: #1e293b;
+      letter-spacing: -0.5px;
+    }
+    
+    p.sub {
+      color: #64748b;
+      margin-bottom: 32px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    /* Aesthetic Inputs */
+    .input-group { margin-bottom: 24px; }
+    label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; }
+    
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 16px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      font-size: 16px;
+      color: #334155;
+      outline: none;
+      transition: 0.3s;
+    }
+    input:focus, select:focus {
+      background: #fff;
+      border-color: #818cf8;
+      box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.1);
+    }
+
+    /* Range Slider Styling */
+    input[type=range] {
+      -webkit-appearance: none; width: 100%; background: transparent; margin: 10px 0;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
+      background: #6366f1; cursor: pointer; margin-top: -10px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px;
+    }
+    .range-labels { display: flex; justify-content: space-between; color: #94a3b8; font-size: 12px; margin-top: 5px; }
+
+    /* Button */
+    .btn-primary {
+      width: 100%;
+      padding: 18px;
+      background: #1e293b;
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+    .btn-primary:hover {
+      background: #6366f1;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
+    }
+
+    /* Progress Dots */
+    .progress-dots {
+      display: flex; justify-content: center; gap: 8px; margin-top: 32px;
+    }
+    .dot { width: 8px; height: 8px; background: #cbd5e1; border-radius: 50%; transition: 0.3s; }
+    .dot.active { background: #6366f1; width: 24px; border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Light Splash Screen with Circle Logo -->
+  <div id="splash">
+    <div class="splash-logo">
+      <img src="https://image2url.com/r2/bucket2/images/1766762556727-7c9f00ac-d24f-4cf4-95c1-a80c21117051.jpg" alt="Mind Sanctuary Logo">
+      <h2>Mind Sanctuary</h2>
+      <p>Cultivate Inner Peace</p>
+      <button id="enterBtn">Begin Journey</button>
+    </div>
+  </div>
+
+  <!-- Calming Sound (change src to your file) -->
+  <audio id="calmSound" src="calm-sound.mp3"></audio>
+
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div id="mainContent" style="display:none; width:100%; display:flex; justify-content:center; align-items:center;">
+    <div class="card">
+
+      <!-- same logo on login card -->
+      <div class="login-logo">
+        <img src="https://image2url.com/r2/bucket2/images/1766762556727-7c9f00ac-d24f-4cf4-95c1-a80c21117051.jpg" alt="Mind Sanctuary Logo Small">
+      </div>
+      
+      <!-- STEP 1: IDENTITY -->
+      <div id="step1" class="step active">
+        <h1>Welcome Home</h1>
+        <p class="sub">Tell us a bit about yourself so we can curate your sanctuary.</p>
+        
+        <div class="input-group">
+          <label>Your Name</label>
+          <input type="text" id="inpName" placeholder="e.g. Aarav">
+        </div>
+        
+        <div class="input-group" style="display:flex; gap:20px;">
+          <div style="flex:1">
+            <label>Age</label>
+            <input type="number" id="inpAge" placeholder="20">
+          </div>
+          <div style="flex:1">
+             <label>Profession</label>
+             <select id="inpProf">
+               <option value="student">Student</option>
+               <option value="engineer">Engineer</option>
+               <option value="medical">Medical Pro</option>
+               <option value="artist">Artist/Creative</option>
+               <option value="other">Other</option>
+             </select>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="nextStep(2)">Continue →</button>
+      </div>
+
+      <!-- STEP 2: PSYCHOLOGY -->
+      <div id="step2" class="step">
+        <h1>Mind Check-in</h1>
+        <p class="sub">Be honest. This helps us customize your tools.</p>
+
+        <div class="input-group">
+          <label>How overwhelmed do you feel?</label>
+          <input type="range" id="q1" min="1" max="10" value="5">
+          <div class="range-labels"><span>Calm (1)</span><span>Very Overwhelmed (10)</span></div>
+        </div>
+
+        <div class="input-group">
+          <label>How is your sleep quality?</label>
+          <input type="range" id="q2" min="1" max="10" value="5">
+          <div class="range-labels"><span>Terrible (1)</span><span>Excellent (10)</span></div>
+        </div>
+
+        <div class="input-group">
+          <label>Current energy level?</label>
+          <input type="range" id="q3" min="1" max="10" value="5">
+          <div class="range-labels"><span>Drained (1)</span><span>Energized (10)</span></div>
+        </div>
+
+        <button class="btn-primary" onclick="finishLogin()">Enter Sanctuary ✨</button>
+      </div>
+
+      <!-- DOTS -->
+      <div class="progress-dots">
+        <div class="dot active" id="dot1"></div>
+        <div class="dot" id="dot2"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Splash: click => play calming sound once + reveal main content
+    document.addEventListener('DOMContentLoaded', () => {
+      const splash = document.getElementById('splash');
+      const mainContent = document.getElementById('mainContent');
+      const enterBtn = document.getElementById('enterBtn');
+      const calmSound = document.getElementById('calmSound');
+
+      let hasPlayedLogoSound = false; // ensure sound plays only once [web:69]
+
+      enterBtn.addEventListener('click', () => {
+        // user-gesture based play is required by autoplay policies [web:6][web:26]
+        if (!hasPlayedLogoSound) {
+          calmSound.currentTime = 0;
+          calmSound.play().catch(err => {
+            console.warn('Audio play blocked:', err);
+          });
+          hasPlayedLogoSound = true;
+        }
+
+        splash.style.transition = 'opacity 0.5s ease';
+        splash.style.opacity = '0';
+
+        setTimeout(() => {
+          splash.style.display = 'none';
+          mainContent.style.display = 'flex';
+        }, 500);
+      });
+    });
+
+    // --- Step Navigation Logic ---
+    function nextStep(step) {
+      document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+      document.getElementById('step' + step).classList.add('active');
+      
+      document.querySelectorAll('.dot').forEach(el => el.classList.remove('active'));
+      document.getElementById('dot' + step).classList.add('active');
+    }
+
+    // --- Core Data Logic ---
+    function finishLogin() {
+      const name = document.getElementById('inpName').value || "Friend";
+      const profession = document.getElementById('inpProf').value;
+      
+      const overwhelmed = parseInt(document.getElementById('q1').value);
+      const sleep = parseInt(document.getElementById('q2').value);
+      const energy = parseInt(document.getElementById('q3').value);
+
+      localStorage.setItem('userName', name);
+      localStorage.setItem('userProfession', profession);
+
+      let stressScore = 0;
+      stressScore += (overwhelmed * 4);
+      stressScore += ((10 - sleep) * 3);
+      stressScore += ((10 - energy) * 3);
+
+      if (profession === 'student') stressScore += 5;
+      if (profession === 'medical') stressScore += 10;
+      if (profession === 'engineer') stressScore += 5;
+
+      stressScore = Math.max(0, Math.min(100, stressScore));
+
+      let recommendations = [];
+      let status = "";
+
+      if (stressScore >= 70) {
+        status = "Critical";
+        recommendations = [
+          "🚨 SOS Panic Button",
+          "🌬️ 4-7-8 Breathing",
+          "🧘 Deep Sleep Yoga"
+        ];
+      } else if (stressScore >= 40) {
+        status = "Elevated";
+        recommendations = [
+          "🎮 Stress Relief Games",
+          "🕰️ Nostalgia TV",
+          "🎵 Lofi Focus Beats"
+        ];
+      } else {
+        status = "Healthy";
+        recommendations = [
+          "📅 Goal Planner",
+          "✨ Daily Affirmations",
+          "🤝 Community Chat"
+        ];
+      }
+
+      localStorage.setItem('userStressScore', stressScore);
+      localStorage.setItem('userStatus', status);
+      localStorage.setItem('userRecs', JSON.stringify(recommendations));
+
+      const btn = document.querySelector('#step2 button');
+      btn.innerText = "Curating Experience...";
+      btn.style.background = "#4f46e5"; 
+      
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1500);
+    }
+  </script>
+
+</body>
+</html>
